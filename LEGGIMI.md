@@ -41,3 +41,7 @@ In Opportunità puoi alternare Bacheca ed Elenco e ordinare per titolo, valore i
 ## Passaggi commerciali rapidi
 
 Le opportunità in Lead mostrano Qualifica Prospect, quelle in Prospect mostrano Converti in Cliente, sia in bacheca sia in elenco. Il passaggio viene registrato nello storico; importi e prossimo follow-up restano associati alla trattativa. Per tornare a una fase precedente usa la scheda di modifica. Le opportunità archiviate non mostrano il passaggio rapido. Email e telefono sono cliccabili nelle anagrafiche e nella scheda azienda: aprono il programma email o il gestore delle chiamate del dispositivo, senza inviare automaticamente messaggi.
+
+## Anagrafiche e referenti (requisiti Notion, Fase 2)
+
+La scheda azienda include identificativo fiscale, settore, sito e sede. Al referente principale puoi affiancare altri referenti con ruolo, email, telefono, canale preferito e note. Puoi aggiungere o rimuovere righe prima di salvare; Annulla lascia i dati invariati. La ricerca comprende i recapiti e i referenti aggiuntivi. Il backup JSON conserva i nuovi dati e continua ad accettare i backup precedenti. Il CSV comprende i dati aziendali e un riepilogo dei referenti. Le modifiche anagrafiche sono registrate nello storico aziendale. La rimozione di un referente non dispone ancora di cestino: conserva un backup per ripristinarne i dettagli.
