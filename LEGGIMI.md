@@ -63,3 +63,9 @@ Il controllo cerca corrispondenze per identificativo fiscale, email o nome norma
 Il salvataggio è unico dopo l’anteprima. Le celle vuote non cancellano campi esistenti. Referenti aggiuntivi, categorie, scelte manuali e opportunità vengono conservati negli aggiornamenti; le nuove aziende usano la classificazione automatica. File, riga e data sono registrati come provenienza dell’importazione e nello storico. Se il salvataggio fallisce, i dati in memoria restano invariati. Se i dati cambiano dopo l’anteprima, il salvataggio viene bloccato.
 
 Il CSV importa dati aziendali e il referente principale: non ripristina referenti aggiuntivi, categorie, opportunità o fasi. Per ripristinare l’intero CRM usa il backup JSON. Prima di aggiornare molte aziende esporta un backup.
+
+## Referenti e conversazioni
+
+Nelle opportunità puoi scegliere il referente principale o uno dei referenti aggiuntivi dell’azienda. Cambiando azienda il selettore si aggiorna. Il nome è conservato come riferimento storico anche se il referente viene successivamente rimosso dall’anagrafica. Il collegamento appare nella pipeline e nel CSV.
+
+Nella scheda azienda espandi Registra una conversazione, scegli canale, data e persona, poi scrivi una sintesi. Solo Salva registra la conversazione; Annulla non modifica lo storico. Le date future sono rifiutate: per pianificare un richiamo usa il prossimo passo dell’opportunità. Le conversazioni sono ricercabili e presenti nel backup JSON e nel CSV contatti. Questa registrazione è manuale e non invia email né sincronizza Gmail.

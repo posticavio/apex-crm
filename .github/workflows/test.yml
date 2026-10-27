@@ -14,3 +14,4 @@ jobs:
       - run: node crm-check.cjs
       - run: node --check company-import.js
       - run: node import-check.cjs
+      - run: node relationship-check.cjs

@@ -67,3 +67,15 @@ La conferma salva l'intera importazione in un'unica scrittura; conserva referent
 Test `node import-check.cjs` e regressioni `node crm-check.cjs` superati. Verifica browser con dati sintetici: caricamento di quattro righe, una nuova azienda, una corrispondenza selezionata esplicitamente per aggiornamento, un duplicato escluso e una email errata esclusa. Salvataggio concluso con una creazione e un aggiornamento; referente aggiuntivo e categoria manuale preesistenti conservati. Screenshot `apex-crm-import-csv.png` nella cartella di lavoro superiore.
 
 Non importa opportunità, referenti aggiuntivi, categorie o fatturati. Per ripristinare l'archivio completo rimane il backup JSON. Questa funzione non costituisce una sincronizzazione automatica né un arricchimento online.
+
+## Incremento relazioni e conversazioni — test automatici superati
+
+Fonte requisiti rilette: pagina APEX CRM in Notion, Fase 2 (referenti, relazioni e cronologia) e Fase 3 (opportunità collegate ai referenti).
+
+La scheda opportunità permette di scegliere il referente principale o aggiuntivo della relativa azienda. Cambiando azienda la scelta si azzera e le opzioni si aggiornano. Il nome del referente è conservato come snapshot storico quando la persona viene rimossa dall'anagrafica. La pipeline e il CSV opportunità mostrano il collegamento.
+
+Nella scheda azienda è disponibile Registra una conversazione: canale Email, Telefono, Incontro o Nota; data non futura; persona coinvolta e sintesi. Il salvataggio registra un evento nello storico e Annulla non lo registra. La ricerca aziendale include le conversazioni e il CSV contatti le esporta. Il backup JSON conserva tutti i dettagli. Non si tratta di sincronizzazione Gmail o trascrizione automatica.
+
+Verifiche riuscite: `node --check app.js`, `node crm-check.cjs`, `node import-check.cjs`, `node relationship-check.cjs`. I test specifici coprono assegnazioni fra aziende, snapshot storici, canali/date/persone, ricerca, CSV, JSON, salvataggio fallito e protezione dal doppio invio.
+
+Verifica visiva non completata: il browser ha rifiutato l'autorizzazione all'origine localhost dell'anteprima. Nessun altro percorso di controllo del browser è stato tentato. L'incremento non è marcato come completato in Notion.
