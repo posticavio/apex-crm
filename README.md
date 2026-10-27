@@ -20,6 +20,7 @@ node --check company-import.js
 node import-check.cjs
 node relationship-check.cjs
 node sales-check.cjs
+node resource-check.cjs
 ```
 
 I test funzionali usano dati sintetici e simulazioni di DOM/localStorage. La scheda azienda e i referenti sono stati verificati anche nel browser, su un'origine localhost separata dai dati dell'utente.

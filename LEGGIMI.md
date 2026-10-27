@@ -75,3 +75,7 @@ Nella scheda azienda espandi Registra una conversazione, scegli canale, data e p
 La classificazione dell’azienda rimane Lead, Prospect o Cliente. La pipeline delle singole opportunità usa invece Nuovo contatto, Trattativa, Offerta, Vinta e Persa. I record precedenti vengono letti senza perdere dati: Lead corrisponde a Nuovo contatto, Prospect a Trattativa e Cliente a Vinta. Non vengono inventate offerte già inviate o motivi di perdita.
 
 Le opportunità vinte e perse non contribuiscono al valore della pipeline aperta. Le perse non generano follow-up attivi; quelle vinte possono conservare richiami per il cliente. I cambi di fase sono registrati nello storico. Il motivo di perdita è facoltativo nella scheda. Le opportunità chiuse possono essere riaperte dalla scheda, indicando un nuovo passo e una data. I pulsanti rapidi avanzano una fase per volta.
+
+## Documenti collegati
+
+Le schede azienda e opportunità consentono di collegare documenti, offerte, progetti o altri file con titolo, URL e note. Puoi usare link a Google Drive o ad altri servizi HTTP/HTTPS. Salva conferma aggiunte e rimozioni; Annulla conserva i collegamenti precedenti. Le rimozioni riguardano solo il collegamento nel CRM e non eliminano il file originale. Modifiche registrate nello storico, collegamenti inclusi in backup JSON e CSV. Non sono presenti caricamento file, sincronizzazione o gestione dei permessi: l’accesso resta quello del servizio che ospita il documento.
