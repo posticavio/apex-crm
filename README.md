@@ -16,8 +16,12 @@ Richiede Node.js 24; nessuna dipendenza da installare.
 ```sh
 node --check app.js
 node crm-check.cjs
+node --check company-import.js
+node import-check.cjs
 ```
 
 I test funzionali usano dati sintetici e simulazioni di DOM/localStorage. La scheda azienda e i referenti sono stati verificati anche nel browser, su un'origine localhost separata dai dati dell'utente.
+
+L'importazione aziende CSV offre mappatura, anteprima e controllo duplicati. Le corrispondenze esistenti richiedono una scelta esplicita di aggiornamento; i campi vuoti non cancellano valori già salvati.
 
 Gli aggiornamenti vengono preparati su rami dedicati. La pubblicazione online e l'integrazione in main sono operazioni separate; questo repository non contiene un flusso di distribuzione automatica.

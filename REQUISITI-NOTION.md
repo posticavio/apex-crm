@@ -15,7 +15,7 @@ Il repository GitHub `posticavio/apex-crm` è accessibile ma vuoto al momento de
 | Fase Notion | Stato osservato |
 | --- | --- |
 | 1, ambito e interfaccia | Utente unico e interfaccia PC presenti. Il perimetro resta solo Apex, come richiesto nella chat. |
-| 2, anagrafiche | Dati aziendali, referenti con ruoli e preferenze e categorie personalizzabili automatiche/manuali presenti. Importazioni con deduplica e arricchimento online restano da fare. |
+| 2, anagrafiche | Dati aziendali, referenti con ruoli e preferenze, categorie personalizzabili automatiche/manuali e importazione aziende CSV con deduplica presenti. Arricchimento online e relazioni avanzate restano da fare. |
 | 3, commerciale | Pipeline e follow-up di base presenti. Offerte con righe, versioni e PDF, fatturati storici, budget, previsioni e assistente AI mancanti. |
 | 4, integrazioni | Gmail, Calendar e Drive non sincronizzati. I collegamenti mailto/tel non sono integrazioni. |
 | 5, interfaccia | Menu, filtri e viste bacheca/elenco presenti. Widget configurabili, colonne configurabili, viste persistenti, pagina azienda completa e pannello AI mancanti. |
@@ -42,7 +42,7 @@ Verifica visiva eseguita: apertura nuova anagrafica, aggiunta di un referente te
 ## Prossime checklist da dettagliare
 
 1. Classificazione manuale/automatica e categorie personalizzabili: incremento implementato e verificato, vedi sotto.
-2. Deduplicazione e importazione con anteprima.
+2. Deduplicazione e importazione con anteprima: implementate per anagrafiche e referente principale in CSV, vedi sotto.
 3. Separare la fase aziendale Lead/Prospect/Cliente dagli stati dell'opportunità nuovo contatto/trattativa/offerta/vinta/persa.
 4. Preventivi con righe, calcoli e versioni; regole fiscali e valuta da definire prima del modulo economico.
 
@@ -57,3 +57,13 @@ Filtri per categoria e senza categoria, ricerca per nome categoria e CSV aggiorn
 Test: `node --check app.js` e `node crm-check.cjs` superati. Copertura di normalizzazione accenti, nomi duplicati, classificazione automatica, override manuale, rinomina, disattivazione, backup/importazione e fallimento del salvataggio. Verifica browser con dati dimostrativi: creazione regola sul settore, assegnazione automatica a un'azienda esistente e salvataggio della modalità manuale. Screenshot `apex-crm-categorie.png` nella cartella di lavoro superiore.
 
 Non sono inclusi AI, arricchimento online o sincronizzazione con Notion. La Fase 2 nel complesso resta parziale.
+
+## Incremento importazione aziende CSV — verificato
+
+Ramo locale `feature/company-csv-import`. Sono disponibili associazione delle colonne, riconoscimento delle intestazioni comuni, anteprima per riga, scelta fra esclusione/creazione/aggiornamento e controllo dei duplicati. Le corrispondenze per identificativo fiscale, email e nome vengono proposte, senza aggiornamento automatico. Conflitti fra più aziende, identificativi fiscali diversi e possibili duplicati nel file sono bloccati e spiegati. I campi vuoti non cancellano valori esistenti.
+
+La conferma salva l'intera importazione in un'unica scrittura; conserva referenti aggiuntivi, categorie manuali e relazioni. Registra file, riga e data di provenienza, più una nota nello storico. Blocca il salvataggio se stato o archivio cambiano dopo l'anteprima. Supportati UTF-8, virgola/punto e virgola/tab, virgolette e celle su più righe; limiti di 5 MB, 5.000 righe e 100 colonne.
+
+Test `node import-check.cjs` e regressioni `node crm-check.cjs` superati. Verifica browser con dati sintetici: caricamento di quattro righe, una nuova azienda, una corrispondenza selezionata esplicitamente per aggiornamento, un duplicato escluso e una email errata esclusa. Salvataggio concluso con una creazione e un aggiornamento; referente aggiuntivo e categoria manuale preesistenti conservati. Screenshot `apex-crm-import-csv.png` nella cartella di lavoro superiore.
+
+Non importa opportunità, referenti aggiuntivi, categorie o fatturati. Per ripristinare l'archivio completo rimane il backup JSON. Questa funzione non costituisce una sincronizzazione automatica né un arricchimento online.

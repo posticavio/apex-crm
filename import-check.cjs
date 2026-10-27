@@ -1,0 +1,34 @@
+const fs=require('node:fs'),path=require('node:path'),vm=require('node:vm'),assert=require('node:assert/strict');
+const elements=new Map(),storage=new Map();
+function element(s){if(!elements.has(s))elements.set(s,{innerHTML:'',textContent:'',style:{},dataset:{},classList:{toggle(){}},addEventListener(){},showModal(){this.open=true},close(){this.open=false},click(){}});return elements.get(s);}
+const sandbox={console,Intl,Date,Set,Number,String,JSON,Error,Blob,URL,structuredClone,crypto:require('node:crypto').webcrypto,setTimeout(){},clearTimeout(){},confirm:()=>true,localStorage:{getItem:k=>storage.get(k)||null,setItem:(k,v)=>storage.set(k,v)},document:{querySelector:element,querySelectorAll:()=>[],addEventListener(){},createElement:()=>({click(){}})}};
+vm.createContext(sandbox);for(const file of ['app.js','company-import.js'])vm.runInContext(fs.readFileSync(path.join(__dirname,file),'utf8'),sandbox);
+const run=code=>vm.runInContext(code,sandbox);
+assert.equal(run(String.raw`parseCompanyCsv('\uFEFFAzienda;Note\r\nAcme;"Riga 1\nRiga 2 con ""virgolette"""').rows[0][1]`),'Riga 1\nRiga 2 con "virgolette"');
+assert.equal(run(String.raw`parseCompanyCsv('"Azienda; ufficiale",Email\nAcme,a@example.com').delimiter`),',');
+assert.equal(run(String.raw`parseCompanyCsv('Azienda\tTelefono\nAcme\t123').delimiter`),'\t');
+assert.throws(()=>run(String.raw`parseCompanyCsv('Azienda;Note\nAcme;"non chiusa')`));
+assert.throws(()=>run(String.raw`parseCompanyCsv('Azienda;Note\nAcme;"Test"x')`));
+assert.throws(()=>run(String.raw`parseCompanyCsv('Azienda\u0000;Note\nAcme;test')`));
+assert.throws(()=>run(String.raw`parseCompanyCsv('Azienda;Note')`));
+run("state.contacts=[{id:'acme',company:'Acme',person:'Maria',email:'old@example.com',taxId:'IT-111',sector:'Servizi',referents:[{id:'r',name:'Tecnico'}],categoryMode:'manual',manualCategoryIds:[],history:[]}];persist(state)");
+run(String.raw`const parsedImport=parseCompanyCsv('Azienda;Email;Identificativo fiscale;Città\nAcme;new@example.com;IT111;Roma\nNuova Srl;fresh@example.com;;Milano\nNUOVA SRL;fresh@example.com;;Torino\nSenza email;bad;;Roma\nConflitto;old@example.com;IT999;Roma');const mapImport=guessCsvMapping(parsedImport.headers);const planImport=csvPlan(parsedImport,mapImport,state.contacts)`);
+assert.equal(run('planImport[0].action'),'skip');assert.equal(run('planImport[0].targetId'),'acme');assert.equal(run('planImport[1].action'),'create');assert.match(run('planImport[2].error'),/duplicato/);assert.match(run('planImport[3].error'),/Email/);assert.match(run('planImport[4].error'),/fiscali diversi/);
+assert.throws(()=>run("csvPlan(parsedImport,{company:'',email:'1'},state.contacts)"));
+assert.throws(()=>run("csvPlan(parsedImport,{company:'0',email:'0'},state.contacts)"));
+const before=run('JSON.stringify(state)');
+run("planImport[0].action='update';const imported=csvImportResult(state,planImport,'fixture.csv')");
+assert.equal(run('JSON.stringify(state)'),before,'Planning must not mutate live state');assert.equal(run('imported.counts.created'),1);assert.equal(run('imported.counts.updated'),1);assert.equal(run('imported.next.contacts[0].person'),'Maria');assert.equal(run('imported.next.contacts[0].referents[0].name'),'Tecnico');assert.equal(run('imported.next.contacts[0].categoryMode'),'manual');assert.equal(run('imported.next.contacts[0].city'),'Roma');assert.match(run('imported.next.contacts[0].history[0].text'),/fixture.csv/);
+run("state.contacts.push({id:'other',company:'Other',email:'second@example.com'})");
+run(String.raw`const ambiguous=parseCompanyCsv('Azienda;Email\nAcme;second@example.com');const ambiguousPlan=csvPlan(ambiguous,guessCsvMapping(ambiguous.headers),state.contacts)`);assert.match(run('ambiguousPlan[0].error'),/più aziende/);
+run(String.raw`const repeatTarget=parseCompanyCsv('Azienda;Email;Identificativo fiscale\nRename;new@example.com;IT111\nAnother;old@example.com;');const repeatPlan=csvPlan(repeatTarget,guessCsvMapping(repeatTarget.headers),state.contacts)`);assert.match(run('repeatPlan[1].error'),/duplicato/);
+run(String.raw`const malformed=parseCompanyCsv('Azienda;Email\nTroppi;a@example.com;extra');const badPlan=csvPlan(malformed,guessCsvMapping(malformed.headers),state.contacts)`);assert.match(run('badPlan[0].error'),/celle/);
+run(String.raw`startCsvImport('Azienda;Email\nImpresa nuova;import@example.com','test.csv')`);
+const previewState=run('JSON.stringify(state)');sandbox.localStorage.setItem=()=>{throw Error('quota')};assert.equal(run('applyCsvImport()'),false);assert.equal(run('JSON.stringify(state)'),previewState);
+sandbox.localStorage.setItem=(k,v)=>storage.set(k,v);
+assert.equal(run('applyCsvImport()'),true);assert.equal(run("state.contacts.filter(c=>c.company==='Impresa nuova').length"),1);assert.equal(run('applyCsvImport()'),false,'A finished session cannot import twice');
+run(String.raw`startCsvImport('Azienda;Email\nNon salvare;blocked@example.com','stale.csv');state.contacts[0].city='Cambiata'`);assert.equal(run('applyCsvImport()'),false);assert.match(element('#csv-error').textContent,/cambiati/);
+run(String.raw`startCsvImport('Azienda;Email\nSeconda;seconda@example.com','tab.csv')`);storage.set('apex-crm-v1','other-tab-data');assert.equal(run('applyCsvImport()'),false);
+assert.equal(run("csvIdentity({company:'ÀCME, S.R.L.'}).name"),'acme s r l');
+console.log('PASS: CSV delimiters, quoting, BOM, newlines, invalid encodings, column mapping, duplicates/conflicts, explicit updates, existing relationships preserved, provenance, atomic save, stale preview and duplicate-apply protection.');
+

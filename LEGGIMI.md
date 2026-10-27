@@ -53,3 +53,13 @@ Apri Categorie e aggiungi un nome con eventuali parole chiave. Una regola cerca 
 Nella scheda azienda, Automatica applica le regole correnti; Manuale usa soltanto le categorie selezionate, anche una selezione vuota. Modificando una regola le classificazioni automatiche si ricalcolano; le scelte manuali restano invariate. Disattivare una categoria la esclude dalle regole, ma conserva le assegnazioni manuali esistenti. Le categorie sono separate dalla fase Lead/Prospect/Cliente.
 
 Gli elenchi azienda includono il filtro Categorie e Senza categoria; ricerca e CSV comprendono la classificazione. Il backup JSON include catalogo, regole e scelte manuali. Importare un backup precedente senza catalogo ripristina un catalogo vuoto, insieme ai dati presenti nel backup.
+
+## Importazione aziende CSV
+
+Usa Importa aziende CSV nella barra laterale. Scegli un file UTF-8 (.csv o .tsv), associa le colonne e controlla l’anteprima. Massimo 5 MB, 5.000 righe e 100 colonne. Le intestazioni comuni vengono riconosciute automaticamente; Azienda è obbligatoria.
+
+Il controllo cerca corrispondenze per identificativo fiscale, email o nome normalizzato. Un’azienda già presente è esclusa per impostazione iniziale: puoi scegliere esplicitamente Aggiorna campi non vuoti. Più corrispondenze, identificativi fiscali contrastanti, righe malformate e possibili duplicati nello stesso file vengono esclusi con una spiegazione. Se due aziende usano la stessa email, correggi il file o importa separatamente le righe dopo verifica.
+
+Il salvataggio è unico dopo l’anteprima. Le celle vuote non cancellano campi esistenti. Referenti aggiuntivi, categorie, scelte manuali e opportunità vengono conservati negli aggiornamenti; le nuove aziende usano la classificazione automatica. File, riga e data sono registrati come provenienza dell’importazione e nello storico. Se il salvataggio fallisce, i dati in memoria restano invariati. Se i dati cambiano dopo l’anteprima, il salvataggio viene bloccato.
+
+Il CSV importa dati aziendali e il referente principale: non ripristina referenti aggiuntivi, categorie, opportunità o fasi. Per ripristinare l’intero CRM usa il backup JSON. Prima di aggiornare molte aziende esporta un backup.
