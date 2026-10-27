@@ -45,3 +45,11 @@ Le opportunità in Lead mostrano Qualifica Prospect, quelle in Prospect mostrano
 ## Anagrafiche e referenti (requisiti Notion, Fase 2)
 
 La scheda azienda include identificativo fiscale, settore, sito e sede. Al referente principale puoi affiancare altri referenti con ruolo, email, telefono, canale preferito e note. Puoi aggiungere o rimuovere righe prima di salvare; Annulla lascia i dati invariati. La ricerca comprende i recapiti e i referenti aggiuntivi. Il backup JSON conserva i nuovi dati e continua ad accettare i backup precedenti. Il CSV comprende i dati aziendali e un riepilogo dei referenti. Le modifiche anagrafiche sono registrate nello storico aziendale. La rimozione di un referente non dispone ancora di cestino: conserva un backup per ripristinarne i dettagli.
+
+## Categorie personalizzabili
+
+Apri Categorie e aggiungi un nome con eventuali parole chiave. Una regola cerca una delle parole o frasi in Settore, Provenienza, Nome azienda oppure Note aziendali, ignorando maiuscole e accenti. È una classificazione deterministica, senza AI o consultazioni online. Le aziende possono appartenere a più categorie.
+
+Nella scheda azienda, Automatica applica le regole correnti; Manuale usa soltanto le categorie selezionate, anche una selezione vuota. Modificando una regola le classificazioni automatiche si ricalcolano; le scelte manuali restano invariate. Disattivare una categoria la esclude dalle regole, ma conserva le assegnazioni manuali esistenti. Le categorie sono separate dalla fase Lead/Prospect/Cliente.
+
+Gli elenchi azienda includono il filtro Categorie e Senza categoria; ricerca e CSV comprendono la classificazione. Il backup JSON include catalogo, regole e scelte manuali. Importare un backup precedente senza catalogo ripristina un catalogo vuoto, insieme ai dati presenti nel backup.

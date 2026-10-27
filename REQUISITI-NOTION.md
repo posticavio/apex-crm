@@ -15,7 +15,7 @@ Il repository GitHub `posticavio/apex-crm` è accessibile ma vuoto al momento de
 | Fase Notion | Stato osservato |
 | --- | --- |
 | 1, ambito e interfaccia | Utente unico e interfaccia PC presenti. Il perimetro resta solo Apex, come richiesto nella chat. |
-| 2, anagrafiche | Base presente. In questo incremento: dati aziendali e più referenti con ruoli e preferenze. Categorie automatiche/manuali, importazioni con deduplica e arricchimento online restano da fare. |
+| 2, anagrafiche | Dati aziendali, referenti con ruoli e preferenze e categorie personalizzabili automatiche/manuali presenti. Importazioni con deduplica e arricchimento online restano da fare. |
 | 3, commerciale | Pipeline e follow-up di base presenti. Offerte con righe, versioni e PDF, fatturati storici, budget, previsioni e assistente AI mancanti. |
 | 4, integrazioni | Gmail, Calendar e Drive non sincronizzati. I collegamenti mailto/tel non sono integrazioni. |
 | 5, interfaccia | Menu, filtri e viste bacheca/elenco presenti. Widget configurabili, colonne configurabili, viste persistenti, pagina azienda completa e pannello AI mancanti. |
@@ -41,9 +41,19 @@ Verifica visiva eseguita: apertura nuova anagrafica, aggiunta di un referente te
 
 ## Prossime checklist da dettagliare
 
-1. Classificazione manuale/automatica e categorie personalizzabili.
+1. Classificazione manuale/automatica e categorie personalizzabili: incremento implementato e verificato, vedi sotto.
 2. Deduplicazione e importazione con anteprima.
 3. Separare la fase aziendale Lead/Prospect/Cliente dagli stati dell'opportunità nuovo contatto/trattativa/offerta/vinta/persa.
 4. Preventivi con righe, calcoli e versioni; regole fiscali e valuta da definire prima del modulo economico.
 
 Il supporto ad altre attività, previsto in Notion, richiede di riconciliare l'indicazione precedente “solo Apex”. Anche la pipeline classica Notion va aggiunta come stato dell'opportunità, preservando la classificazione aziendale concordata.
+
+## Incremento categorie — verificato
+
+Ramo locale: `feature/company-categories`. Catalogo personalizzabile con regole deterministiche basate su un campo e parole chiave. Categorie multiple; modalità automatica o manuale per singola azienda, inclusa una scelta manuale vuota. Rinominare una categoria mantiene il suo identificativo; disattivarla interrompe soltanto le regole automatiche e conserva le scelte manuali. La classificazione commerciale Lead/Prospect/Cliente resta distinta.
+
+Filtri per categoria e senza categoria, ricerca per nome categoria e CSV aggiornati. Backup JSON comprende catalogo, regole e override; i vecchi backup senza categorie rimangono importabili e ripristinano un catalogo vuoto.
+
+Test: `node --check app.js` e `node crm-check.cjs` superati. Copertura di normalizzazione accenti, nomi duplicati, classificazione automatica, override manuale, rinomina, disattivazione, backup/importazione e fallimento del salvataggio. Verifica browser con dati dimostrativi: creazione regola sul settore, assegnazione automatica a un'azienda esistente e salvataggio della modalità manuale. Screenshot `apex-crm-categorie.png` nella cartella di lavoro superiore.
+
+Non sono inclusi AI, arricchimento online o sincronizzazione con Notion. La Fase 2 nel complesso resta parziale.

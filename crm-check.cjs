@@ -112,4 +112,38 @@ element('#record-form').submit({preventDefault(){},target:{values:primaryOnly}})
 run("validateCompany({company:'Legacy',person:'Persona',email:'old@example.com'})");
 assert.doesNotMatch(run("referentRow(0,{id:'safe',name:'<script>bad</script>'})"),/<script>/);
 console.log('PASS: multiple referents with roles and channels; company fields; search by additional contact; JSON/CSV portability; legacy compatibility; referent removal; input validation; audit history; save failure preserves company data.');
+run("setView('categories');openCategory()");
+element('#record-form').submit({preventDefault(){},target:{values:{categoryName:'Servizi digitali',ruleField:'sector',keywords:'servizi, SERVIZI, digitale',active:'on'}}});
+assert.equal(run('state.categories.length'),1);assert.equal(run('state.categories[0].keywords.length'),2);
+assert.equal(run("companyCategories(contact('lead-test')).length"),1,'Sector rule matches existing companies');
+run("const categoryId=state.categories[0].id;openCategory()");
+assert.equal(run("saveCategory({categoryName:'SERVIZI DIGITALI',ruleField:'sector',keywords:'x',active:'on'})"),false,'Duplicate names rejected');
+const beforeCategoryFailure=run('JSON.stringify(state)');sandbox.localStorage.setItem=()=>{throw Error('quota')};
+assert.equal(run("saveCategory({categoryName:'Manuale',ruleField:'notes',keywords:'',active:'on'})"),false);assert.equal(run('JSON.stringify(state)'),beforeCategoryFailure);
+sandbox.localStorage.setItem=(k,v)=>storage.set(k,v);
+assert.equal(run("saveCategory({categoryName:'Partner',ruleField:'source',keywords:'rete',active:'on'})"),true);
+run("const partnerId=state.categories[1].id;contact('lead-test').categoryMode='manual';contact('lead-test').manualCategoryIds=[partnerId]");
+assert.equal(run("companyCategories(contact('lead-test'))[0].name"),'Partner');assert.equal(run("companyCategories(contact('lead-test')).length"),1);
+run("setView('contatti');categoryFilter=categoryId;render()");assert.equal(run('visibleContacts().length'),0,'Manual choice overrides matching automatic rule');
+run("categoryFilter=partnerId;render()");assert.equal(run('visibleContacts().length'),1);assert.match(run('buildCsv()'),/Partner/);assert.match(run('buildCsv()'),/Manuale/);
+run("openCategory(partnerId)");assert.equal(run("saveCategory({categoryName:'Partner fidati',ruleField:'source',keywords:'nessuna corrispondenza',active:''})"),true);
+assert.equal(run("companyCategories(contact('lead-test'))[0].name"),'Partner fidati','Rename keeps stable ID');
+run("contact('lead-test').categoryMode='auto'");assert.equal(run("companyCategories(contact('lead-test'))[0].name"),'Servizi digitali','Can restore automatic mode');
+run("contact('lead-test').categoryMode='manual';contact('lead-test').manualCategoryIds=[]");assert.equal(run("companyCategories(contact('lead-test')).length"),0,'Empty manual override is intentional');
+run("setView('contatti');categoryFilter='none';render()");assert.ok(run("visibleContacts().some(c=>c.id==='lead-test')"));
+assert.equal(run("categoryMatches({sector:'SANITÀ'},{active:true,field:'sector',keywords:['sanita']})"),true);
+assert.throws(()=>run("validate({contacts:[],deals:[],categories:[{id:'x',name:'Bad',field:'secret',keywords:[]}]})"));
+assert.throws(()=>run("validate({contacts:[{id:'x',company:'X',manualCategoryIds:['missing']}],deals:[],categories:[]})"));
+run("const categoryBackup=JSON.parse(JSON.stringify(state));validate(categoryBackup)");
+assert.equal(run('categoryBackup.categories.length'),2);
+run("const manualForm={categoryMode:'manual',['manualcat_'+categoryId]:'on'};collectClassification(manualForm,contact('lead-test'))");assert.equal(run('manualForm.manualCategoryIds[0]'),run('categoryId'));
+run("contact('lead-test').categoryMode='manual';contact('lead-test').manualCategoryIds=[categoryId]");
+const currentBackup=run('JSON.stringify(state)');
+(async()=>{
+ await element('#import-file').onchange({target:{files:[{text:async()=>currentBackup}],value:'chosen'}});
+ assert.equal(run('state.categories.length'),2);assert.equal(run("contact('lead-test').manualCategoryIds[0]"),run('categoryId'));
+ await element('#import-file').onchange({target:{files:[{text:async()=>JSON.stringify({contacts:[{id:'legacy',company:'Legacy'}],deals:[]})}],value:'chosen'}});
+ assert.equal(run('state.categories.length'),0);assert.equal(run('state.contacts[0].company'),'Legacy');
+ console.log('PASS: category creation, deduplication, automatic rules, accents, manual override and empty override, rename with stable IDs, deactivation, filters, CSV, backup restoration, old backups, and failed saves.');
+})().catch(error=>{console.error(error);process.exitCode=1;});
 
