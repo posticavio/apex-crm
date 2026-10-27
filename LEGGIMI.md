@@ -69,3 +69,9 @@ Il CSV importa dati aziendali e il referente principale: non ripristina referent
 Nelle opportunità puoi scegliere il referente principale o uno dei referenti aggiuntivi dell’azienda. Cambiando azienda il selettore si aggiorna. Il nome è conservato come riferimento storico anche se il referente viene successivamente rimosso dall’anagrafica. Il collegamento appare nella pipeline e nel CSV.
 
 Nella scheda azienda espandi Registra una conversazione, scegli canale, data e persona, poi scrivi una sintesi. Solo Salva registra la conversazione; Annulla non modifica lo storico. Le date future sono rifiutate: per pianificare un richiamo usa il prossimo passo dell’opportunità. Le conversazioni sono ricercabili e presenti nel backup JSON e nel CSV contatti. Questa registrazione è manuale e non invia email né sincronizza Gmail.
+
+## Stati delle opportunità
+
+La classificazione dell’azienda rimane Lead, Prospect o Cliente. La pipeline delle singole opportunità usa invece Nuovo contatto, Trattativa, Offerta, Vinta e Persa. I record precedenti vengono letti senza perdere dati: Lead corrisponde a Nuovo contatto, Prospect a Trattativa e Cliente a Vinta. Non vengono inventate offerte già inviate o motivi di perdita.
+
+Le opportunità vinte e perse non contribuiscono al valore della pipeline aperta. Le perse non generano follow-up attivi; quelle vinte possono conservare richiami per il cliente. I cambi di fase sono registrati nello storico. Il motivo di perdita è facoltativo nella scheda. Le opportunità chiuse possono essere riaperte dalla scheda, indicando un nuovo passo e una data. I pulsanti rapidi avanzano una fase per volta.

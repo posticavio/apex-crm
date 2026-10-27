@@ -15,3 +15,4 @@ jobs:
       - run: node --check company-import.js
       - run: node import-check.cjs
       - run: node relationship-check.cjs
+      - run: node sales-check.cjs
