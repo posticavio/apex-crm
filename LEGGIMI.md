@@ -95,3 +95,17 @@ La sezione Preventivi consente di redigere proposte commerciali strutturate coll
 - **Stampa e PDF nativi:** anteprima di stampa A4 ottimizzata con dati emittente, snapshot anagrafico del cliente (nome, indirizzo, P. IVA/C.F.), tabella dettagliata e note contrattuali, pronta per il salvataggio in PDF dal browser.
 - **Protezione ed esportazione:** un'azienda o un'opportunità con preventivi collegati non può essere eliminata per salvaguardare l'integrità dei dati. I preventivi sono inclusi nel backup JSON completo e dispongono di esportazione CSV dedicata. Duplica preventivo permette di generare una nuova proposta ripartendo dalla bozza.
 
+## Attività per Lead, Prospect e Clienti e Playbook operativi
+
+La sezione **Attività** (accessibile dal menu laterale e integrata in Dashboard, Anagrafiche, Lead, Prospect, Clienti, Scheda Azienda e Scheda Opportunità) consente di pianificare e gestire l'intero ciclo operativo per ciascuna fase dell'azienda:
+
+- **Classificazione dinamica per fase (`Lead`, `Prospect`, `Cliente`):** ogni attività è collegata a un'azienda e riflette automaticamente la sua fase commerciale attuale, con bacheca Kanban dedicata a 3 colonne (*Lead*, *Prospect*, *Cliente*) e vista tabellare ordinabile.
+- **Playbook operativi automatici (`⚡ Playbook`):** attivabili con un clic dalle viste *Lead*, *Prospect*, *Clienti*, *Contatti* o dentro la scheda azienda per generare le sequenze di lavoro tipiche:
+  - **Lead:** profilazione e analisi preliminare, primo contatto di qualifica, discovery call.
+  - **Prospect:** mappatura tecnica processo e ROI, demo personalizzata soluzione AI, invio e revisione proposta commerciale.
+  - **Cliente:** kick-off operativo, consegna/collaudo e formazione team, check-in periodico risultati e opportunità di upsell.
+- **Collegamenti trasversali:** ogni attività può essere associata a un referente specifico (con conservazione dello snapshot storico), a un'opportunità di vendita e a un preventivo.
+- **Completamento e concatenazione follow-up:** completando un'attività è possibile registrare l'esito (scritto automaticamente nello storico aziendale e dell'opportunità) e pianificare contestualmente l'attività successiva concatenata.
+- **Esportazione e integrità:** le attività sono incluse nel backup JSON completo, nell'esportazione CSV dedicata e nel riepilogo CSV aziendale. Aziende e opportunità con attività collegate sono protette dalla cancellazione accidentale.
+
+

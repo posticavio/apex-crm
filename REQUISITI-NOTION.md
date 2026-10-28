@@ -95,3 +95,17 @@ Requisiti coperti:
 - Esportazione CSV dedicata e compatibilità bidirezionale nei backup JSON (inclusi vecchi backup senza il modulo).
 - Test automatici dedicati: `quotes-check.cjs` e regressioni complete su tutti i test (`crm-check.cjs`, `import-check.cjs`, `relationship-check.cjs`, `resource-check.cjs`, `sales-check.cjs`, `unscheduled-check.cjs`) superati.
 
+## Incremento attività per Lead, Prospect e Clienti e revisione layout — verificato
+
+Ramo locale: `feature/lifecycle-activities-layout`.
+
+Requisiti coperti:
+- Modulo completo **Attività** per **Lead, Prospect e Clienti** (`activities.js`), con bacheca Kanban a 3 fasi (*Lead*, *Prospect*, *Cliente*) e vista elenco tabellare.
+- **Playbook operativi per fase** (Lead: qualifica e discovery; Prospect: analisi tecnica, demo e proposta; Cliente: onboarding, consegna e check-in/upsell) attivabili con un clic e protetti da duplicazioni.
+- Collegamento trasversale di ogni attività ad azienda, referente (con snapshot storico), opportunità e preventivo.
+- Completamento attività con registrazione automatica dell'esito nello storico aziendale/opportunità e concatenazione immediata della prossima attività.
+- Integrazione diretta in Dashboard (*Oggi*), nelle tabelle *Lead*, *Prospect*, *Clienti* e *Contatti*, nella scheda azienda e nella scheda opportunità.
+- **Revisione completa del layout (`layout.css` e `index.html`)**: design system moderno executive con sidebar dark-indigo, header sticky traslucido con azioni rapide globali (`+ Attività`, `+ Azienda`, `+ Opportunità`, `+ Preventivo`), KPI card con cifre tabulari non troncate, bacheche Kanban ad alto contrasto e responsività mobile/desktop senza overflow orizzontale.
+- Test automatici: `activities-check.cjs` e tutte le suite di regressione superate.
+
+

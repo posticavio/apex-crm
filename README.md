@@ -22,6 +22,8 @@ node relationship-check.cjs
 node sales-check.cjs
 node resource-check.cjs
 node unscheduled-check.cjs
+node quotes-check.cjs
+node activities-check.cjs
 ```
 
 I test funzionali usano dati sintetici e simulazioni di DOM/localStorage. La scheda azienda e i referenti sono stati verificati anche nel browser, su un'origine localhost separata dai dati dell'utente.
