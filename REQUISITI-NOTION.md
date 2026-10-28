@@ -79,3 +79,19 @@ Nella scheda azienda è disponibile Registra una conversazione: canale Email, Te
 Verifiche riuscite: `node --check app.js`, `node crm-check.cjs`, `node import-check.cjs`, `node relationship-check.cjs`. I test specifici coprono assegnazioni fra aziende, snapshot storici, canali/date/persone, ricerca, CSV, JSON, salvataggio fallito e protezione dal doppio invio.
 
 Verifica visiva non completata: il browser ha rifiutato l'autorizzazione all'origine localhost dell'anteprima. Nessun altro percorso di controllo del browser è stato tentato. L'incremento non è marcato come completato in Notion.
+
+## Incremento preventivi e proposte commerciali — verificato
+
+Ramo locale: `feature/quote-drafts`.
+
+Requisiti coperti:
+- Gestione proposte commerciali strutturate collegate all'anagrafica cliente e facoltativamente all'opportunità di vendita.
+- Righe servizio con calcoli monetari esatti in centesimi di euro (quantità decimale, prezzo unitario, percentuale di sconto, imponibile, imposta e totale).
+- Modelli di riga predefiniti con un clic (Automazione, Assistente AI, Consulenza).
+- Versionamento nativo automatico e non distruttivo: ogni salvataggio genera una nuova versione progressiva conservando integralmente le versioni precedenti per consultazione e ristampa.
+- Regole fiscali: aliquota IVA esplicita richiesta per il consolidamento in stato Accettato; IVA facoltativa (da definire) per le bozze in elaborazione.
+- Layout di stampa e salvataggio PDF A4 con layout pulito, dati emittente e cliente.
+- Protezione di integrità: blocco della cancellazione di aziende o trattative collegate a preventivi.
+- Esportazione CSV dedicata e compatibilità bidirezionale nei backup JSON (inclusi vecchi backup senza il modulo).
+- Test automatici dedicati: `quotes-check.cjs` e regressioni complete su tutti i test (`crm-check.cjs`, `import-check.cjs`, `relationship-check.cjs`, `resource-check.cjs`, `sales-check.cjs`, `unscheduled-check.cjs`) superati.
+

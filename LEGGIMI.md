@@ -83,3 +83,15 @@ Le schede azienda e opportunità consentono di collegare documenti, offerte, pro
 ## Ricontatti da pianificare
 
 La dashboard mostra anche le opportunità aperte senza data o senza un prossimo passo. Il filtro Da pianificare le raccoglie e il pulsante con l’orologio apre la scheda per completarle. Le date mancanti non sono conteggiate come scadute né future. Le opportunità vinte senza richiamo e quelle perse non entrano in questa lista.
+
+## Preventivi e proposte commerciali
+
+La sezione Preventivi consente di redigere proposte commerciali strutturate collegate a un’azienda e facoltativamente a un’opportunità di vendita:
+
+- **Righe servizio e calcolo rigoroso:** ogni riga include descrizione, quantità (anche frazionaria per ore o giornate), prezzo unitario e sconto percentuale. Imponibile, sconto complessivo, imposta e totale sono calcolati in centesimi di euro per evitare errori di arrotondamento.
+- **Modelli rapidi di riga:** pulsante per inserire blocchi di servizi tipici di Apex Digital (Automazione, Assistente AI, Consulenza).
+- **Versionamento conservativo:** ogni modifica salvata su un preventivo genera una nuova versione progressiva, preservando integralmente tutte le versioni antecedenti con data e totali storici, consultabili e stampabili singolarmente.
+- **Regole fiscali e stati:** stati Bozza, Da approvare, Accettato e Rifiutato. La marcatura in Accettato richiede l'indicazione esplicita dell'aliquota IVA. Nelle bozze l'IVA può essere lasciata vuota (da definire) con opportuna nota nel documento stampato.
+- **Stampa e PDF nativi:** anteprima di stampa A4 ottimizzata con dati emittente, snapshot anagrafico del cliente (nome, indirizzo, P. IVA/C.F.), tabella dettagliata e note contrattuali, pronta per il salvataggio in PDF dal browser.
+- **Protezione ed esportazione:** un'azienda o un'opportunità con preventivi collegati non può essere eliminata per salvaguardare l'integrità dei dati. I preventivi sono inclusi nel backup JSON completo e dispongono di esportazione CSV dedicata. Duplica preventivo permette di generare una nuova proposta ripartendo dalla bozza.
+
