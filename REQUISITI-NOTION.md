@@ -108,4 +108,14 @@ Requisiti coperti:
 - **Revisione completa del layout (`layout.css` e `index.html`)**: design system moderno executive con sidebar dark-indigo, header sticky traslucido con azioni rapide globali (`+ Attività`, `+ Azienda`, `+ Opportunità`, `+ Preventivo`), KPI card con cifre tabulari non troncate, bacheche Kanban ad alto contrasto e responsività mobile/desktop senza overflow orizzontale.
 - Test automatici: `activities-check.cjs` e tutte le suite di regressione superate.
 
+## Incremento progetti, forecast economico, playbook personalizzabili e temi (Dark/AMOLED) — verificato
+
+Requisiti coperti:
+- **Modulo Progetti e Consegne (`projects.js`)**: gestione commesse collegate a clienti, opportunità e preventivi; milestone con verifica deterministica delle dipendenze (`dependsOn`), avanzamento percentuale automatico, controllo economico (budget, costi, margine) e monte ore (stimate vs effettive).
+- **Obiettivi, Budget, Forecast ponderato e Fatturati storici (`analytics.js`)**: configurazione target annuo, target MRR, budget costi mensili e probabilità di chiusura per ciascuna fase della pipeline; registro fatturati storici per periodo (`YYYY-MM`) e ripartizione per linea di servizio AI.
+- **Personalizzazione Playbook (`Lead`, `Prospect`, `Cliente`)**: editor dedicato per aggiungere, modificare o rimuovere i passi dei playbook di attività per ogni fase aziendale, con salvataggio nel backup JSON e ripristino predefiniti.
+- **Temi e Densità UI**: supporto nativo persistente per *Chiaro Executive*, *Scuro Slate* e *Nero Assoluto AMOLED* (`#000000`), più selettore di densità *Confortevole* / *Compatta*.
+- Test automatici: `enterprise-check.cjs` e tutte le 9 suite di test superate.
+
+
 

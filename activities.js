@@ -103,7 +103,7 @@ function openTaskEditor(id=null,overrides={}){
  $('#task-title').textContent=existing?(overrides.status==='Completata'?'Completa attività':'Modifica attività'):`Nuova attività · ${stage}`;
  $('#task-error').hidden=true;
  $('#task-delete').classList.toggle('hidden',!existing);
- const templates=activityPlaybooks[stage]||activityPlaybooks.Lead;
+ const templates=(typeof getPlaybooks==='function'?getPlaybooks():activityPlaybooks)[stage]||activityPlaybooks.Lead;
  $('#task-fields').innerHTML=`
   <div class="task-playbook-Quickbar">
    <div>
@@ -116,6 +116,7 @@ function openTaskEditor(id=null,overrides={}){
      ${templates.map((t,i)=>`<option value="${i}">${esc(t.title)} (${esc(t.type)})</option>`).join('')}
     </select>
     <button type="button" id="apply-task-template" class="secondary-add">Applica modello</button>
+    <button type="button" data-open-playbooks="true" class="text-button">⚙ Personalizza</button>
    </div>
   </div>
   <div class="field-grid">
@@ -304,7 +305,8 @@ function applyPlaybook(contactId,customStage=null){
  const c=contact(contactId);
  if(!c){toast('Azienda non trovata.');return 0;}
  const stage=stages.includes(customStage)?customStage:contactStage(c.id);
- const steps=activityPlaybooks[stage]||activityPlaybooks.Lead;
+ const activePb=typeof getPlaybooks==='function'?getPlaybooks():activityPlaybooks;
+ const steps=activePb[stage]||activityPlaybooks.Lead;
  const existingOpen=new Set(openCompanyTasks(c.id).map(a=>a.title.toLocaleLowerCase('it')));
  const toCreate=steps.filter(s=>!existingOpen.has(s.title.toLocaleLowerCase('it')));
  if(!toCreate.length){toast(`Tutte le attività del playbook ${stage} sono già attive per ${c.company}.`);return 0;}
@@ -476,6 +478,7 @@ function activitiesView(){
      <button type="button" data-activity-layout="board" aria-pressed="${activityLayout==='board'}" class="${activityLayout==='board'?'selected':''}">▥ Bacheca Fasi</button>
      <button type="button" data-activity-layout="list" aria-pressed="${activityLayout==='list'}" class="${activityLayout==='list'?'selected':''}">☷ Elenco</button>
     </div>
+    <button type="button" id="open-playbook-editor" data-open-playbooks="true">⚙ Configura Playbook</button>
     <button type="button" id="export-csv" ${!rows.length?'disabled':''}>↓ Esporta CSV</button>
    </div>
   </div>
@@ -512,12 +515,12 @@ function activitiesTable(rows){
    const quote=a.quoteId?(state.quotes||[]).find(q=>q.id===a.quoteId):null;
    return `<tr>
     <td><strong>${esc(a.title)}</strong><small>${esc(a.type)}${a.notes?' · '+esc(a.notes):''}</small>${a.outcome?`<small class="task-outcome-preview">Esito: ${esc(a.outcome)}</small>`:''}</td>
-    <td><button type="button" class="text-button" data-edit-contact="${esc(a.contactId)}"><strong>${esc(c?.company||'—')}</strong></button><small><span class="pill ${stage==='Cliente'?'green':stage==='Prospect'?'amber':''}">${esc(stage)}</span></small></td>
-    <td>${esc(person||'Azienda')}${deal?`<small>Opp.: ${esc(deal.title)}</small>`:''}${quote?`<small>Prev.: ${esc(latestQuote(quote).number)}</small>`:''}</td>
-    <td><span class="pill ${priorityPillClass(a.priority)}">${esc(a.priority)}</span></td>
-    <td>${a.dueDate?`<span class="${isOpenTask(a)&&a.dueDate<today()?'overdue-date':''}">${date(a.dueDate)}${a.dueTime?' '+esc(a.dueTime):''}</span>`:'Senza data'}</td>
-    <td><span class="pill ${statusPillClass(a.status)}">${esc(a.status)}</span></td>
-    <td><div class="row-actions">
+    <td data-label="Azienda & Fase"><div><button type="button" class="text-button" data-edit-contact="${esc(a.contactId)}"><strong>${esc(c?.company||'—')}</strong></button><small><span class="pill ${stage==='Cliente'?'green':stage==='Prospect'?'amber':''}">${esc(stage)}</span></small></div></td>
+    <td data-label="Referente & Collegamenti"><div>${esc(person||'Azienda')}${deal?`<small>Opp.: ${esc(deal.title)}</small>`:''}${quote?`<small>Prev.: ${esc(latestQuote(quote).number)}</small>`:''}</div></td>
+    <td data-label="Priorità"><span class="pill ${priorityPillClass(a.priority)}">${esc(a.priority)}</span></td>
+    <td data-label="Scadenza">${a.dueDate?`<span class="${isOpenTask(a)&&a.dueDate<today()?'overdue-date':''}">${date(a.dueDate)}${a.dueTime?' '+esc(a.dueTime):''}</span>`:'Senza data'}</td>
+    <td data-label="Stato"><span class="pill ${statusPillClass(a.status)}">${esc(a.status)}</span></td>
+    <td class="cell-actions"><div class="row-actions">
      ${isOpenTask(a)?`<button type="button" class="phase-action" data-complete-task="${esc(a.id)}">✓ Completa</button>`:''}
      <button type="button" class="text-button" data-edit-task="${esc(a.id)}">Apri scheda ↗</button>
     </div></td>
@@ -614,7 +617,8 @@ document.addEventListener('click',e=>{
   const idx=Number($('#task-template-select')?.value);
   const companyId=$('#task-company')?.value||state.contacts[0]?.id;
   const stage=contactStage(companyId);
-  const step=(activityPlaybooks[stage]||activityPlaybooks.Lead)[idx];
+  const activePb=typeof getPlaybooks==='function'?getPlaybooks():activityPlaybooks;
+  const step=(activePb[stage]||activityPlaybooks.Lead)[idx];
   if(step){
    const f=$('#task-form');
    if(f.querySelector('[name="title"]'))f.querySelector('[name="title"]').value=step.title;
@@ -653,4 +657,144 @@ if(document.querySelector('#task-delete')){
 }
 if(document.querySelector('#task-editor')){
  document.querySelector('#task-editor').addEventListener('cancel',()=>{taskSession=null;});
+}
+
+const PREFS_KEY='apex-crm-prefs-v1';
+let uiPrefs={theme:'light',haptics:true};
+try{
+ const savedPrefs=localStorage.getItem(PREFS_KEY);
+ if(savedPrefs){
+  const p=JSON.parse(savedPrefs);
+  if(p&&typeof p==='object'){
+   if(['light','dark','amoled'].includes(p.theme))uiPrefs.theme=p.theme;
+   if(typeof p.haptics==='boolean')uiPrefs.haptics=p.haptics;
+  }
+ }
+}catch{}
+
+function applyUiPrefs(){
+ if(typeof document!=='undefined'&&document.documentElement?.setAttribute){
+  document.documentElement.setAttribute('data-theme',uiPrefs.theme||'light');
+ }
+ if(typeof document!=='undefined'&&document.querySelectorAll){
+  document.querySelectorAll('[data-set-theme]').forEach(b=>{
+   if(b.classList)b.classList.toggle('selected',b.dataset.setTheme===uiPrefs.theme);
+  });
+ }
+ const hapticsEl=typeof document!=='undefined'?document.querySelector('#pref-haptics'):null;
+ if(hapticsEl)hapticsEl.checked=uiPrefs.haptics!==false;
+}
+function saveUiPrefs(){
+ try{localStorage.setItem(PREFS_KEY,JSON.stringify(uiPrefs));}catch{}
+ applyUiPrefs();
+}
+function hapticTap(ms=10){
+ try{if(uiPrefs.haptics!==false&&typeof navigator!=='undefined'&&typeof navigator.vibrate==='function')navigator.vibrate([ms]);}catch{}
+}
+
+function setMobileDrawer(open){
+ if(typeof document==='undefined'||!document.body?.classList)return;
+ document.body.classList.toggle('drawer-open',Boolean(open));
+ const backdrop=document.querySelector('#drawer-backdrop');
+ if(backdrop)backdrop.hidden=!open;
+ const btn=document.querySelector('#mobile-menu-btn');
+ if(btn&&btn.setAttribute)btn.setAttribute('aria-expanded',open?'true':'false');
+}
+
+function syncMobileShell(){
+ if(typeof document==='undefined')return;
+ const isAnagrafiche=['contatti','lead','prospect','clienti','categories'].includes(view);
+ const subnav=document.querySelector('#mobile-subnav');
+ if(subnav)subnav.hidden=!isAnagrafiche;
+ if(document.querySelectorAll){
+  document.querySelectorAll('#mobile-bottom-nav [data-view]').forEach(b=>{
+   const active=b.dataset.view===view||(b.dataset.view==='contatti'&&isAnagrafiche);
+   if(b.classList)b.classList.toggle('active',active);
+  });
+ }
+ setMobileDrawer(false);
+}
+
+function openSettingsDialog(){
+ const dlg=document.querySelector('#settings-dialog');
+ if(!dlg)return;
+ applyUiPrefs();
+ const sum=document.querySelector('#settings-archive-summary');
+ if(sum){
+  const openTasks=(state.activities||[]).filter(isOpenTask).length;
+  sum.innerHTML=`
+   <div class="settings-stat"><span>Aziende</span><strong>${state.contacts.length}</strong></div>
+   <div class="settings-stat"><span>Opportunità</span><strong>${state.deals.length}</strong></div>
+   <div class="settings-stat"><span>Attività aperte</span><strong>${openTasks}</strong></div>
+   <div class="settings-stat"><span>Preventivi</span><strong>${(state.quotes||[]).length}</strong></div>`;
+ }
+ setMobileDrawer(false);
+ if(!dlg.open&&typeof dlg.showModal==='function')dlg.showModal();
+}
+
+applyUiPrefs();
+
+document.addEventListener('click',e=>{
+ const b=e.target.closest('button');
+ if(e.target.id==='drawer-backdrop'){setMobileDrawer(false);return;}
+ if(!b)return;
+ if(b.id==='mobile-menu-btn'){
+  const isOpen=document.body?.classList?.contains('drawer-open');
+  setMobileDrawer(!isOpen);
+  hapticTap(8);
+  return;
+ }
+ if(b.id==='drawer-close'){setMobileDrawer(false);return;}
+ if(b.id==='open-settings'||b.id==='header-settings-btn'){openSettingsDialog();return;}
+ if(b.id==='settings-close'||b.id==='settings-done'){document.querySelector('#settings-dialog')?.close();return;}
+ if(b.id==='quote-close'){document.querySelector('#quote-editor')?.close();quoteSession=null;return;}
+ if(b.id==='csv-close'){document.querySelector('#csv-dialog')?.close();if(typeof csvSession!=='undefined')csvSession=null;return;}
+ if(b.dataset.setTheme){
+  uiPrefs.theme=b.dataset.setTheme;
+  saveUiPrefs();
+  hapticTap(10);
+  return;
+ }
+ if(b.id==='settings-export-json'){document.querySelector('#settings-dialog')?.close();document.querySelector('#export')?.click();return;}
+ if(b.id==='settings-import-csv'){document.querySelector('#settings-dialog')?.close();document.querySelector('#import-companies')?.click();return;}
+ if(b.id==='settings-import-json'){document.querySelector('#settings-dialog')?.close();document.querySelector('#import')?.click();return;}
+ if(b.dataset.view||b.dataset.complete||b.dataset.completeTask){hapticTap(10);}
+});
+
+document.addEventListener('change',e=>{
+ if(e.target.id==='pref-haptics'){
+  uiPrefs.haptics=Boolean(e.target.checked);
+  saveUiPrefs();
+ }
+});
+
+if(typeof window!=='undefined'&&typeof document.addEventListener==='function'){
+ let touchStartX=0,touchStartY=0,touchDialog=null;
+ document.addEventListener('touchstart',e=>{
+  const t=e.touches?.[0];if(!t)return;
+  touchStartX=t.clientX;touchStartY=t.clientY;
+  const heading=e.target.closest?.('.modal-heading');
+  touchDialog=heading?heading.closest('dialog'):null;
+ },{passive:true});
+ document.addEventListener('touchend',e=>{
+  const t=e.changedTouches?.[0];if(!t)return;
+  const dx=t.clientX-touchStartX,dy=t.clientY-touchStartY;
+  if(touchDialog&&dy>75&&Math.abs(dy)>Math.abs(dx)*1.4){
+   touchDialog.close();
+   if(touchDialog.id==='task-editor')taskSession=null;
+   if(touchDialog.id==='quote-editor')quoteSession=null;
+   touchDialog=null;
+   return;
+  }
+  touchDialog=null;
+  if(Math.abs(dx)>65&&Math.abs(dx)>Math.abs(dy)*1.5){
+   const drawerOpen=document.body?.classList?.contains('drawer-open');
+   if(!drawerOpen&&touchStartX<32&&dx>65){
+    setMobileDrawer(true);
+    hapticTap(8);
+   }else if(drawerOpen&&dx<-65){
+    setMobileDrawer(false);
+   }
+  }
+ },{passive:true});
 }

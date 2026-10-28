@@ -107,5 +107,29 @@ La sezione **Attività** (accessibile dal menu laterale e integrata in Dashboard
 - **Collegamenti trasversali:** ogni attività può essere associata a un referente specifico (con conservazione dello snapshot storico), a un'opportunità di vendita e a un preventivo.
 - **Completamento e concatenazione follow-up:** completando un'attività è possibile registrare l'esito (scritto automaticamente nello storico aziendale e dell'opportunità) e pianificare contestualmente l'attività successiva concatenata.
 - **Esportazione e integrità:** le attività sono incluse nel backup JSON completo, nell'esportazione CSV dedicata e nel riepilogo CSV aziendale. Aziende e opportunità con attività collegate sono protette dalla cancellazione accidentale.
+- **Playbook personalizzabili (`⚙ Configura Playbook`):** i modelli di attività per *Lead*, *Prospect* e *Cliente* possono essere modificati, estesi con nuovi passi o ripristinati ai valori predefiniti Apex Digital.
+
+## Progetti, consegne e milestone post-vendita
+
+La sezione **Progetti** (`🚀 Progetti`) e il relativo pannello nella scheda azienda permettono di gestire le commesse dei clienti acquisiti:
+
+- **Milestone con dipendenze:** ogni progetto include una lista di milestone con scadenza e vincolo opzionale di dipendenza (*Dipende da*): una milestone non può essere marcata come completata finché la milestone preliminare non è conclusa. Il completamento di tutte le milestone porta automaticamente il progetto in stato *Completato*.
+- **Controllo economico e ore:** monitoraggio di Budget commessa (€), Costi operativi (€), Margine operativo (€ e %) e Ore erogate rispetto alle ore stimate.
+- **Viste Bacheca e Cronoprogramma:** alternanza immediata tra bacheca Kanban per stato (*Pianificato*, *In corso*, *In revisione*, *Completato*, *In pausa*) e tabella Cronoprogramma & Costi con esportazione CSV.
+
+## Obiettivi di fatturato, budget e forecast ponderato
+
+La sezione **Forecast & KPI** (`📈 Forecast & KPI`) offre la vista direzionale ed economica del CRM:
+
+- **Target e budget:** configurazione di Obiettivo Fatturato Annuo, Target Canoni Ricorrenti (MRR) e Budget Costi Operativi Mensili.
+- **Forecast probabilistico per fase:** calcolo automatico del valore ponderato della pipeline aperta moltiplicando gli importi di ciascuna fase (*Nuovo contatto*, *Trattativa*, *Offerta*) per i rispettivi pesi percentuali personalizzabili.
+- **Storico fatturati:** registrazione degli incassi/fatturati storici per periodo (`YYYY-MM`) e azienda, sommati al valore acquisito per misurare l'avanzamento verso il target annuo.
+
+## Tema (Chiaro / Scuro / AMOLED) e densità interfaccia
+
+Nella barra superiore sono sempre disponibili i selettori rapidi per:
+- **Tema visivo:** *Chiaro Executive*, *Scuro Slate* e *Nero Assoluto AMOLED* (`#000000`).
+- **Densità interfaccia:** *Confortevole* oppure *Compatta* ad alta densità per massimizzare le righe visibili a schermo.
+
 
 
