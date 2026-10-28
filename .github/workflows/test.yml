@@ -17,3 +17,4 @@ jobs:
       - run: node relationship-check.cjs
       - run: node sales-check.cjs
       - run: node resource-check.cjs
+      - run: node unscheduled-check.cjs

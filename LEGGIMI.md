@@ -79,3 +79,7 @@ Le opportunità vinte e perse non contribuiscono al valore della pipeline aperta
 ## Documenti collegati
 
 Le schede azienda e opportunità consentono di collegare documenti, offerte, progetti o altri file con titolo, URL e note. Puoi usare link a Google Drive o ad altri servizi HTTP/HTTPS. Salva conferma aggiunte e rimozioni; Annulla conserva i collegamenti precedenti. Le rimozioni riguardano solo il collegamento nel CRM e non eliminano il file originale. Modifiche registrate nello storico, collegamenti inclusi in backup JSON e CSV. Non sono presenti caricamento file, sincronizzazione o gestione dei permessi: l’accesso resta quello del servizio che ospita il documento.
+
+## Ricontatti da pianificare
+
+La dashboard mostra anche le opportunità aperte senza data o senza un prossimo passo. Il filtro Da pianificare le raccoglie e il pulsante con l’orologio apre la scheda per completarle. Le date mancanti non sono conteggiate come scadute né future. Le opportunità vinte senza richiamo e quelle perse non entrano in questa lista.
