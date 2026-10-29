@@ -1568,7 +1568,7 @@ td small {
 }
 
 /* ==========================================================================
-   Record Modals & Right-Hand Slide-Over Drawers (Attio / Twenty / HubSpot)
+   Record Modals & Wide Horizontal Desktop Creation Canvas (Zero Vertical Scroll)
    ========================================================================== */
 dialog {
   border-radius: var(--radius-lg);
@@ -1588,7 +1588,7 @@ dialog::backdrop {
   -webkit-backdrop-filter: blur(3px);
 }
 
-/* Desktop Slide-Over Record Drawer for Company/Deal/Task/Project/Quote Editors */
+/* Desktop Wide Horizontal Creation & Edit Modals — Zero Vertical Window/Scroll Rule */
 @media (min-width: 768px) {
   #editor,
   #task-editor,
@@ -1596,15 +1596,300 @@ dialog::backdrop {
   #quote-editor,
   #finance-editor,
   #playbook-editor {
-    margin: 0 0 0 auto;
-    height: 100dvh;
-    max-height: 100dvh;
-    width: min(760px, 92vw);
-    border-radius: var(--radius-lg) 0 0 var(--radius-lg);
-    border-right: 0;
-    border-top: 0;
-    border-bottom: 0;
-    box-shadow: var(--shadow-drawer);
+    margin: auto;
+    height: auto;
+    max-height: 96dvh;
+    width: min(1480px, 96vw);
+    max-width: 96vw;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--line);
+    box-shadow: var(--shadow-lg);
+    overflow-y: hidden;
+  }
+
+  #editor form,
+  #task-editor form,
+  #project-editor form,
+  #quote-editor form,
+  #finance-editor form,
+  #playbook-editor form {
+    padding: 14px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  #editor .modal-heading,
+  #task-editor .modal-heading,
+  #project-editor .modal-heading,
+  #quote-editor .modal-heading,
+  #finance-editor .modal-heading,
+  #playbook-editor .modal-heading {
+    padding-bottom: 8px;
+    margin-bottom: 4px;
+  }
+
+  #editor .form-actions,
+  #task-editor .form-actions,
+  #project-editor .form-actions,
+  #quote-editor .form-actions,
+  #finance-editor .form-actions,
+  #playbook-editor .form-actions {
+    padding-top: 10px;
+    margin-top: 6px;
+  }
+
+  /* Wide Multi-Column Horizontal Field Grids on Desktop (4 Columns) */
+  #editor .field-grid,
+  #task-editor .field-grid,
+  #project-editor .field-grid,
+  #quote-editor .field-grid,
+  #finance-editor .field-grid,
+  #playbook-editor .field-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 8px 12px;
+    align-items: start;
+  }
+
+  /* Convert .field.full into 2-column horizontal spans so items sit side-by-side */
+  #editor .field.full,
+  #task-editor .field.full,
+  #project-editor .field.full,
+  #quote-editor .field.full,
+  #finance-editor .field.full {
+    grid-column: span 2;
+  }
+
+  #editor .form-section,
+  #task-editor .form-section,
+  #project-editor .form-section,
+  #quote-editor .form-section,
+  #finance-editor .form-section {
+    grid-column: 1 / -1;
+    margin: 2px 0 0;
+    padding: 4px 9px;
+    font-size: 9.5px;
+  }
+
+  #editor .field,
+  #task-editor .field,
+  #project-editor .field,
+  #quote-editor .field,
+  #finance-editor .field,
+  #playbook-editor .field {
+    gap: 3px;
+    font-size: 11px;
+  }
+
+  #editor input,
+  #editor select,
+  #task-editor input,
+  #task-editor select,
+  #project-editor input,
+  #project-editor select,
+  #quote-editor input,
+  #quote-editor select,
+  #finance-editor input,
+  #finance-editor select,
+  #playbook-editor input,
+  #playbook-editor select {
+    padding: 5px 9px;
+    min-height: 30px;
+    font-size: 12px;
+  }
+
+  #editor textarea,
+  #task-editor textarea,
+  #project-editor textarea,
+  #quote-editor textarea {
+    min-height: 36px;
+    height: 36px;
+    padding: 5px 9px;
+    font-size: 12px;
+    resize: none;
+  }
+
+  /* Side-by-side Bento Layout for #fields, #project-fields, #quote-fields, #playbook-fields */
+  #fields {
+    display: grid;
+    grid-template-columns: minmax(0, 2.2fr) minmax(300px, 1fr);
+    gap: 10px 14px;
+    align-items: start;
+  }
+
+  #fields > .contact-shortcuts,
+  #fields > .activity-copy {
+    grid-column: 1 / -1;
+    margin-bottom: 0;
+    padding: 6px 12px;
+  }
+
+  #fields > .field-grid {
+    grid-column: 1;
+    grid-row: 1 / span 6;
+  }
+
+  /* When #fields only has .field-grid (e.g. Category modal), span full width */
+  #fields > .field-grid:only-child {
+    grid-column: 1 / -1;
+  }
+
+  #fields > .resources-editor,
+  #fields > .interaction-editor,
+  #fields > .related-deals {
+    grid-column: 2;
+    margin-top: 0;
+    padding: 8px 11px;
+  }
+
+  #fields .related-deals .timeline,
+  #fields .history {
+    max-height: 92px;
+    overflow-y: auto;
+  }
+
+  /* Task Editor Horizontal Layout */
+  .task-playbook-Quickbar {
+    padding: 7px 12px;
+    margin-bottom: 8px;
+  }
+
+  .next-task-chain {
+    grid-column: span 2;
+    padding: 7px 11px;
+  }
+
+  /* Project Editor Horizontal Split: Form Left (58%) + Milestones Right (42%) */
+  #project-fields {
+    display: grid;
+    grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr);
+    gap: 8px 14px;
+    align-items: start;
+  }
+
+  #project-fields > .field-grid {
+    grid-column: 1;
+    grid-row: 1 / span 4;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  #project-fields > .form-section {
+    grid-column: 2;
+    margin: 0 !important;
+  }
+
+  #project-milestones {
+    grid-column: 2;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+
+  #add-project-milestone {
+    grid-column: 2;
+    justify-self: start;
+  }
+
+  .milestone-row {
+    margin: 0;
+    padding: 6px 9px;
+  }
+
+  .milestone-row .quote-line-grid {
+    grid-template-columns: 1.5fr 1fr 1fr auto;
+    gap: 6px;
+    align-items: end;
+  }
+
+  .milestone-row .quote-line-grid .field.full {
+    grid-column: span 1;
+  }
+
+  /* Quote Editor Horizontal Split: Metadata Left + Service Lines Right */
+  #quote-fields {
+    display: grid;
+    grid-template-columns: minmax(0, 1.35fr) minmax(0, 1.15fr);
+    gap: 8px 14px;
+    align-items: start;
+  }
+
+  #quote-fields > .field-grid {
+    grid-column: 1;
+    grid-row: 1 / span 6;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  #quote-fields > .quote-model-bar,
+  #quote-fields > #quote-lines,
+  #quote-fields > #add-quote-line,
+  #quote-fields > #quote-totals,
+  #quote-fields > label.field.full,
+  #quote-fields > .quote-version-list {
+    grid-column: 2;
+    margin: 0;
+  }
+
+  #quote-lines {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+
+  .quote-line {
+    margin: 0;
+    padding: 7px 10px;
+  }
+
+  .quote-line-grid {
+    grid-template-columns: 2fr repeat(3, 0.8fr);
+    gap: 8px;
+    align-items: end;
+  }
+
+  .quote-line-grid .field.full {
+    grid-column: span 1;
+  }
+
+  /* Playbook Editor: 3 Stages Side-by-Side Horizontally (Lead | Prospect | Cliente) */
+  #playbook-fields {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+    align-items: start;
+  }
+
+  .playbook-stage-block .pb-step-row {
+    margin: 4px 0;
+    padding: 6px 8px;
+  }
+
+  .playbook-stage-block .quote-line-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px;
+  }
+
+  /* Compact Category & Referent Choices inside Horizontal Desktop Grid */
+  .category-choices {
+    padding: 6px 8px;
+    gap: 5px;
+  }
+
+  .category-choices label {
+    padding: 3px 8px;
+    font-size: 11px;
+  }
+
+  #referent-rows,
+  #resource-rows {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .referent-row,
+  .resource-row {
+    margin: 0;
+    padding: 8px 10px;
   }
 }
 

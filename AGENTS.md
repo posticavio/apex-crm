@@ -57,6 +57,24 @@ node enterprise-check.cjs
 
 > Mantieni questo registro sintetico, ordinato cronologicamente (sessione più recente in alto) e compatibile sia con Google Antigravity sia con OpenAI Codex.
 
+### Sessione 2026-10-29 (Desktop Schermate di Creazione Orizzontali Zero-Scroll & Aggiornamento Skill Desktop) — Agente: Google Antigravity
+- **Ultimo commit precedente rilevato**: `da5f02a` (`[Antigravity] feat(mobile): apply Play Store Top 20 mobile UX patterns (Extended FAB, M3 pill nav, segmented controls)`) su `main`.
+- **Attività completate**:
+  - Salvata e formalizzata nelle skill globali (`universal-app-layout/SKILL.md`, `universal-app-layout/references/desktop_top10_design_spec.md`, `universal-app-layout/references/responsive_breakpoints.md`, `mobile-first-app-design/SKILL.md`, `mobile-first-app-design/references/troubleshooting_kb.md` Caso 23, e sincronizzata in `SKILLS_ANTIGRAVITY`) la **regola tassativa per la versione Desktop**:
+    - **Divieto assoluto di finestre verticali strette o con scorrimento verticale (`overflow-y: hidden`)** quando si apre una schermata per creare o modificare qualcosa.
+    - **Sfruttamento orizzontale panoramico (`width: min(1480px, 96vw)`)** disponendo i campi su **4 colonne orizzontali** (`grid-template-columns: repeat(4, minmax(0, 1fr))`), i campi `.field.full` e `textarea` su `grid-column: span 2` compatti (`height: 36px`), e i blocchi secondari (allegati, conversazioni, righe preventivo, milestone progetto, 3 fasi playbook Lead/Prospect/Cliente) **affiancati in orizzontale** (layout Master-Detail sinistra/destra o a 3 colonne).
+  - Applicato il nuovo layout orizzontale privo di scorrimento verticale in `layout.css` a tutte le schermate desktop di creazione/modifica di **Apex Digital CRM** (`#editor`, `#task-editor`, `#project-editor`, `#quote-editor`, `#finance-editor`, `#playbook-editor`).
+- **File modificati**:
+  - `layout.css`
+  - `AGENTS.md`
+  - Skill globali: `universal-app-layout` e `mobile-first-app-design` (+ mirror `SKILLS_ANTIGRAVITY`)
+- **Test eseguiti**:
+  - Eseguita l'intera suite di 6 controlli sintattici (`node --check`) e 9 test funzionali (`crm-check.cjs`, `import-check.cjs`, `relationship-check.cjs`, `sales-check.cjs`, `resource-check.cjs`, `unscheduled-check.cjs`, `quotes-check.cjs`, `activities-check.cjs`, `enterprise-check.cjs`) con esito `PASS`.
+- **Problemi aperti**:
+  - Nessuno.
+- **Attività successive consigliate**:
+  - Eventuale esecuzione di `pubblica-vercel.cmd` per aggiornare la build live su Vercel.
+
 ### Sessione 2026-10-29 (Benchmark Top 10 App Desktop & Aggiornamento Skill Desktop Mode) — Agente: Google Antigravity
 - **Ultimo commit precedente rilevato**: `edd3545` (`[Antigravity] feat(ui): apply Attio/Twenty/Linear CRM design system and Cmd+K command palette`) su `main`.
 - **Attività completate**:
