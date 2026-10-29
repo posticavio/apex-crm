@@ -57,6 +57,32 @@ node enterprise-check.cjs
 
 > Mantieni questo registro sintetico, ordinato cronologicamente (sessione più recente in alto) e compatibile sia con Google Antigravity sia con OpenAI Codex.
 
+### Sessione 2026-10-29 (Benchmark Top 10 App Desktop & Aggiornamento Skill Desktop Mode) — Agente: Google Antigravity
+- **Ultimo commit precedente rilevato**: `edd3545` (`[Antigravity] feat(ui): apply Attio/Twenty/Linear CRM design system and Cmd+K command palette`) su `main`.
+- **Attività completate**:
+  - Analizzato il design system, la disposizione ottica delle icone, la gerarchia dei comandi e l'ergonomia delle **Top 10 Applicazioni Generiche per Desktop** (*Linear, Notion, Attio / Twenty CRM, Slack Desktop, VS Code, Raycast, Figma Desktop, Apple macOS Finder/Mail, Superhuman, Airtable / Stripe Dashboard*).
+  - Applicati i pattern Desktop Mode ad **Apex Digital CRM** (`index.html`, `activities.js`, `layout.css`, `enterprise-check.cjs`):
+    1. **Bounding Box Ottico `20×20px` (`.nav-icon`) + Contatori Live (`.nav-badge`)**: ogni voce della sidebar desktop è strutturata in 3 zone (indicatore attivo `2.5px` + icona centrata in box `20×20px` + etichetta `.nav-text` allineata verticalmente + badge numerico monospace `[data-nav-count]` a destra, nascosto se `0`).
+    2. **Sidebar Collassabile in Navigation Rail (`244px` $\leftrightarrow$ `68px` con `Ctrl+B` / `⌘B`)**: aggiunto pulsante `#sidebar-collapse-btn` (`⇤`/`⇥`), funzione `toggleSidebarCollapse()` persistita in `localStorage` (`uiPrefs.sidebarCollapsed`), comando nella Command Palette e scorciatoia `Ctrl+B` / `⌘B` in stile VS Code / Linear.
+    3. **Top Command Bar (`54px`) divisa in 4 Cluster con Divisori Hairline `1px`**: separazione visiva tra Contesto/Breadcrumb, Spotlight Trigger `⌘K`, Cluster Creazione Rapida (`.header-create-cluster`) e Cluster Preferenze/Sistema (`.header-sys-cluster`).
+    4. **Scorciatoie Keyboard-First**: supporto per `Ctrl+K` / `⌘K` (Command Palette), `Ctrl+B` / `⌘B` (Toggle Sidebar Rail) e `Alt+1..7` (navigazione immediata tra le 7 viste principali).
+  - Aggiornate le skill globali per il **Desktop Mode**:
+    - Creato `C:\Users\posti\.gemini\config\skills\universal-app-layout\references\desktop_top10_design_spec.md`.
+    - Aggiornati `universal-app-layout/SKILL.md` e `mobile-first-app-design/SKILL.md` (+ `references/troubleshooting_kb.md`).
+- **File modificati**:
+  - `index.html`
+  - `activities.js`
+  - `layout.css`
+  - `enterprise-check.cjs`
+  - `AGENTS.md`
+- **Test eseguiti**:
+  - Eseguita l'intera suite di 6 controlli sintattici (`node --check`) e 9 test funzionali (`crm-check.cjs`, `import-check.cjs`, `relationship-check.cjs`, `sales-check.cjs`, `resource-check.cjs`, `unscheduled-check.cjs`, `quotes-check.cjs`, `activities-check.cjs`, `enterprise-check.cjs`) con esito `PASS`.
+  - Eseguiti gli script di audit `audit_layout.py` e `audit_mobile_responsive.py` con `0 anomalie / 0 issues found`.
+- **Problemi aperti**:
+  - Nessuno.
+- **Attività successive consigliate**:
+  - Eseguire `pubblica-vercel.cmd` se si desidera pubblicare l'aggiornamento live su Vercel.
+
 ### Sessione 2026-10-29 (Benchmark Top 20 App Play Store Mobile & Aggiornamento Skill) — Agente: Google Antigravity
 - **Ultimo commit precedente rilevato**: `edd3545` (`[Antigravity] feat(ui): apply Attio/Twenty/Linear CRM design system and Cmd+K command palette`) su `main`.
 - **Attività completate**:

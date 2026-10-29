@@ -183,12 +183,17 @@ assert.equal(run("toggleDensity()"),'compact');
 assert.equal(sandbox.document.body.dataset.density,'compact');
 assert.equal(run("toggleDensity()"),'comfortable');
 
-// 6. Command Palette (Cmd+K / Ctrl+K) Search & Actions
+// 6. Command Palette (Cmd+K / Ctrl+K) Search, Actions & Desktop Collapsible Rail (Ctrl+B)
 assert.equal(run("openCommandPalette('Delta')"),true);
 assert.equal(element('#command-dialog').open,true);
 assert.match(element('#command-results').innerHTML,/Delta Tech Srl/);
 assert.equal(run("runCommandAction('view:trattative')"),true);
 assert.equal(run("view"),'trattative');
+
+assert.equal(run("toggleSidebarCollapse()"),true);
+assert.equal(sandbox.document.body.dataset.sidebar,'collapsed');
+assert.equal(run("runCommandAction('toggle-sidebar')"),true);
+assert.equal(sandbox.document.body.dataset.sidebar,'expanded');
 
 // 7. Full JSON Backup & Restore Validation
 const backup=run("JSON.stringify({version:1,...state})");
