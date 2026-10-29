@@ -114,8 +114,8 @@ Requisiti coperti:
 - **Modulo Progetti e Consegne (`projects.js`)**: gestione commesse collegate a clienti, opportunità e preventivi; milestone con verifica deterministica delle dipendenze (`dependsOn`), avanzamento percentuale automatico, controllo economico (budget, costi, margine) e monte ore (stimate vs effettive).
 - **Obiettivi, Budget, Forecast ponderato e Fatturati storici (`analytics.js`)**: configurazione target annuo, target MRR, budget costi mensili e probabilità di chiusura per ciascuna fase della pipeline; registro fatturati storici per periodo (`YYYY-MM`) e ripartizione per linea di servizio AI.
 - **Personalizzazione Playbook (`Lead`, `Prospect`, `Cliente`)**: editor dedicato per aggiungere, modificare o rimuovere i passi dei playbook di attività per ogni fase aziendale, con salvataggio nel backup JSON e ripristino predefiniti.
-- **Temi e Densità UI**: supporto nativo persistente per *Chiaro Executive*, *Scuro Slate* e *Nero Assoluto AMOLED* (`#000000`), più selettore di densità *Confortevole* / *Compatta*.
-- Test automatici: `enterprise-check.cjs` e tutte le 9 suite di test superate.
+- **Temi, Densità UI, Command Palette (`⌘K`) e Mobile-First Shell**: supporto nativo persistente per *Chiaro Executive*, *Scuro Slate* e *Nero Assoluto AMOLED* (`#000000`), selettore di densità *Confortevole* / *Compatta*, **Command Palette universale (`Ctrl+K` / `Cmd+K`)** in stile Linear/Attio/Twenty per ricerca istantanea e comandi rapidi, e architettura responsiva mobile-first (Bottom Navigation Bar a 5 tab, Slide-Over Drawer con Impostazioni, trasformazione automatica tabelle in card verticali su smartphone e modali Bottom Sheet con swipe-to-dismiss).
+- Test automatici: `enterprise-check.cjs`, `activities-check.cjs` e tutte le 9 suite di test + script di audit ergonomico (`audit_layout.py` e `audit_mobile_responsive.py`) superati con 0 anomalie.
 
 
 

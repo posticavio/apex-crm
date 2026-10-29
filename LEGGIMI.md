@@ -125,11 +125,13 @@ La sezione **Forecast & KPI** (`📈 Forecast & KPI`) offre la vista direzionale
 - **Forecast probabilistico per fase:** calcolo automatico del valore ponderato della pipeline aperta moltiplicando gli importi di ciascuna fase (*Nuovo contatto*, *Trattativa*, *Offerta*) per i rispettivi pesi percentuali personalizzabili.
 - **Storico fatturati:** registrazione degli incassi/fatturati storici per periodo (`YYYY-MM`) e azienda, sommati al valore acquisito per misurare l'avanzamento verso il target annuo.
 
-## Tema (Chiaro / Scuro / AMOLED) e densità interfaccia
+## Tema (Chiaro / Scuro / AMOLED), densità interfaccia e Palette Comandi (⌘K / Ctrl+K)
 
 Nella barra superiore sono sempre disponibili i selettori rapidi per:
+- **Palette Comandi e Ricerca Universale (`⌕ Cerca / Comandi ⌘K` o scorciatoia `Ctrl+K` / `Cmd+K`):** ispirata ai migliori CRM moderni (Linear, Attio, Twenty), permette di cercare istantaneamente aziende, opportunità e attività aperte o di lanciare qualsiasi azione rapida e vista senza staccare le mani dalla tastiera.
 - **Tema visivo:** *Chiaro Executive*, *Scuro Slate* e *Nero Assoluto AMOLED* (`#000000`).
 - **Densità interfaccia:** *Confortevole* oppure *Compatta* ad alta densità per massimizzare le righe visibili a schermo.
+- **Esperienza Mobile-First Nativa (Smartphone e Tablet):** barra di navigazione inferiore a 5 tab nella zona del pollice (`Oggi`, `Attività`, `Aziende`, `Pipeline`, `Preventivi`), sotto-navigazione contestuale per le anagrafiche, menu laterale a scomparsa (*Slide-Over Drawer*) con gesture edge-swipe, tabelle convertite automaticamente in card verticali con etichette `data-label` e finestre modali trasformate in *Bottom Sheet* con *pill grabber* e chiusura *swipe-to-dismiss*.
 
 
 

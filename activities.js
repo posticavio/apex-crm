@@ -712,6 +712,11 @@ function syncMobileShell(){
  const isAnagrafiche=['contatti','lead','prospect','clienti','categories'].includes(view);
  const subnav=document.querySelector('#mobile-subnav');
  if(subnav)subnav.hidden=!isAnagrafiche;
+ const fabLabel=document.querySelector('#mobile-fab-label');
+ if(fabLabel){
+  const fabMap={activities:'Attività',contatti:'Azienda',lead:'Lead',prospect:'Prospect',clienti:'Cliente',categories:'Categoria',quotes:'Preventivo',projects:'Progetto',analytics:'Obiettivi'};
+  fabLabel.textContent=fabMap[view]||'Trattativa';
+ }
  if(document.querySelectorAll){
   document.querySelectorAll('#mobile-bottom-nav [data-view]').forEach(b=>{
    const active=b.dataset.view===view||(b.dataset.view==='contatti'&&isAnagrafiche);
@@ -741,6 +746,116 @@ function openSettingsDialog(){
  if(!dlg.open&&typeof dlg.showModal==='function')dlg.showModal();
 }
 
+// Command Palette (Ctrl+K / Cmd+K) inspired by Linear & Attio
+let commandQuery='';
+function buildCommandItems(q=''){
+ const term=String(q||'').trim().toLocaleLowerCase('it');
+ const matchText=(...parts)=>!term||parts.filter(Boolean).join(' ').toLocaleLowerCase('it').includes(term);
+ const actions=[
+  {group:'Azioni rapide',icon:'＋',label:'Nuova trattativa / opportunità',meta:'Crea opportunità commerciale',cmd:'new-deal'},
+  {group:'Azioni rapide',icon:'🏢',label:'Nuova azienda / contatto',meta:'Aggiungi anagrafica e referenti',cmd:'new-contact'},
+  {group:'Azioni rapide',icon:'☑',label:'Nuova attività operativa',meta:'Pianifica chiamata, demo o follow-up',cmd:'new-task'},
+  {group:'Azioni rapide',icon:'▤',label:'Nuovo preventivo',meta:'Crea proposta commerciale con versioni',cmd:'new-quote'},
+  {group:'Azioni rapide',icon:'🚀',label:'Nuovo progetto / commessa',meta:'Avvia commessa con milestone',cmd:'new-project'},
+  {group:'Azioni rapide',icon:'⚡',label:'Cambia tema (Chiaro / Scuro / AMOLED)',meta:'Alterna profilo cromatico',cmd:'cycle-theme'},
+  {group:'Azioni rapide',icon:'↕',label:'Cambia densità (Confortevole / Compatta)',meta:'Ottimizza densità tabelle',cmd:'toggle-density'},
+  {group:'Azioni rapide',icon:'↓',label:'Esporta backup JSON completo',meta:'Salva copia locale',cmd:'export-json'},
+  {group:'Navigazione',icon:'◷',label:'Vai a Oggi (Dashboard)',meta:'Prossime azioni e KPI',cmd:'view:oggi'},
+  {group:'Navigazione',icon:'☑',label:'Vai a Attività',meta:'Bacheca Lead, Prospect e Clienti',cmd:'view:activities'},
+  {group:'Navigazione',icon:'🚀',label:'Vai a Progetti & Consegne',meta:'Milestone, budget e ore',cmd:'view:projects'},
+  {group:'Navigazione',icon:'◎',label:'Vai a Contatti & Anagrafiche',meta:'Tutte le aziende',cmd:'view:contatti'},
+  {group:'Navigazione',icon:'▥',label:'Vai a Opportunità (Pipeline)',meta:'Bacheca 5 fasi ed elenco',cmd:'view:trattative'},
+  {group:'Navigazione',icon:'▤',label:'Vai a Preventivi',meta:'Proposte commerciali e stampa PDF',cmd:'view:quotes'},
+  {group:'Navigazione',icon:'📈',label:'Vai a Forecast & KPI',meta:'Target, pesi e storico fatturati',cmd:'view:analytics'},
+  {group:'Navigazione',icon:'⚙',label:'Apri Impostazioni',meta:'Temi, feedback aptico e archivio',cmd:'open-settings'}
+ ].filter(item=>matchText(item.label,item.meta,item.group));
+
+ const companyItems=(state.contacts||[]).filter(c=>matchText(c.company,c.person,c.email,c.sector,c.city)).slice(0,6).map(c=>({
+  group:'Aziende',
+  icon:'🏢',
+  label:c.company,
+  meta:`${contactStage(c.id)}${c.person?' · '+c.person:''}`,
+  cmd:`contact:${c.id}`
+ }));
+
+ const dealItems=(state.deals||[]).filter(d=>!isArchived(d)&&matchText(d.title,contact(d.contactId)?.company,d.service,getSalesStage(d))).slice(0,6).map(d=>({
+  group:'Opportunità',
+  icon:'💼',
+  label:d.title,
+  meta:`${contact(d.contactId)?.company||'Azienda'} · ${getSalesStage(d)} · ${money(d.setup)}`,
+  cmd:`deal:${d.id}`
+ }));
+
+ const taskItems=(state.activities||[]).filter(a=>isOpenTask(a)&&matchText(a.title,contact(a.contactId)?.company,a.type)).slice(0,5).map(a=>({
+  group:'Attività aperte',
+  icon:'☑',
+  label:a.title,
+  meta:`${contact(a.contactId)?.company||'Azienda'} · ${a.type}${a.dueDate?' · '+date(a.dueDate):''}`,
+  cmd:`task:${a.id}`
+ }));
+
+ return [...companyItems,...dealItems,...taskItems,...actions];
+}
+
+function renderCommandPalette(q=commandQuery){
+ commandQuery=String(q??'');
+ const box=typeof document!=='undefined'?document.querySelector('#command-results'):null;
+ if(!box)return '';
+ const items=buildCommandItems(commandQuery);
+ if(!items.length){
+  box.innerHTML='<div class="empty-compact">Nessun comando o scheda trovata per questa ricerca.</div>';
+  return box.innerHTML;
+ }
+ const groups=new Map();
+ for(const item of items){
+  if(!groups.has(item.group))groups.set(item.group,[]);
+  groups.get(item.group).push(item);
+ }
+ box.innerHTML=[...groups.entries()].map(([g,list])=>`
+  <div class="command-group">
+   <div class="command-group-label">${esc(g)}</div>
+   ${list.map(item=>`<button type="button" class="command-item" data-run-cmd="${esc(item.cmd)}">
+    <span class="command-item-icon">${esc(item.icon)}</span>
+    <span class="command-item-main"><strong>${esc(item.label)}</strong><small>${esc(item.meta)}</small></span>
+    <span class="command-item-enter">↵</span>
+   </button>`).join('')}
+  </div>`).join('');
+ return box.innerHTML;
+}
+
+function openCommandPalette(initialQuery=''){
+ const dlg=typeof document!=='undefined'?document.querySelector('#command-dialog'):null;
+ if(!dlg)return false;
+ commandQuery=String(initialQuery||'');
+ const inp=document.querySelector('#command-input');
+ if(inp)inp.value=commandQuery;
+ renderCommandPalette(commandQuery);
+ setMobileDrawer(false);
+ if(!dlg.open&&typeof dlg.showModal==='function')dlg.showModal();
+ if(inp&&typeof inp.focus==='function')inp.focus();
+ return true;
+}
+
+function runCommandAction(cmd){
+ const dlg=typeof document!=='undefined'?document.querySelector('#command-dialog'):null;
+ if(dlg?.open&&typeof dlg.close==='function')dlg.close();
+ if(!cmd)return false;
+ if(cmd==='new-deal'){openEditor('deal');return true;}
+ if(cmd==='new-contact'){openEditor('contact');return true;}
+ if(cmd==='new-task'){openTaskEditor();return true;}
+ if(cmd==='new-quote'){openQuote();return true;}
+ if(cmd==='new-project'){if(typeof openProjectEditor==='function')openProjectEditor();return true;}
+ if(cmd==='cycle-theme'){if(typeof cycleTheme==='function')cycleTheme();return true;}
+ if(cmd==='toggle-density'){if(typeof toggleDensity==='function')toggleDensity();return true;}
+ if(cmd==='export-json'){document.querySelector('#export')?.click();return true;}
+ if(cmd==='open-settings'){openSettingsDialog();return true;}
+ if(cmd.startsWith('view:')){setView(cmd.slice(5));return true;}
+ if(cmd.startsWith('contact:')){openEditor('contact',cmd.slice(8));return true;}
+ if(cmd.startsWith('deal:')){openEditor('deal',cmd.slice(5));return true;}
+ if(cmd.startsWith('task:')){openTaskEditor(cmd.slice(5));return true;}
+ return false;
+}
+
 applyUiPrefs();
 
 document.addEventListener('click',e=>{
@@ -754,7 +869,11 @@ document.addEventListener('click',e=>{
   return;
  }
  if(b.id==='drawer-close'){setMobileDrawer(false);return;}
+ if(b.id==='mobile-fab'){hapticTap(12);document.querySelector('#new')?.click();return;}
  if(b.id==='open-settings'||b.id==='header-settings-btn'){openSettingsDialog();return;}
+ if(b.id==='cmd-trigger-btn'){openCommandPalette();return;}
+ if(b.id==='command-close'){document.querySelector('#command-dialog')?.close();return;}
+ if(b.dataset.runCmd){runCommandAction(b.dataset.runCmd);return;}
  if(b.id==='settings-close'||b.id==='settings-done'){document.querySelector('#settings-dialog')?.close();return;}
  if(b.id==='quote-close'){document.querySelector('#quote-editor')?.close();quoteSession=null;return;}
  if(b.id==='csv-close'){document.querySelector('#csv-dialog')?.close();if(typeof csvSession!=='undefined')csvSession=null;return;}
@@ -774,6 +893,25 @@ document.addEventListener('change',e=>{
  if(e.target.id==='pref-haptics'){
   uiPrefs.haptics=Boolean(e.target.checked);
   saveUiPrefs();
+ }
+});
+
+document.addEventListener('input',e=>{
+ if(e.target.id==='command-input'){
+  renderCommandPalette(e.target.value);
+ }
+});
+
+document.addEventListener('keydown',e=>{
+ if((e.ctrlKey||e.metaKey)&&String(e.key).toLowerCase()==='k'){
+  e.preventDefault?.();
+  openCommandPalette();
+ }else if(e.key==='Enter'&&e.target?.id==='command-input'){
+  const first=document.querySelector?.('#command-results [data-run-cmd]');
+  if(first?.dataset?.runCmd){
+   e.preventDefault?.();
+   runCommandAction(first.dataset.runCmd);
+  }
  }
 });
 

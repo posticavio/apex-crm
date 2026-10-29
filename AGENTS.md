@@ -57,6 +57,32 @@ node enterprise-check.cjs
 
 > Mantieni questo registro sintetico, ordinato cronologicamente (sessione più recente in alto) e compatibile sia con Google Antigravity sia con OpenAI Codex.
 
+### Sessione 2026-10-29 (Design System Attio × Twenty CRM × Linear & Command Palette) — Agente: Google Antigravity
+- **Ultimo commit precedente rilevato**: `c65026f` (`[Antigravity] chore: configure Vercel production deployment and update AGENTS.md handoff log`) su `main`.
+- **Attività completate**:
+  - Estrapolati i design token, la gerarchia tipografica, le superfici e i pattern architetturali dalle skill GitHub (`ui-ux-pro-max`, `frontend-design`, `universal-app-layout`, `mobile-first-app-design`) e dai migliori CRM moderni (`twentyhq/twenty`, **Attio**, **Linear**).
+  - Riprogettato integralmente `layout.css` applicando:
+    - **Token & Hairline Borders (Attio / Linear)**: superfici paper-slate (`#f6f7f9` / `#ffffff`), bordi hairline `1px` (`#e4e7ec` / `rgba(255,255,255,0.08)`), micro-ombre con highlight interno (`--shadow-inset`) e raggi geometrici `6px`/`8px`/`10px`.
+    - **Tipografia & Numeri Tabulari**: combinazione `Inter` + `Plus Jakarta Sans` + `JetBrains Mono` per badge, codici preventivo, contatori e importi finanziari tabulari (`tabular-nums`).
+    - **Sidebar Obsidian & Top Command Bar (Twenty CRM / Linear)**: rail laterale `#0b0d11` con Workspace Switcher card, indicatori attivi e barra superiore con trigger Spotlight `⌕ Cerca / Comandi ⌘K`.
+    - **Record Slide-Over Drawer (Attio / Twenty)**: su desktop (`>= 768px`) le modali di scheda (`#editor`, `#task-editor`, `#project-editor`, `#quote-editor`, `#finance-editor`, `#playbook-editor`) scorrono come pannelli laterali destri a tutta altezza (`100dvh`), mentre su smartphone (`< 768px`) si trasformano in Bottom Sheet nativi con pill grabber.
+    - **Data Grid Spreadsheet & Kanban**: tabelle ad alta densità con divisori verticali sottili, dot semantici sulle colonne Kanban e card opportunità con box valore monospace.
+  - Completato e testato il cablaggio della Command Palette (`#command-dialog`, `#cmd-trigger-btn`, `openCommandPalette`, `runCommandAction`, scorciatoia `Ctrl+K` / `⌘K`) su `index.html`, `activities.js` e `enterprise-check.cjs`.
+- **File modificati**:
+  - `layout.css`
+  - `index.html`
+  - `activities.js`
+  - `activities-check.cjs`
+  - `enterprise-check.cjs`
+  - `AGENTS.md`
+- **Test eseguiti**:
+  - 6 controlli sintattici `node --check` + 9 suite funzionali (`crm-check.cjs`, `import-check.cjs`, `relationship-check.cjs`, `sales-check.cjs`, `resource-check.cjs`, `unscheduled-check.cjs`, `quotes-check.cjs`, `activities-check.cjs`, `enterprise-check.cjs`) tutti con esito `PASS`.
+  - Audit layout e mobile responsiveness (`audit_layout.py` e `audit_mobile_responsive.py`): `0 anomalie / 0 issues found`.
+- **Problemi aperti**:
+  - Nessuno.
+- **Attività successive consigliate**:
+  - Eventuale esecuzione di `pubblica-vercel.cmd` per aggiornare la build live su Vercel.
+
 ### Sessione 2026-10-29 (Deploy Vercel & CI) — Agente: Google Antigravity
 - **Ultimo commit precedente rilevato**: `a5b7893` (`[Antigravity] docs: add AGENTS.md coordination protocol and harden .gitignore`) e `81c3d26` (`test: align smartphone card data-label assertion in activities-check`) su `main`.
 - **Attività completate**:

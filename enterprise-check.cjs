@@ -183,10 +183,17 @@ assert.equal(run("toggleDensity()"),'compact');
 assert.equal(sandbox.document.body.dataset.density,'compact');
 assert.equal(run("toggleDensity()"),'comfortable');
 
-// 6. Full JSON Backup & Restore Validation
+// 6. Command Palette (Cmd+K / Ctrl+K) Search & Actions
+assert.equal(run("openCommandPalette('Delta')"),true);
+assert.equal(element('#command-dialog').open,true);
+assert.match(element('#command-results').innerHTML,/Delta Tech Srl/);
+assert.equal(run("runCommandAction('view:trattative')"),true);
+assert.equal(run("view"),'trattative');
+
+// 7. Full JSON Backup & Restore Validation
 const backup=run("JSON.stringify({version:1,...state})");
 const restored=run("migrate(JSON.parse("+JSON.stringify(backup)+"))");
 run("validate("+JSON.stringify(restored)+")");
 
-console.log('PASS: projects with milestones and dependency guards, economic margin and hours tracking, revenue targets, budget and weighted forecast, historical revenues, customizable stage playbooks, dark/AMOLED themes and compact density, CSV/JSON portability.');
+console.log('PASS: projects with milestones and dependency guards, economic margin and hours tracking, revenue targets, budget and weighted forecast, historical revenues, customizable stage playbooks, command palette Cmd+K, dark/AMOLED themes and compact density, CSV/JSON portability.');
 
