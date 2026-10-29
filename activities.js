@@ -673,12 +673,18 @@ try{
 }catch{}
 
 function applyUiPrefs(){
- if(typeof document!=='undefined'&&document.documentElement?.setAttribute){
-  document.documentElement.setAttribute('data-theme',uiPrefs.theme||'light');
+ const t=uiPrefs.theme||'light';
+ if(typeof document!=='undefined'){
+  if(document.documentElement?.setAttribute)document.documentElement.setAttribute('data-theme',t);
+  if(document.documentElement?.dataset)document.documentElement.dataset.theme=t;
+  if(document.body?.dataset)document.body.dataset.theme=t;
+  if(typeof applyUiSettings==='function'&&typeof getUiSettings==='function'){
+   try{applyUiSettings({...getUiSettings(),theme:t});}catch{}
+  }
  }
  if(typeof document!=='undefined'&&document.querySelectorAll){
   document.querySelectorAll('[data-set-theme]').forEach(b=>{
-   if(b.classList)b.classList.toggle('selected',b.dataset.setTheme===uiPrefs.theme);
+   if(b.classList)b.classList.toggle('selected',b.dataset.setTheme===t);
   });
  }
  const hapticsEl=typeof document!=='undefined'?document.querySelector('#pref-haptics'):null;
@@ -710,6 +716,9 @@ function syncMobileShell(){
   document.querySelectorAll('#mobile-bottom-nav [data-view]').forEach(b=>{
    const active=b.dataset.view===view||(b.dataset.view==='contatti'&&isAnagrafiche);
    if(b.classList)b.classList.toggle('active',active);
+  });
+  document.querySelectorAll('#mobile-subnav [data-view]').forEach(b=>{
+   if(b.classList)b.classList.toggle('active',b.dataset.view===view);
   });
  }
  setMobileDrawer(false);

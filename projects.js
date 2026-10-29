@@ -376,13 +376,13 @@ function projectsGanttTable(rows){
    const c=contact(p.contactId),prog=projectProgress(p),margin=projectMarginCents(p);
    return `<tr>
     <td><strong>${esc(p.name)}</strong><small>${esc(c?.company||'—')}</small></td>
-    <td><span class="pill ${projectStatusPill(p.status)}">${esc(p.status)}</span><div class="progress-bar-wrap" style="margin-top:8px"><div class="progress-bar-fill" style="width:${prog}%"></div></div><small>${prog}% completato</small></td>
-    <td><small>${p.startDate?date(p.startDate):'—'} → ${p.endDate?date(p.endDate):'—'}</small>
+    <td data-label="Stato & Avanzamento"><span class="pill ${projectStatusPill(p.status)}">${esc(p.status)}</span><div class="progress-bar-wrap" style="margin-top:8px"><div class="progress-bar-fill" style="width:${prog}%"></div></div><small>${prog}% completato</small></td>
+    <td data-label="Cronoprogramma & Milestone"><small>${p.startDate?date(p.startDate):'—'} → ${p.endDate?date(p.endDate):'—'}</small>
      <div class="milestone-mini-list">${(p.milestones||[]).map(m=>`<button type="button" class="milestone-chip ${m.done?'done':''}" data-toggle-ms="${esc(m.id)}" data-ms-project="${esc(p.id)}">${m.done?'✓':'○'} ${esc(m.title)}${m.dueDate?' ('+date(m.dueDate)+')':''}</button>`).join('')}</div>
     </td>
-    <td><strong>${quoteMoney(p.budgetCents)}</strong><small>Costo: ${quoteMoney(p.costCents)} · Margine: ${quoteMoney(margin)}</small></td>
-    <td>${p.loggedHours} / ${p.estimatedHours} h</td>
-    <td><button type="button" class="text-button" data-edit-project="${esc(p.id)}">Modifica ↗</button></td>
+    <td data-label="Budget / Costi / Margine"><strong class="money-atomic">${quoteMoney(p.budgetCents)}</strong><small>Costo: ${quoteMoney(p.costCents)} · Margine: ${quoteMoney(margin)}</small></td>
+    <td data-label="Ore">${p.loggedHours} / ${p.estimatedHours} h</td>
+    <td class="cell-actions"><div class="row-actions"><button type="button" class="text-button" data-edit-project="${esc(p.id)}">Modifica ↗</button></div></td>
    </tr>`;
   }).join('')}</tbody>
  </table></div>`:empty('Nessun progetto attivo','Avvia una commessa per monitorare consegne, milestone, dipendenze e marginalità dei clienti.','+ Nuovo progetto','project')}</div>`;
@@ -442,3 +442,4 @@ if(document.querySelector('#project-delete')){
 if(document.querySelector('#project-editor')){
  document.querySelector('#project-editor').addEventListener('cancel',()=>{projectSession=null;});
 }
+

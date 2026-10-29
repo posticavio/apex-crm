@@ -134,11 +134,11 @@ function analyticsView(){
        <tbody>
         ${f.byStage.map(row=>`<tr>
          <td><strong>${esc(row.stage)}</strong></td>
-         <td>${row.count}</td>
-         <td><span class="pill ${row.weight===100?'green':row.weight===0?'red':''}">${row.weight}%</span></td>
-         <td>${money(row.gross)}</td>
-         <td><strong>${money(row.weighted)}</strong></td>
-         <td>${money(row.weightedMonthly)} / mese</td>
+         <td data-label="N° Opportunità">${row.count}</td>
+         <td data-label="Probabilità"><span class="pill ${row.weight===100?'green':row.weight===0?'red':''}">${row.weight}%</span></td>
+         <td data-label="Valore Lordo" class="money-atomic">${money(row.gross)}</td>
+         <td data-label="Forecast Ponderato" class="money-atomic"><strong>${money(row.weighted)}</strong></td>
+         <td data-label="Canone Ponderato" class="money-atomic">${money(row.weightedMonthly)} / mese</td>
         </tr>`).join('')}
        </tbody>
       </table>
@@ -168,10 +168,10 @@ function analyticsView(){
       <thead><tr><th>Periodo</th><th>Azienda</th><th>Descrizione</th><th>Importo</th><th></th></tr></thead>
       <tbody>${f.fin.revenues.slice().sort((a,b)=>b.period.localeCompare(a.period)).map(r=>`<tr>
        <td><span class="pill">${esc(r.period)}</span></td>
-       <td><strong>${esc(contact(r.contactId)?.company||'—')}</strong></td>
-       <td>${esc(r.description)}</td>
-       <td><strong>${money(r.amount)}</strong></td>
-       <td><button type="button" class="text-button" data-delete-revenue="${esc(r.id)}">Rimuovi</button></td>
+       <td data-label="Azienda"><strong>${esc(contact(r.contactId)?.company||'—')}</strong></td>
+       <td data-label="Descrizione">${esc(r.description)}</td>
+       <td data-label="Importo" class="money-atomic"><strong>${money(r.amount)}</strong></td>
+       <td class="cell-actions"><div class="row-actions"><button type="button" class="text-button" data-delete-revenue="${esc(r.id)}">Rimuovi</button></div></td>
       </tr>`).join('')}</tbody>
      </table></div>`:'<p class="related-empty">Nessun fatturato storico aggiuntivo registrato. Usa "+ Registra fatturato storico" per inserire incassi pregressi.</p>'}
     </div>
@@ -475,3 +475,4 @@ if(document.querySelector('#playbook-close')){
 }
 
 applyUiSettings();
+

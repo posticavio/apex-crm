@@ -189,3 +189,4 @@ const restored=run("migrate(JSON.parse("+JSON.stringify(backup)+"))");
 run("validate("+JSON.stringify(restored)+")");
 
 console.log('PASS: projects with milestones and dependency guards, economic margin and hours tracking, revenue targets, budget and weighted forecast, historical revenues, customizable stage playbooks, dark/AMOLED themes and compact density, CSV/JSON portability.');
+
