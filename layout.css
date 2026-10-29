@@ -783,6 +783,111 @@ header {
   color: var(--ink);
 }
 
+/* Single-Button Day/Night Mode Switch (Changes color on activation) */
+#theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 32px;
+  padding: 5px 10px;
+  font-size: 11.5px;
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  color: var(--ink-secondary);
+  cursor: pointer;
+  transition: background-color 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+              color 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.1s ease;
+  user-select: none;
+  white-space: nowrap;
+}
+
+#theme-toggle:hover:not(:disabled) {
+  background: var(--surface-subtle);
+  border-color: var(--line-strong);
+  color: var(--ink);
+}
+
+#theme-toggle:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+#theme-toggle .theme-dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #f59e0b;
+  box-shadow: 0 0 4px rgba(245, 158, 11, 0.4);
+  flex-shrink: 0;
+  transition: background-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+#theme-toggle .theme-icon {
+  font-size: 12px;
+  line-height: 1;
+  color: #d97706;
+  transition: color 0.2s ease;
+}
+
+#theme-toggle .theme-text {
+  line-height: 1;
+  letter-spacing: -0.01em;
+}
+
+/* VISUAL COLOR CHANGE WHEN ACTIVATED (Night / Dark / AMOLED Mode) */
+#theme-toggle.active-mode,
+#theme-toggle[data-theme-active="true"] {
+  background: #4f46e5;
+  border-color: #4338ca;
+  color: #ffffff;
+  box-shadow: 0 0 0 1px rgba(79, 70, 229, 0.5), 0 2px 6px rgba(79, 70, 229, 0.35);
+}
+
+#theme-toggle.active-mode:hover:not(:disabled),
+#theme-toggle[data-theme-active="true"]:hover:not(:disabled) {
+  background: #4338ca;
+  border-color: #3730a3;
+  color: #ffffff;
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.4), 0 2px 8px rgba(79, 70, 229, 0.45);
+}
+
+#theme-toggle.active-mode .theme-dot,
+#theme-toggle[data-theme-active="true"] .theme-dot {
+  background: #38bdf8;
+  box-shadow: 0 0 6px #38bdf8;
+}
+
+#theme-toggle.active-mode .theme-icon,
+#theme-toggle[data-theme-active="true"] .theme-icon {
+  color: #bfdbfe;
+}
+
+/* Special AMOLED Active Variant */
+[data-theme="amoled"] #theme-toggle.active-mode,
+[data-theme="amoled"] #theme-toggle[data-theme-active="true"] {
+  background: #000000;
+  border-color: #06b6d4;
+  color: #38bdf8;
+  box-shadow: 0 0 0 1px #06b6d4, 0 0 12px rgba(6, 182, 212, 0.45);
+}
+
+[data-theme="amoled"] #theme-toggle.active-mode .theme-dot,
+[data-theme="amoled"] #theme-toggle[data-theme-active="true"] .theme-dot {
+  background: #06b6d4;
+  box-shadow: 0 0 8px #06b6d4;
+}
+
+[data-theme="amoled"] #theme-toggle.active-mode .theme-icon,
+[data-theme="amoled"] #theme-toggle[data-theme-active="true"] .theme-icon {
+  color: #38bdf8;
+}
+
 /* Attio/Linear Spotlight Search Pill Trigger in Header */
 .cmd-trigger {
   display: inline-flex;
@@ -3458,34 +3563,69 @@ body[data-density="compact"] .deal-container .deal {
     font-size: 11.5px;
   }
 
-  /* Barra Sotto-Navigazione Contestuale (Tutte, Lead, Prospect, Clienti, Categorie) */
+  /* Barra Sotto-Navigazione Contestuale (Expanding Pill / Solo Icona per inattivi)
+     Zero Scroll Orizzontale Garantito */
   .mobile-subnav:not([hidden]) {
-    display: grid;
-    grid-template-columns: repeat(5, minmax(0, 1fr));
+    display: flex;
+    align-items: center;
     gap: 4px;
-    padding: 6px 10px;
+    padding: 6px 8px;
     background: var(--surface);
     border-bottom: 1px solid var(--line);
     position: sticky;
     top: 54px;
     z-index: 18;
+    overflow-x: hidden;
   }
 
   .mobile-subnav button {
+    flex: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
     padding: 6px 4px;
     font-size: 11px;
     font-weight: 600;
-    min-height: 34px;
-    border-radius: var(--radius-xs);
-    text-align: center;
-    justify-content: center;
+    min-height: 36px;
+    border-radius: var(--radius-sm);
+    border: 1px solid transparent;
+    background: transparent;
+    color: var(--muted);
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     white-space: nowrap;
+    user-select: none;
   }
 
+  .mobile-subnav button .subnav-icon {
+    font-size: 15px;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Inattivi su smartphone: SOLO ICONA */
+  .mobile-subnav button:not(.active) .subnav-label {
+    display: none;
+  }
+
+  /* Attivo su smartphone: ICONA + TESTO in capsula espansa */
   .mobile-subnav button.active {
+    flex: 1.8;
+    gap: 6px;
     background: var(--blue);
     border-color: var(--blue);
     color: #ffffff;
+    font-weight: 700;
+    border-radius: var(--radius-pill);
+    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.25);
+  }
+
+  .mobile-subnav button.active .subnav-label {
+    display: inline;
+    font-size: 11.5px;
+    letter-spacing: -0.01em;
   }
 
   /* Spazio inferiore per la Fixed Bottom Navigation Bar */

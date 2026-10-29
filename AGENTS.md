@@ -57,6 +57,31 @@ node enterprise-check.cjs
 
 > Mantieni questo registro sintetico, ordinato cronologicamente (sessione più recente in alto) e compatibile sia con Google Antigravity sia con OpenAI Codex.
 
+### Sessione 2026-10-29 (Toggle Day Mode / Light Mode Tasto Singolo con Cambio Cromatico di Stato) — Agente: Google Antigravity
+- **Ultimo commit precedente rilevato**: `19fe47d` (`[Antigravity] feat(ui): replace scattered create buttons with unified '+ Crea' popover on desktop and action sheet on mobile`) su `main`.
+- **Attività completate**:
+  - Riprogettata l'opzione tema Day Mode / Light Mode: sostituito il ciclo testuale ambiguo con un **singolo pulsante toggle compatto e diretto (`#theme-toggle`)** sia su Desktop sia su Smartphone:
+    - Dotato di icona semantica (`☀` Day Mode / `🌙` Night Mode), micro-indicatore luminoso (`.theme-dot`) e stato accessibile `role="switch" aria-pressed="true" / "false"`.
+    - **Cambio cromatico visivo di stato (Active Color Switch)**:
+      - Quando inattivo (**Day Mode / Light Mode**): superficie pulita, neutra ed elegante con bordo hairline sottile (`var(--surface)` / `var(--line)`) e dot ambrato caldo.
+      - Quando attivato (**Night / Dark / AMOLED Mode**): il pulsante stesso **cambia colore di sfondo e bordo in modo evidente** (indaco/blu `#4f46e5`, bordo `#4338ca`, testo chiaro `#ffffff`, dot ciano luminoso `#38bdf8` o nero profondo con bagliore neon in AMOLED), fornendo feedback immediato visibile a colpo d'occhio.
+  - Aggiornate e formalizzate le regole e i pattern nelle skill globali:
+    - `universal-app-layout` (`SKILL.md`, `references/desktop_top10_design_spec.md`, `references/troubleshooting_kb.md` Caso 25)
+    - `mobile-first-app-design` (`SKILL.md`, `references/troubleshooting_kb.md` Caso 25)
+- **File modificati**:
+  - `index.html`
+  - `analytics.js`
+  - `layout.css`
+  - `AGENTS.md`
+  - Skill globali: `universal-app-layout` e `mobile-first-app-design`
+- **Test eseguiti**:
+  - Eseguita l'intera suite di 6 controlli sintattici (`node --check`) e 9 test funzionali (`crm-check.cjs`, `import-check.cjs`, `relationship-check.cjs`, `sales-check.cjs`, `resource-check.cjs`, `unscheduled-check.cjs`, `quotes-check.cjs`, `activities-check.cjs`, `enterprise-check.cjs`) con esito `PASS`.
+  - Audit di layout e mobile responsive (`audit_layout.py` e `audit_mobile_responsive.py`) superati con 0 anomalie.
+- **Problemi aperti**:
+  - Nessuno.
+- **Attività successive consigliate**:
+  - Esecuzione di `pubblica-vercel.cmd` per promuovere l'aggiornamento in produzione su Vercel.
+
 ### Sessione 2026-10-29 (Menu Unificato "+ Crea" Popover Desktop e Action Sheet Mobile) — Agente: Google Antigravity
 - **Ultimo commit precedente rilevato**: `fcf7547` (`[Antigravity] feat(desktop): enforce horizontal zero-scroll creation modals on desktop`) su `main`.
 - **Attività completate**:

@@ -416,7 +416,24 @@ function applyUiSettings(settings=getUiSettings()){
  }
  try{localStorage.setItem(UI_KEY,JSON.stringify({theme,density}));}catch{}
  const themeBtn=document.querySelector('#theme-toggle');
- if(themeBtn)themeBtn.textContent=theme==='light'?'🌙 Scuro':theme==='dark'?'● AMOLED':'☀ Chiaro';
+ if(themeBtn){
+  const isDark=theme!=='light';
+  if(themeBtn.classList&&typeof themeBtn.classList.toggle==='function'){
+   themeBtn.classList.toggle('active-mode',isDark);
+   themeBtn.classList.toggle('theme-dark-active',isDark);
+  }
+  if(typeof themeBtn.setAttribute==='function'){
+   themeBtn.setAttribute('aria-pressed',isDark?'true':'false');
+   themeBtn.setAttribute('aria-checked',isDark?'true':'false');
+  }
+  if(themeBtn.dataset){
+   themeBtn.dataset.themeActive=isDark?'true':'false';
+   themeBtn.dataset.theme=theme;
+  }
+  const icon=theme==='light'?'☀':theme==='dark'?'🌙':'●';
+  const label=theme==='light'?'Day Mode':theme==='dark'?'Night Mode':'AMOLED';
+  themeBtn.innerHTML='<span class="theme-dot" aria-hidden="true"></span><span class="theme-icon" aria-hidden="true">'+icon+'</span><span class="theme-text">'+label+'</span>';
+ }
  const densityBtn=document.querySelector('#density-toggle');
  if(densityBtn)densityBtn.textContent=density==='compact'?'↕ Confortevole':'⚡ Compatta';
  return {theme,density};
