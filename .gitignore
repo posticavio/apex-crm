@@ -1,1 +1,17 @@
 private-imports/
+.vercel/
+
+# Segreti e file di ambiente
+.env
+.env.*
+*.pem
+*.key
+
+# Dipendenze, build e file temporanei/locali
+node_modules/
+dist/
+build/
+.DS_Store
+Thumbs.db
+*.log
+
