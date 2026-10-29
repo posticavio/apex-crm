@@ -57,6 +57,32 @@ node enterprise-check.cjs
 
 > Mantieni questo registro sintetico, ordinato cronologicamente (sessione più recente in alto) e compatibile sia con Google Antigravity sia con OpenAI Codex.
 
+### Sessione 2026-10-29 (Smartphone Zero Scroll Orizzontale Expanding Pill, Anti Death-Scroll Accordion & Icone Moderne) — Agente: Google Antigravity
+- **Ultimo commit precedente rilevato**: `b5c2387` (`[Antigravity] feat(ui): implement single-button Day/Night mode switch with distinct active color styling`) su `main`.
+- **Attività completate**:
+  - Implementato in `layout.css` e `index.html` il pattern tassativo **Zero Scroll Orizzontale su Smartphone (< 768px)**:
+    - Navigazione inferiore `#mobile-bottom-nav` e sotto-navigazione `#mobile-subnav`: solo l'elemento ATTIVO mostra icona moderna + etichetta di testo in una capsula/pill espansa (`flex: 1.8; gap: 6px; background: var(--blue-soft)`), mentre tutti gli elementi INATTIVI mostrano SOLO l'icona moderna (`.bnav-label { display: none; }`, `.subnav-label { display: none; }`).
+    - Eliminato qualsiasi scorrimento orizzontale (`overflow-x: hidden`), garantendo perfetta leggibilità e compatibilità su schermi stretti (da 320px a 430px) senza troncamenti né barre laterali.
+  - Implementato il sistema **Anti Death-Scroll Verticale con Sezioni Collassabili & Accordion ("Nascondi / Fai vedere")**:
+    - Definite classi riutilizzabili `.mobile-collapsible-section`, `.mobile-collapsible-summary`, `.mobile-summary-toggle` con badge contatore, icona semantica e trigger esplicito con chevron animato (`⌄` / `›`).
+  - Creata la specifica estesa:
+    - `references/smartphone_compact_ui_spec.md`
+  - Creato l'esempio pronto all'uso:
+    - `examples/smartphone_adaptive_shell_example.tsx`
+  - Aggiornati i riferimenti in `universal-app-layout` (`SKILL.md`, `references/troubleshooting_kb.md` Casi 26 e 27) e sincronizzati nel mirror `C:\Users\posti\Downloads\Antigravity\SKILLS_ANTIGRAVITY\universal-app-layout\` e in `mobile-first-app-design`.
+- **File modificati**:
+  - `layout.css`
+  - `index.html`
+  - `AGENTS.md`
+  - Skill globali: `universal-app-layout` e `mobile-first-app-design` (+ mirror `SKILLS_ANTIGRAVITY`)
+- **Test eseguiti**:
+  - Eseguita l'intera suite di 6 controlli sintattici (`node --check`) e 9 test funzionali (`crm-check.cjs`, `import-check.cjs`, `relationship-check.cjs`, `sales-check.cjs`, `resource-check.cjs`, `unscheduled-check.cjs`, `quotes-check.cjs`, `activities-check.cjs`, `enterprise-check.cjs`) con esito `PASS`.
+  - Audit di layout e mobile responsive (`audit_layout.py` e `audit_mobile_responsive.py`) superati con 0 anomalie.
+- **Problemi aperti**:
+  - Nessuno.
+- **Attività successive consigliate**:
+  - Esecuzione di `pubblica-vercel.cmd` per promuovere l'aggiornamento in produzione su Vercel.
+
 ### Sessione 2026-10-29 (Toggle Day Mode / Light Mode Tasto Singolo con Cambio Cromatico di Stato) — Agente: Google Antigravity
 - **Ultimo commit precedente rilevato**: `19fe47d` (`[Antigravity] feat(ui): replace scattered create buttons with unified '+ Crea' popover on desktop and action sheet on mobile`) su `main`.
 - **Attività completate**:
