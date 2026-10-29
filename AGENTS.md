@@ -57,6 +57,31 @@ node enterprise-check.cjs
 
 > Mantieni questo registro sintetico, ordinato cronologicamente (sessione più recente in alto) e compatibile sia con Google Antigravity sia con OpenAI Codex.
 
+### Sessione 2026-10-29 (Sidebar Desktop Zero Scroll Totale, Footer Grid 4 Icone & Riduzione Altezza a 505px) — Agente: Google Antigravity
+- **Ultimo commit precedente rilevato**: `d20ac43` (`[Antigravity] feat(desktop): enforce zero horizontal scroll for menus, toolbars, and boards on desktop`) su `main`.
+- **Attività completate**:
+  - Eliminato radicalmente qualsiasi scorrimento verticale e orizzontale sulla barra laterale (`aside#app-sidebar`):
+    - Imposto blocco tassativo dello scroll: `overflow: hidden !important; overflow-y: hidden !important; overflow-x: hidden !important; height: 100dvh; max-height: 100dvh; box-sizing: border-box;`.
+    - **Raggruppamento e Consolidamento Footer (`.sidebar-tools-grid`)**: Sostituiti i 5 bottoni alti a tutta larghezza impilati verticalmente con il solo pulsante `⚙ Impostazioni` e una griglia orizzontale compatta a 4 colonne per i comandi ausiliari (`⚡ Playbook`, `↓ Esporta JSON`, `↑ Importa CSV`, `⇄ Ripristina Backup`), riducendo l'altezza del footer da 170px a soli 66px.
+    - **Calibrazione Metriche Verticali a 505px**: Ottimizzati padding e altezze di `nav button` (`28px`), `.nav-label` (`9px`), `.workspace-profile` (`38px`) e `.sidebar-top` (`34px`), portando l'altezza complessiva dell'intera sidebar a circa 505px.
+    - Garantito il fit completo al 100% senza alcuna barra di scorrimento su schermi con altezze da 600px a 1440px e con display scaling Windows (125%/150%).
+  - Aggiornate e sincronizzate le skill globali:
+    - `universal-app-layout` (`references/desktop_top10_design_spec.md` Sezione 10.4, `references/troubleshooting_kb.md` Caso 29).
+    - Sincronizzato il mirror globale `C:\Users\posti\Downloads\Antigravity\SKILLS_ANTIGRAVITY\universal-app-layout\` e `mobile-first-app-design`.
+- **File modificati**:
+  - `layout.css`
+  - `index.html`
+  - `enterprise-check.cjs`
+  - `AGENTS.md`
+  - Skill globali: `universal-app-layout` e `mobile-first-app-design` (+ mirror `SKILLS_ANTIGRAVITY`)
+- **Test eseguiti**:
+  - Eseguita l'intera suite di 6 controlli sintattici (`node --check`) e 9 test funzionali (`crm-check.cjs`, `import-check.cjs`, `relationship-check.cjs`, `sales-check.cjs`, `resource-check.cjs`, `unscheduled-check.cjs`, `quotes-check.cjs`, `activities-check.cjs`, `enterprise-check.cjs`) con esito `PASS`.
+  - Audit di layout e mobile responsive (`audit_layout.py` e `audit_mobile_responsive.py`) superati con 0 anomalie.
+- **Problemi aperti**:
+  - Nessuno.
+- **Attività successive consigliate**:
+  - Esecuzione di `pubblica-vercel.cmd` per promuovere l'aggiornamento in produzione su Vercel.
+
 ### Sessione 2026-10-29 (Desktop Mode Zero Scroll Orizzontale nei Menu, Raggruppamento Popover, Collasso Adattivo & Aggiornamento Skill Desktop) — Agente: Google Antigravity
 - **Ultimo commit precedente rilevato**: `fcf7547` (`[Antigravity] feat(desktop): enforce horizontal zero-scroll creation modals on desktop`) su `main`.
 - **Attività completate**:

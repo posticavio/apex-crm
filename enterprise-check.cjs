@@ -207,7 +207,9 @@ assert.match(layoutCss, /header\s*\{[^}]*overflow-x:\s*hidden\s*!important/);
 assert.match(layoutCss, /\.toolbar\s*\{[^}]*overflow-x:\s*hidden\s*!important/);
 assert.match(layoutCss, /\.activity-filters\s*\{[^}]*overflow-x:\s*hidden\s*!important/);
 assert.match(layoutCss, /\.board[^{]*\{[^}]*overflow-x:\s*hidden\s*!important/);
+assert.match(layoutCss, /aside#app-sidebar\s*\{[^}]*overflow-y:\s*hidden\s*!important/);
 const indexHtml = fs.readFileSync(path.join(__dirname, 'index.html'), 'utf8');
+assert.match(indexHtml, /class="sidebar-tools-grid"/);
 assert.match(indexHtml, /id="density-toggle"[\s\S]*?class="density-label"/);
 assert.match(indexHtml, /id="header-settings-btn"[\s\S]*?class="settings-label"/);
 
