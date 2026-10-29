@@ -1,0 +1,18 @@
+const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
+const elements=new Map(),storage=new Map();const element=s=>{if(!elements.has(s))elements.set(s,{innerHTML:'',textContent:'',style:{},classList:{toggle(){}},addEventListener(t,f){this[t]=f},showModal(){this.open=true},close(){this.open=false}});return elements.get(s);};
+const sandbox={console,Intl,Date,Set,Number,String,JSON,Error,Blob,URL,structuredClone,crypto:require('node:crypto').webcrypto,setTimeout(){},clearTimeout(){},confirm:()=>true,FormData:class{constructor(form){return Object.entries(form.values)}},localStorage:{getItem:k=>storage.get(k)||null,setItem:(k,v)=>storage.set(k,v)},document:{querySelector:element,querySelectorAll:()=>[],addEventListener(){}}};
+vm.createContext(sandbox);vm.runInContext(fs.readFileSync(require('node:path').join(__dirname,'app.js'),'utf8'),sandbox);const run=code=>vm.runInContext(code,sandbox);
+for(const bad of ['javascript:alert(1)','data:text/html,x','file:///secret','https://user:password@example.com'])assert.equal(run('safeResourceUrl('+JSON.stringify(bad)+')'),'');
+run("state.contacts=[{id:'c',company:'Azienda test',history:[]}];state.deals=[{id:'d',contactId:'c',title:'Offerta',stage:'Prospect',salesStage:'Offerta',setup:100,monthly:0,next:'Demo',due:'2026-10-27',history:[]}];persist(state);openEditor('deal','d')");assert.match(element('#fields').innerHTML,/Collega documento/);
+const values={contactId:'c',title:'Offerta',salesStage:'Offerta',setup:'100',monthly:'0',next:'Demo',due:'2026-10-27',resourcesForm:'yes',resource_0_id:'doc',resource_0_name:'Offerta preliminare',resource_0_url:'https://example.com/offerta.pdf',resource_0_type:'Offerta',resource_0_notes:'Versione uno'};
+element('#record-form').submit({preventDefault(){},target:{values}});assert.equal(run('state.deals[0].resources[0].name'),'Offerta preliminare');assert.match(run('state.deals[0].history.at(-1).text'),/Collegamenti/);
+run("setView('trattative')");assert.match(run('buildCsv()'),/offerta.pdf/);
+run("openEditor('contact','c')");const contactValues={company:'Azienda test',resourcesForm:'yes',resource_0_id:'folder',resource_0_name:'Cartella contratto',resource_0_url:'https://drive.google.com/drive/folders/QA',resource_0_type:'Progetto',resource_0_notes:'Documenti'};
+const before=run('JSON.stringify(state)');sandbox.localStorage.setItem=()=>{throw Error('quota')};element('#record-form').submit({preventDefault(){},target:{values:contactValues}});assert.equal(run('JSON.stringify(state)'),before);
+sandbox.localStorage.setItem=(k,v)=>storage.set(k,v);element('#record-form').submit({preventDefault(){},target:{values:contactValues}});assert.equal(run('state.contacts[0].resources.length'),1);
+run("setView('contatti');search='Cartella contratto';render()");assert.equal(run('visibleContacts().length'),1);assert.match(run('buildCsv()'),/drive.google.com/);
+assert.match(run('resourceLinks(state.contacts[0])'),/noopener noreferrer/);
+run("validate(JSON.parse(JSON.stringify(state)));openEditor('contact','c')");assert.match(element('#fields').innerHTML,/Cartella contratto/);
+element('#record-form').submit({preventDefault(){},target:{values:{company:'Azienda test',resourcesForm:'yes'}}});assert.equal(run('state.contacts[0].resources.length'),0);assert.equal(run('state.deals[0].resources.length'),1);
+assert.throws(()=>run("validateResources({resources:[{id:'bad',name:'Bad',url:'javascript:alert(1)',type:'Documento'}]})"));
+console.log('PASS: safe document URLs, company and opportunity links, form persistence/removal, audit log, search, CSV/JSON, separate relationships, and atomic failed-save behavior.');

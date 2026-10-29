@@ -1,0 +1,27 @@
+name: CRM checks
+on:
+  push:
+  pull_request:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - run: node --check app.js
+      - run: node --check company-import.js
+      - run: node --check quotes.js
+      - run: node --check activities.js
+      - run: node --check projects.js
+      - run: node --check analytics.js
+      - run: node crm-check.cjs
+      - run: node import-check.cjs
+      - run: node relationship-check.cjs
+      - run: node sales-check.cjs
+      - run: node resource-check.cjs
+      - run: node unscheduled-check.cjs
+      - run: node quotes-check.cjs
+      - run: node activities-check.cjs
+      - run: node enterprise-check.cjs

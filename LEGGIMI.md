@@ -41,3 +41,95 @@ In Opportunità puoi alternare Bacheca ed Elenco e ordinare per titolo, valore i
 ## Passaggi commerciali rapidi
 
 Le opportunità in Lead mostrano Qualifica Prospect, quelle in Prospect mostrano Converti in Cliente, sia in bacheca sia in elenco. Il passaggio viene registrato nello storico; importi e prossimo follow-up restano associati alla trattativa. Per tornare a una fase precedente usa la scheda di modifica. Le opportunità archiviate non mostrano il passaggio rapido. Email e telefono sono cliccabili nelle anagrafiche e nella scheda azienda: aprono il programma email o il gestore delle chiamate del dispositivo, senza inviare automaticamente messaggi.
+
+## Anagrafiche e referenti (requisiti Notion, Fase 2)
+
+La scheda azienda include identificativo fiscale, settore, sito e sede. Al referente principale puoi affiancare altri referenti con ruolo, email, telefono, canale preferito e note. Puoi aggiungere o rimuovere righe prima di salvare; Annulla lascia i dati invariati. La ricerca comprende i recapiti e i referenti aggiuntivi. Il backup JSON conserva i nuovi dati e continua ad accettare i backup precedenti. Il CSV comprende i dati aziendali e un riepilogo dei referenti. Le modifiche anagrafiche sono registrate nello storico aziendale. La rimozione di un referente non dispone ancora di cestino: conserva un backup per ripristinarne i dettagli.
+
+## Categorie personalizzabili
+
+Apri Categorie e aggiungi un nome con eventuali parole chiave. Una regola cerca una delle parole o frasi in Settore, Provenienza, Nome azienda oppure Note aziendali, ignorando maiuscole e accenti. È una classificazione deterministica, senza AI o consultazioni online. Le aziende possono appartenere a più categorie.
+
+Nella scheda azienda, Automatica applica le regole correnti; Manuale usa soltanto le categorie selezionate, anche una selezione vuota. Modificando una regola le classificazioni automatiche si ricalcolano; le scelte manuali restano invariate. Disattivare una categoria la esclude dalle regole, ma conserva le assegnazioni manuali esistenti. Le categorie sono separate dalla fase Lead/Prospect/Cliente.
+
+Gli elenchi azienda includono il filtro Categorie e Senza categoria; ricerca e CSV comprendono la classificazione. Il backup JSON include catalogo, regole e scelte manuali. Importare un backup precedente senza catalogo ripristina un catalogo vuoto, insieme ai dati presenti nel backup.
+
+## Importazione aziende CSV
+
+Usa Importa aziende CSV nella barra laterale. Scegli un file UTF-8 (.csv o .tsv), associa le colonne e controlla l’anteprima. Massimo 5 MB, 5.000 righe e 100 colonne. Le intestazioni comuni vengono riconosciute automaticamente; Azienda è obbligatoria.
+
+Il controllo cerca corrispondenze per identificativo fiscale, email o nome normalizzato. Un’azienda già presente è esclusa per impostazione iniziale: puoi scegliere esplicitamente Aggiorna campi non vuoti. Più corrispondenze, identificativi fiscali contrastanti, righe malformate e possibili duplicati nello stesso file vengono esclusi con una spiegazione. Se due aziende usano la stessa email, correggi il file o importa separatamente le righe dopo verifica.
+
+Il salvataggio è unico dopo l’anteprima. Le celle vuote non cancellano campi esistenti. Referenti aggiuntivi, categorie, scelte manuali e opportunità vengono conservati negli aggiornamenti; le nuove aziende usano la classificazione automatica. File, riga e data sono registrati come provenienza dell’importazione e nello storico. Se il salvataggio fallisce, i dati in memoria restano invariati. Se i dati cambiano dopo l’anteprima, il salvataggio viene bloccato.
+
+Il CSV importa dati aziendali e il referente principale: non ripristina referenti aggiuntivi, categorie, opportunità o fasi. Per ripristinare l’intero CRM usa il backup JSON. Prima di aggiornare molte aziende esporta un backup.
+
+## Referenti e conversazioni
+
+Nelle opportunità puoi scegliere il referente principale o uno dei referenti aggiuntivi dell’azienda. Cambiando azienda il selettore si aggiorna. Il nome è conservato come riferimento storico anche se il referente viene successivamente rimosso dall’anagrafica. Il collegamento appare nella pipeline e nel CSV.
+
+Nella scheda azienda espandi Registra una conversazione, scegli canale, data e persona, poi scrivi una sintesi. Solo Salva registra la conversazione; Annulla non modifica lo storico. Le date future sono rifiutate: per pianificare un richiamo usa il prossimo passo dell’opportunità. Le conversazioni sono ricercabili e presenti nel backup JSON e nel CSV contatti. Questa registrazione è manuale e non invia email né sincronizza Gmail.
+
+## Stati delle opportunità
+
+La classificazione dell’azienda rimane Lead, Prospect o Cliente. La pipeline delle singole opportunità usa invece Nuovo contatto, Trattativa, Offerta, Vinta e Persa. I record precedenti vengono letti senza perdere dati: Lead corrisponde a Nuovo contatto, Prospect a Trattativa e Cliente a Vinta. Non vengono inventate offerte già inviate o motivi di perdita.
+
+Le opportunità vinte e perse non contribuiscono al valore della pipeline aperta. Le perse non generano follow-up attivi; quelle vinte possono conservare richiami per il cliente. I cambi di fase sono registrati nello storico. Il motivo di perdita è facoltativo nella scheda. Le opportunità chiuse possono essere riaperte dalla scheda, indicando un nuovo passo e una data. I pulsanti rapidi avanzano una fase per volta.
+
+## Documenti collegati
+
+Le schede azienda e opportunità consentono di collegare documenti, offerte, progetti o altri file con titolo, URL e note. Puoi usare link a Google Drive o ad altri servizi HTTP/HTTPS. Salva conferma aggiunte e rimozioni; Annulla conserva i collegamenti precedenti. Le rimozioni riguardano solo il collegamento nel CRM e non eliminano il file originale. Modifiche registrate nello storico, collegamenti inclusi in backup JSON e CSV. Non sono presenti caricamento file, sincronizzazione o gestione dei permessi: l’accesso resta quello del servizio che ospita il documento.
+
+## Ricontatti da pianificare
+
+La dashboard mostra anche le opportunità aperte senza data o senza un prossimo passo. Il filtro Da pianificare le raccoglie e il pulsante con l’orologio apre la scheda per completarle. Le date mancanti non sono conteggiate come scadute né future. Le opportunità vinte senza richiamo e quelle perse non entrano in questa lista.
+
+## Preventivi e proposte commerciali
+
+La sezione Preventivi consente di redigere proposte commerciali strutturate collegate a un’azienda e facoltativamente a un’opportunità di vendita:
+
+- **Righe servizio e calcolo rigoroso:** ogni riga include descrizione, quantità (anche frazionaria per ore o giornate), prezzo unitario e sconto percentuale. Imponibile, sconto complessivo, imposta e totale sono calcolati in centesimi di euro per evitare errori di arrotondamento.
+- **Modelli rapidi di riga:** pulsante per inserire blocchi di servizi tipici di Apex Digital (Automazione, Assistente AI, Consulenza).
+- **Versionamento conservativo:** ogni modifica salvata su un preventivo genera una nuova versione progressiva, preservando integralmente tutte le versioni antecedenti con data e totali storici, consultabili e stampabili singolarmente.
+- **Regole fiscali e stati:** stati Bozza, Da approvare, Accettato e Rifiutato. La marcatura in Accettato richiede l'indicazione esplicita dell'aliquota IVA. Nelle bozze l'IVA può essere lasciata vuota (da definire) con opportuna nota nel documento stampato.
+- **Stampa e PDF nativi:** anteprima di stampa A4 ottimizzata con dati emittente, snapshot anagrafico del cliente (nome, indirizzo, P. IVA/C.F.), tabella dettagliata e note contrattuali, pronta per il salvataggio in PDF dal browser.
+- **Protezione ed esportazione:** un'azienda o un'opportunità con preventivi collegati non può essere eliminata per salvaguardare l'integrità dei dati. I preventivi sono inclusi nel backup JSON completo e dispongono di esportazione CSV dedicata. Duplica preventivo permette di generare una nuova proposta ripartendo dalla bozza.
+
+## Attività per Lead, Prospect e Clienti e Playbook operativi
+
+La sezione **Attività** (accessibile dal menu laterale e integrata in Dashboard, Anagrafiche, Lead, Prospect, Clienti, Scheda Azienda e Scheda Opportunità) consente di pianificare e gestire l'intero ciclo operativo per ciascuna fase dell'azienda:
+
+- **Classificazione dinamica per fase (`Lead`, `Prospect`, `Cliente`):** ogni attività è collegata a un'azienda e riflette automaticamente la sua fase commerciale attuale, con bacheca Kanban dedicata a 3 colonne (*Lead*, *Prospect*, *Cliente*) e vista tabellare ordinabile.
+- **Playbook operativi automatici (`⚡ Playbook`):** attivabili con un clic dalle viste *Lead*, *Prospect*, *Clienti*, *Contatti* o dentro la scheda azienda per generare le sequenze di lavoro tipiche:
+  - **Lead:** profilazione e analisi preliminare, primo contatto di qualifica, discovery call.
+  - **Prospect:** mappatura tecnica processo e ROI, demo personalizzata soluzione AI, invio e revisione proposta commerciale.
+  - **Cliente:** kick-off operativo, consegna/collaudo e formazione team, check-in periodico risultati e opportunità di upsell.
+- **Collegamenti trasversali:** ogni attività può essere associata a un referente specifico (con conservazione dello snapshot storico), a un'opportunità di vendita e a un preventivo.
+- **Completamento e concatenazione follow-up:** completando un'attività è possibile registrare l'esito (scritto automaticamente nello storico aziendale e dell'opportunità) e pianificare contestualmente l'attività successiva concatenata.
+- **Esportazione e integrità:** le attività sono incluse nel backup JSON completo, nell'esportazione CSV dedicata e nel riepilogo CSV aziendale. Aziende e opportunità con attività collegate sono protette dalla cancellazione accidentale.
+- **Playbook personalizzabili (`⚙ Configura Playbook`):** i modelli di attività per *Lead*, *Prospect* e *Cliente* possono essere modificati, estesi con nuovi passi o ripristinati ai valori predefiniti Apex Digital.
+
+## Progetti, consegne e milestone post-vendita
+
+La sezione **Progetti** (`🚀 Progetti`) e il relativo pannello nella scheda azienda permettono di gestire le commesse dei clienti acquisiti:
+
+- **Milestone con dipendenze:** ogni progetto include una lista di milestone con scadenza e vincolo opzionale di dipendenza (*Dipende da*): una milestone non può essere marcata come completata finché la milestone preliminare non è conclusa. Il completamento di tutte le milestone porta automaticamente il progetto in stato *Completato*.
+- **Controllo economico e ore:** monitoraggio di Budget commessa (€), Costi operativi (€), Margine operativo (€ e %) e Ore erogate rispetto alle ore stimate.
+- **Viste Bacheca e Cronoprogramma:** alternanza immediata tra bacheca Kanban per stato (*Pianificato*, *In corso*, *In revisione*, *Completato*, *In pausa*) e tabella Cronoprogramma & Costi con esportazione CSV.
+
+## Obiettivi di fatturato, budget e forecast ponderato
+
+La sezione **Forecast & KPI** (`📈 Forecast & KPI`) offre la vista direzionale ed economica del CRM:
+
+- **Target e budget:** configurazione di Obiettivo Fatturato Annuo, Target Canoni Ricorrenti (MRR) e Budget Costi Operativi Mensili.
+- **Forecast probabilistico per fase:** calcolo automatico del valore ponderato della pipeline aperta moltiplicando gli importi di ciascuna fase (*Nuovo contatto*, *Trattativa*, *Offerta*) per i rispettivi pesi percentuali personalizzabili.
+- **Storico fatturati:** registrazione degli incassi/fatturati storici per periodo (`YYYY-MM`) e azienda, sommati al valore acquisito per misurare l'avanzamento verso il target annuo.
+
+## Tema (Chiaro / Scuro / AMOLED) e densità interfaccia
+
+Nella barra superiore sono sempre disponibili i selettori rapidi per:
+- **Tema visivo:** *Chiaro Executive*, *Scuro Slate* e *Nero Assoluto AMOLED* (`#000000`).
+- **Densità interfaccia:** *Confortevole* oppure *Compatta* ad alta densità per massimizzare le righe visibili a schermo.
+
+
+
