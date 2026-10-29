@@ -57,6 +57,29 @@ node enterprise-check.cjs
 
 > Mantieni questo registro sintetico, ordinato cronologicamente (sessione più recente in alto) e compatibile sia con Google Antigravity sia con OpenAI Codex.
 
+### Sessione 2026-10-29 (Benchmark Top 20 App Play Store Mobile & Aggiornamento Skill) — Agente: Google Antigravity
+- **Ultimo commit precedente rilevato**: `edd3545` (`[Antigravity] feat(ui): apply Attio/Twenty/Linear CRM design system and Cmd+K command palette`) su `main`.
+- **Attività completate**:
+  - Analizzato il design system, il tema, le forme, le dimensioni e la disposizione spaziale delle **Top 20 applicazioni premium/grossing su Google Play Store** (*Todoist Pro, TickTick Premium, Notion Plus, Linear Mobile, HubSpot CRM, Pipedrive CRM, Salesforce Mobile, 1Money Pro, YNAB, Wallet by BudgetBakers, Trello Premium, Asana, ClickUp, Monday.com, Airtable, Revolut Metal, N26 Smart, Tasker/Solid Explorer, Niagara Launcher Pro, Google Workspace Material 3*).
+  - Applicati i pattern mobile Play Store Top 20 ad **Apex Digital CRM** (`index.html`, `activities.js`, `layout.css`):
+    1. **Extended Squircle FAB contestuale (`#mobile-fab`)** nella zona pollice inferiore destra (`bottom: calc(74px + env(safe-area-inset-bottom))`, `border-radius: 16px`, `min-height: 50px`), sincronizzato con la vista attiva (`+ Attività`, `+ Azienda`, `+ Lead`, `+ Prospect`, `+ Cliente`, `+ Preventivo`, `+ Progetto`, `+ Obiettivi`, `+ Trattativa`).
+    2. **Material Design 3 Active Pill Capsule (`.bnav-icon` `54px × 28px`)** nella Bottom Navigation Bar (`#mobile-bottom-nav`) con barra frosted glass (`backdrop-filter: blur(18px)`).
+    3. **Top App Bar Search Pill (`#cmd-trigger-btn`)** su smartphone (`border-radius: 999px; min-height: 40px`) che apre `#command-dialog` come Bottom Sheet.
+    4. **Segmented Control incassato (`.view-toggle`)** e **strisce semantiche laterali (`4px solid`)** sulle card per urgenza/stato (`.task-overdue`, `.task-today`, `.project-card`).
+  - Aggiornate le skill globali `mobile-first-app-design` (`SKILL.md` + `references/troubleshooting_kb.md` Caso 21) e `universal-app-layout` (`SKILL.md`), sincronizzandole anche nella cartella `SKILLS_ANTIGRAVITY`.
+- **File modificati**:
+  - `index.html`
+  - `activities.js`
+  - `layout.css`
+  - `activities-check.cjs`
+  - `AGENTS.md`
+- **Test eseguiti**:
+  - Eseguita l'intera suite di 6 controlli sintattici (`node --check`) e 9 test funzionali (`crm-check.cjs`, `import-check.cjs`, `relationship-check.cjs`, `sales-check.cjs`, `resource-check.cjs`, `unscheduled-check.cjs`, `quotes-check.cjs`, `activities-check.cjs`, `enterprise-check.cjs`) con esito `PASS`.
+- **Problemi aperti**:
+  - Nessuno.
+- **Attività successive consigliate**:
+  - Eventuale esecuzione di `pubblica-vercel.cmd` per aggiornare la build live su Vercel.
+
 ### Sessione 2026-10-29 (Design System Attio × Twenty CRM × Linear & Command Palette) — Agente: Google Antigravity
 - **Ultimo commit precedente rilevato**: `c65026f` (`[Antigravity] chore: configure Vercel production deployment and update AGENTS.md handoff log`) su `main`.
 - **Attività completate**:

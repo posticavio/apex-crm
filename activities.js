@@ -660,7 +660,7 @@ if(document.querySelector('#task-editor')){
 }
 
 const PREFS_KEY='apex-crm-prefs-v1';
-let uiPrefs={theme:'light',haptics:true};
+let uiPrefs={theme:'light',haptics:true,sidebarCollapsed:false};
 try{
  const savedPrefs=localStorage.getItem(PREFS_KEY);
  if(savedPrefs){
@@ -668,16 +668,27 @@ try{
   if(p&&typeof p==='object'){
    if(['light','dark','amoled'].includes(p.theme))uiPrefs.theme=p.theme;
    if(typeof p.haptics==='boolean')uiPrefs.haptics=p.haptics;
+   if(typeof p.sidebarCollapsed==='boolean')uiPrefs.sidebarCollapsed=p.sidebarCollapsed;
   }
  }
 }catch{}
 
 function applyUiPrefs(){
  const t=uiPrefs.theme||'light';
+ const collapsed=Boolean(uiPrefs.sidebarCollapsed);
  if(typeof document!=='undefined'){
   if(document.documentElement?.setAttribute)document.documentElement.setAttribute('data-theme',t);
   if(document.documentElement?.dataset)document.documentElement.dataset.theme=t;
-  if(document.body?.dataset)document.body.dataset.theme=t;
+  if(document.body?.dataset){
+   document.body.dataset.theme=t;
+   document.body.dataset.sidebar=collapsed?'collapsed':'expanded';
+  }
+  if(document.body?.classList?.toggle)document.body.classList.toggle('sidebar-collapsed',collapsed);
+  const collapseBtn=document.querySelector('#sidebar-collapse-btn');
+  if(collapseBtn){
+   collapseBtn.textContent=collapsed?'⇥':'⇤';
+   if(collapseBtn.setAttribute)collapseBtn.setAttribute('aria-expanded',collapsed?'false':'true');
+  }
   if(typeof applyUiSettings==='function'&&typeof getUiSettings==='function'){
    try{applyUiSettings({...getUiSettings(),theme:t});}catch{}
   }
@@ -693,6 +704,11 @@ function applyUiPrefs(){
 function saveUiPrefs(){
  try{localStorage.setItem(PREFS_KEY,JSON.stringify(uiPrefs));}catch{}
  applyUiPrefs();
+}
+function toggleSidebarCollapse(){
+ uiPrefs.sidebarCollapsed=!uiPrefs.sidebarCollapsed;
+ saveUiPrefs();
+ return uiPrefs.sidebarCollapsed;
 }
 function hapticTap(ms=10){
  try{if(uiPrefs.haptics!==false&&typeof navigator!=='undefined'&&typeof navigator.vibrate==='function')navigator.vibrate([ms]);}catch{}
@@ -724,6 +740,29 @@ function syncMobileShell(){
   });
   document.querySelectorAll('#mobile-subnav [data-view]').forEach(b=>{
    if(b.classList)b.classList.toggle('active',b.dataset.view===view);
+  });
+  const contacts=state.contacts||[];
+  const deals=state.deals||[];
+  const tasks=(state.activities||[]).filter(isOpenTask);
+  const dueFollowups=deals.filter(d=>!isArchived(d)&&getSalesStage(d)!=='Persa'&&d.due&&d.due<=today()).length;
+  const dueTasks=tasks.filter(a=>a.dueDate&&a.dueDate<=today()).length;
+  const counts={
+   oggi:dueFollowups+dueTasks,
+   activities:tasks.length,
+   projects:(state.projects||[]).filter(p=>p.status!=='Completato').length,
+   contatti:contacts.length,
+   lead:contacts.filter(c=>contactStage(c.id)==='Lead').length,
+   prospect:contacts.filter(c=>contactStage(c.id)==='Prospect').length,
+   clienti:contacts.filter(c=>contactStage(c.id)==='Cliente').length,
+   categories:(state.categories||[]).length,
+   trattative:typeof openDeals==='function'?openDeals().length:0,
+   quotes:(state.quotes||[]).length
+  };
+  document.querySelectorAll('[data-nav-count]').forEach(el=>{
+   const key=el.dataset?.navCount;
+   const val=Number(counts[key]||0);
+   el.textContent=val>0?String(val):'';
+   el.hidden=val<=0;
   });
  }
  setMobileDrawer(false);
@@ -759,6 +798,7 @@ function buildCommandItems(q=''){
   {group:'Azioni rapide',icon:'🚀',label:'Nuovo progetto / commessa',meta:'Avvia commessa con milestone',cmd:'new-project'},
   {group:'Azioni rapide',icon:'⚡',label:'Cambia tema (Chiaro / Scuro / AMOLED)',meta:'Alterna profilo cromatico',cmd:'cycle-theme'},
   {group:'Azioni rapide',icon:'↕',label:'Cambia densità (Confortevole / Compatta)',meta:'Ottimizza densità tabelle',cmd:'toggle-density'},
+  {group:'Azioni rapide',icon:'⇤',label:'Comprimi / Espandi barra laterale (Ctrl+B)',meta:'Passa da Sidebar estesa a Navigation Rail compatta',cmd:'toggle-sidebar'},
   {group:'Azioni rapide',icon:'↓',label:'Esporta backup JSON completo',meta:'Salva copia locale',cmd:'export-json'},
   {group:'Navigazione',icon:'◷',label:'Vai a Oggi (Dashboard)',meta:'Prossime azioni e KPI',cmd:'view:oggi'},
   {group:'Navigazione',icon:'☑',label:'Vai a Attività',meta:'Bacheca Lead, Prospect e Clienti',cmd:'view:activities'},
@@ -847,6 +887,7 @@ function runCommandAction(cmd){
  if(cmd==='new-project'){if(typeof openProjectEditor==='function')openProjectEditor();return true;}
  if(cmd==='cycle-theme'){if(typeof cycleTheme==='function')cycleTheme();return true;}
  if(cmd==='toggle-density'){if(typeof toggleDensity==='function')toggleDensity();return true;}
+ if(cmd==='toggle-sidebar'){toggleSidebarCollapse();return true;}
  if(cmd==='export-json'){document.querySelector('#export')?.click();return true;}
  if(cmd==='open-settings'){openSettingsDialog();return true;}
  if(cmd.startsWith('view:')){setView(cmd.slice(5));return true;}
@@ -869,6 +910,7 @@ document.addEventListener('click',e=>{
   return;
  }
  if(b.id==='drawer-close'){setMobileDrawer(false);return;}
+ if(b.id==='sidebar-collapse-btn'){toggleSidebarCollapse();return;}
  if(b.id==='mobile-fab'){hapticTap(12);document.querySelector('#new')?.click();return;}
  if(b.id==='open-settings'||b.id==='header-settings-btn'){openSettingsDialog();return;}
  if(b.id==='cmd-trigger-btn'){openCommandPalette();return;}
@@ -903,9 +945,19 @@ document.addEventListener('input',e=>{
 });
 
 document.addEventListener('keydown',e=>{
- if((e.ctrlKey||e.metaKey)&&String(e.key).toLowerCase()==='k'){
+ const key=String(e.key||'').toLowerCase();
+ if((e.ctrlKey||e.metaKey)&&key==='k'){
   e.preventDefault?.();
   openCommandPalette();
+ }else if((e.ctrlKey||e.metaKey)&&key==='b'){
+  e.preventDefault?.();
+  toggleSidebarCollapse();
+ }else if(e.altKey&&!e.ctrlKey&&!e.metaKey){
+  const altViews={'1':'oggi','2':'activities','3':'projects','4':'contatti','5':'trattative','6':'quotes','7':'analytics'};
+  if(altViews[key]){
+   e.preventDefault?.();
+   setView(altViews[key]);
+  }
  }else if(e.key==='Enter'&&e.target?.id==='command-input'){
   const first=document.querySelector?.('#command-results [data-run-cmd]');
   if(first?.dataset?.runCmd){

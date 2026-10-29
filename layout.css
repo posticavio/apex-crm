@@ -130,7 +130,7 @@ textarea:focus-visible {
 }
 
 /* ==========================================================================
-   Sidebar Navigation (Twenty CRM / Linear Precision Rail)
+   Sidebar Navigation (Twenty CRM / Linear Precision Rail + Collapsible Mode)
    ========================================================================== */
 aside {
   width: 244px;
@@ -138,31 +138,56 @@ aside {
   background: var(--sidebar-bg);
   color: var(--sidebar-ink);
   overflow-y: auto;
+  overflow-x: hidden;
   border-right: 1px solid var(--sidebar-border);
   box-shadow: none;
   z-index: 30;
   display: flex;
   flex-direction: column;
+  transition: width 0.22s cubic-bezier(0.22, 1, 0.36, 1), padding 0.22s ease;
 }
 
 .sidebar-top {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
+  gap: 6px;
   margin-bottom: 10px;
+}
+
+.sidebar-top-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.sidebar-collapse-btn {
+  width: 28px;
+  height: 28px;
+  font-size: 13px;
+  color: var(--sidebar-muted);
+  border-radius: var(--radius-xs);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.sidebar-collapse-btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.18);
+  color: #ffffff;
 }
 
 .brand {
   font-family: var(--font-display);
   font-size: 20px;
   font-weight: 800;
-  padding: 4px 8px;
+  padding: 4px 6px;
   gap: 10px;
   letter-spacing: -0.03em;
   color: #ffffff;
   display: flex;
   align-items: center;
+  min-width: 0;
 }
 
 .mark {
@@ -171,6 +196,7 @@ aside {
   border-radius: 8px;
   width: 30px;
   height: 30px;
+  flex-shrink: 0;
   font-size: 16px;
   font-weight: 800;
   display: grid;
@@ -260,11 +286,51 @@ nav button {
   box-shadow: none;
   width: 100%;
   justify-content: flex-start;
+  position: relative;
 }
 
-nav button span {
+/* Fixed 20x20px Optical Bounding Box for Desktop Icons (Linear / VS Code / Slack Standard) */
+.nav-icon {
+  width: 20px;
+  height: 20px;
+  display: inline-grid;
+  place-items: center;
+  flex-shrink: 0;
+  font-size: 14px;
+  line-height: 1;
+}
+
+.nav-text {
   font-size: 12.5px;
   letter-spacing: -0.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Live Counter Badge on Right of Nav Item (Slack / Linear / Notion Pattern) */
+.nav-badge {
+  margin-left: auto;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  padding: 1px 6px;
+  border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, 0.08);
+  color: #cbd5e1;
+  line-height: 1.35;
+  flex-shrink: 0;
+}
+
+.nav-badge[hidden],
+.nav-badge:empty {
+  display: none;
+}
+
+nav button.active .nav-badge {
+  background: rgba(59, 130, 246, 0.28);
+  color: #93c5fd;
+  border: 1px solid rgba(96, 165, 250, 0.35);
 }
 
 nav button:hover:not(:disabled) {
@@ -290,6 +356,12 @@ nav button.active {
   font-weight: 600;
 }
 
+.sidebar-status-line {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
 .sidebar-bottom p {
   font-size: 10.5px;
   font-weight: 400;
@@ -310,6 +382,7 @@ nav button.active {
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.07);
   box-shadow: none;
+  gap: 8px;
 }
 
 .sidebar-bottom button:hover:not(:disabled) {
@@ -330,7 +403,8 @@ nav button.active {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  margin-right: 6px;
+  margin-right: 4px;
+  flex-shrink: 0;
   background: #10b981;
   box-shadow: 0 0 8px rgba(16, 185, 129, 0.8);
 }
@@ -343,6 +417,55 @@ main {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  transition: margin-left 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Desktop Collapsible Navigation Rail Mode (Ctrl+B / ⌘B — VS Code / Linear / Notion) */
+@media (min-width: 1024px) {
+  body.sidebar-collapsed aside#app-sidebar {
+    width: 68px;
+    padding: 14px 8px 12px;
+  }
+
+  body.sidebar-collapsed main {
+    margin-left: 68px;
+  }
+
+  body.sidebar-collapsed .sidebar-top {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  body.sidebar-collapsed .brand > span:not(.mark),
+  body.sidebar-collapsed .workspace-profile > div:not(.profile-avatar),
+  body.sidebar-collapsed .nav-label,
+  body.sidebar-collapsed .nav-text,
+  body.sidebar-collapsed .nav-badge,
+  body.sidebar-collapsed .sidebar-status-text,
+  body.sidebar-collapsed .sidebar-bottom p {
+    display: none;
+  }
+
+  body.sidebar-collapsed .workspace-profile {
+    justify-content: center;
+    padding: 8px 4px;
+    margin: 0 0 10px;
+  }
+
+  body.sidebar-collapsed nav button,
+  body.sidebar-collapsed .sidebar-bottom button {
+    justify-content: center;
+    padding: 8px 0;
+  }
+
+  body.sidebar-collapsed .sidebar-status-line {
+    justify-content: center;
+    margin-bottom: 8px;
+  }
+
+  body.sidebar-collapsed .live-dot {
+    margin-right: 0;
+  }
 }
 
 header {
@@ -397,7 +520,25 @@ header {
 .header-quick-actions {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
+}
+
+/* Clustered Top Bar Action Groups with Hairline Dividers (Figma / Slack / Linear Standard) */
+.header-create-cluster,
+.header-sys-cluster {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.header-create-cluster {
+  padding-left: 8px;
+  border-left: 1px solid var(--line);
+}
+
+.header-sys-cluster {
+  padding-left: 8px;
+  border-left: 1px solid var(--line);
 }
 
 .ghost-btn {
@@ -2710,6 +2851,10 @@ body[data-density="compact"] .deal-container .deal {
     padding: 0;
   }
 
+  .sidebar-collapse-btn {
+    display: none;
+  }
+
   main {
     margin-left: 0;
     width: 100%;
@@ -2771,14 +2916,24 @@ body[data-density="compact"] .deal-container .deal {
     overflow: visible;
   }
 
+  .header-create-cluster,
   .header-quick-actions .ghost-btn[data-new],
   .header-account {
     display: none;
   }
 
+  .header-sys-cluster {
+    border-left: 0;
+    padding-left: 0;
+  }
+
   .cmd-trigger {
     min-width: 0;
-    padding: 6px 9px;
+    min-height: 40px;
+    padding: 6px 12px;
+    border-radius: var(--radius-pill);
+    background: var(--surface-subtle);
+    border-color: var(--line-strong);
   }
 
   .cmd-trigger .kbd-hint,
@@ -2916,11 +3071,27 @@ body[data-density="compact"] .deal-container .deal {
     width: 100%;
     display: grid;
     grid-template-columns: 1fr 1fr;
+    gap: 4px;
+    padding: 4px;
+    background: var(--surface-subtle);
+    border: 1px solid var(--line);
+    border-radius: 12px;
   }
 
   .list-controls .view-toggle button {
-    min-height: 38px;
+    min-height: 36px;
     justify-content: center;
+    border-radius: 9px;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .list-controls .view-toggle button.selected {
+    background: var(--surface);
+    color: var(--blue);
+    box-shadow: var(--shadow-sm);
+    font-weight: 700;
   }
 
   /* Kanban a 1 colonna verticale a tutta larghezza su smartphone */
@@ -3111,7 +3282,42 @@ body[data-density="compact"] .deal-container .deal {
   }
 
   /* ========================================================================
-     Fixed Bottom Navigation Bar (5 Destinazioni Zona Pollice)
+     Play Store Material 3 Extended Squircle FAB (Zona Pollice Destra)
+     ======================================================================== */
+  .mobile-fab {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    position: fixed;
+    right: 16px;
+    bottom: calc(74px + env(safe-area-inset-bottom, 0px));
+    z-index: 48;
+    min-height: 50px;
+    padding: 0 18px;
+    border-radius: 16px;
+    border: 0;
+    background: linear-gradient(135deg, var(--blue) 0%, var(--indigo, #4f46e5) 100%);
+    color: #ffffff;
+    font-size: 13.5px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    box-shadow: 0 10px 24px rgba(37, 99, 235, 0.38), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+    transition: transform 0.16s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.16s ease;
+  }
+
+  .mobile-fab:active {
+    transform: scale(0.95);
+  }
+
+  .mobile-fab .fab-plus {
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1;
+  }
+
+  /* ========================================================================
+     Fixed Bottom Navigation Bar (5 Destinazioni Zona Pollice + M3 Pill Capsule)
      ======================================================================== */
   .mobile-bottom-nav {
     display: flex;
@@ -3121,10 +3327,10 @@ body[data-density="compact"] .deal-container .deal {
     bottom: 0;
     z-index: 50;
     background: rgba(255, 255, 255, 0.92);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
     border-top: 1px solid var(--line);
-    padding: 4px 6px calc(4px + env(safe-area-inset-bottom, 0px));
+    padding: 5px 6px calc(5px + env(safe-area-inset-bottom, 0px));
     box-shadow: 0 -4px 18px rgba(16, 24, 40, 0.06);
   }
 
@@ -3139,31 +3345,39 @@ body[data-density="compact"] .deal-container .deal {
     background: transparent;
     box-shadow: none;
     color: var(--muted);
-    padding: 5px 2px;
+    padding: 4px 2px;
     border-radius: var(--radius-sm);
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 2px;
-    min-height: 50px;
-    font-size: 10px;
+    gap: 3px;
+    min-height: 52px;
+    font-size: 10.5px;
     font-weight: 600;
   }
 
   .mobile-bottom-nav .bnav-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 54px;
+    height: 28px;
+    border-radius: var(--radius-pill);
     font-size: 16px;
     line-height: 1;
-    transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1);
+    transition: background-color 0.18s ease, transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1);
   }
 
   .mobile-bottom-nav button.active {
     color: var(--blue);
-    background: var(--blue-soft);
+    background: transparent;
+    font-weight: 700;
   }
 
   .mobile-bottom-nav button.active .bnav-icon {
-    transform: translateY(-1.5px) scale(1.1);
+    background: var(--blue-soft);
+    transform: translateY(-1px) scale(1.04);
   }
 }
 

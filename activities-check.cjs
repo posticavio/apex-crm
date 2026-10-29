@@ -227,9 +227,11 @@ run("setView('activities');activityLayout='list';render()");
 assert.match(element('#content').innerHTML,/data-label="Azienda & Fase"/,'Activities table must include data-label for smartphone cards');
 assert.match(element('#content').innerHTML,/class="cell-actions"/,'Activities table must include cell-actions for smartphone cards');
 assert.equal(element('#mobile-subnav').hidden,true,'Mobile subnav hidden on activities view');
+assert.equal(element('#mobile-fab-label').textContent,'Attività','Mobile FAB label reflects activities view');
 
 run("setView('lead');render()");
 assert.equal(element('#mobile-subnav').hidden,false,'Mobile subnav visible on lead/anagrafiche views');
+assert.equal(element('#mobile-fab-label').textContent,'Lead','Mobile FAB label reflects lead view');
 assert.match(element('#content').innerHTML,/data-label="Contatto"/,'Contacts table must include data-label for smartphone cards');
 
 run("openSettingsDialog()");
