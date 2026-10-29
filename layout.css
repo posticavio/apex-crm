@@ -4158,3 +4158,130 @@ details[open] > .mobile-collapsible-summary .chevron {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
+
+/* ==========================================================================
+   Desktop Mode Zero Horizontal Scroll Rule (Menus, Navigation, Toolbars, Filters & Boards)
+   "Nel visuale desktop mai menu con scroll in orizzontale: nascondi, raggruppa o usa popover/rail"
+   ========================================================================== */
+@media (min-width: 768px) {
+  /* 1. Header & Top Command Bar: Zero Scroll Orizzontale Garantito */
+  header {
+    overflow-x: hidden !important;
+    max-width: 100vw;
+  }
+
+  .header-left {
+    min-width: 0;
+    flex-shrink: 1;
+    overflow: hidden;
+  }
+
+  .breadcrumb {
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  .breadcrumb span#crumb {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .header-quick-actions {
+    flex-shrink: 0;
+    overflow-x: hidden !important;
+  }
+
+  /* 2. Sidebar Desktop: Zero Scroll Orizzontale */
+  aside#app-sidebar {
+    overflow-x: hidden !important;
+  }
+
+  aside#app-sidebar nav button {
+    max-width: 100%;
+    overflow-x: hidden !important;
+  }
+
+  /* 3. Toolbar & Barre Filtri nei Moduli: Wrap Responsivo a 2 livelli con Zero Scroll Orizzontale */
+  .toolbar {
+    overflow-x: hidden !important;
+    flex-wrap: wrap !important;
+    row-gap: 10px;
+    column-gap: 8px;
+    align-items: center;
+  }
+
+  .activity-filters {
+    overflow-x: hidden !important;
+    flex-wrap: wrap !important;
+    row-gap: 6px;
+    column-gap: 6px;
+  }
+
+  .quote-model-bar {
+    overflow-x: hidden !important;
+    flex-wrap: wrap !important;
+    gap: 8px;
+  }
+
+  .stage-segment-bar {
+    overflow-x: hidden !important;
+    flex-wrap: wrap !important;
+    gap: 4px;
+  }
+
+  .view-toggle {
+    overflow-x: hidden !important;
+    flex-shrink: 0;
+  }
+
+  /* 4. Bacheche Kanban Desktop: Distribuzione fluida con Zero Scroll Orizzontale */
+  .board,
+  .board.board-3cols {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    overflow-x: hidden !important;
+    width: 100%;
+  }
+
+  .board-header {
+    overflow-x: hidden;
+    min-width: 0;
+  }
+
+  .board-header h3 {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+/* Collasso Adattivo su Notebook & Schermi Desktop Compatti (768px - 1180px) */
+@media (min-width: 768px) and (max-width: 1180px) {
+  .breadcrumb .header-app {
+    display: none;
+  }
+
+  .breadcrumb span:first-child {
+    display: none;
+  }
+
+  #density-toggle .density-label,
+  #header-settings-btn .settings-label {
+    display: none;
+  }
+
+  .header-account > span {
+    display: none;
+  }
+
+  .cmd-trigger {
+    min-width: 120px;
+    padding: 5px 8px;
+  }
+
+  .cmd-trigger .kbd-hint {
+    display: none;
+  }
+}

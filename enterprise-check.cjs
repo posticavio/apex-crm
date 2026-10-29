@@ -200,5 +200,16 @@ const backup=run("JSON.stringify({version:1,...state})");
 const restored=run("migrate(JSON.parse("+JSON.stringify(backup)+"))");
 run("validate("+JSON.stringify(restored)+")");
 
-console.log('PASS: projects with milestones and dependency guards, economic margin and hours tracking, revenue targets, budget and weighted forecast, historical revenues, customizable stage playbooks, command palette Cmd+K, dark/AMOLED themes and compact density, CSV/JSON portability.');
+// 8. Desktop Zero Horizontal Scroll Enforced on Menus, Navigation, Toolbars & Boards
+const layoutCss = fs.readFileSync(path.join(__dirname, 'layout.css'), 'utf8');
+assert.match(layoutCss, /Desktop Mode Zero Horizontal Scroll Rule/);
+assert.match(layoutCss, /header\s*\{[^}]*overflow-x:\s*hidden\s*!important/);
+assert.match(layoutCss, /\.toolbar\s*\{[^}]*overflow-x:\s*hidden\s*!important/);
+assert.match(layoutCss, /\.activity-filters\s*\{[^}]*overflow-x:\s*hidden\s*!important/);
+assert.match(layoutCss, /\.board[^{]*\{[^}]*overflow-x:\s*hidden\s*!important/);
+const indexHtml = fs.readFileSync(path.join(__dirname, 'index.html'), 'utf8');
+assert.match(indexHtml, /id="density-toggle"[\s\S]*?class="density-label"/);
+assert.match(indexHtml, /id="header-settings-btn"[\s\S]*?class="settings-label"/);
+
+console.log('PASS: projects with milestones and dependency guards, economic margin and hours tracking, revenue targets, budget and weighted forecast, historical revenues, customizable stage playbooks, command palette Cmd+K, desktop zero horizontal scroll menus, dark/AMOLED themes and compact density, CSV/JSON portability.');
 

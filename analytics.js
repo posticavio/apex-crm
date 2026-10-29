@@ -435,7 +435,12 @@ function applyUiSettings(settings=getUiSettings()){
   themeBtn.innerHTML='<span class="theme-dot" aria-hidden="true"></span><span class="theme-icon" aria-hidden="true">'+icon+'</span><span class="theme-text">'+label+'</span>';
  }
  const densityBtn=document.querySelector('#density-toggle');
- if(densityBtn)densityBtn.textContent=density==='compact'?'↕ Confortevole':'⚡ Compatta';
+ if(densityBtn){
+  const isCompact=density==='compact';
+  const icon=isCompact?'↕':'⚡';
+  const label=isCompact?'Confortevole':'Compatta';
+  densityBtn.innerHTML='<span class="density-icon" aria-hidden="true">'+icon+'</span> <span class="density-label">'+label+'</span>';
+ }
  return {theme,density};
 }
 

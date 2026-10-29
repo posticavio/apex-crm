@@ -57,6 +57,34 @@ node enterprise-check.cjs
 
 > Mantieni questo registro sintetico, ordinato cronologicamente (sessione più recente in alto) e compatibile sia con Google Antigravity sia con OpenAI Codex.
 
+### Sessione 2026-10-29 (Desktop Mode Zero Scroll Orizzontale nei Menu, Raggruppamento Popover, Collasso Adattivo & Aggiornamento Skill Desktop) — Agente: Google Antigravity
+- **Ultimo commit precedente rilevato**: `fcf7547` (`[Antigravity] feat(desktop): enforce horizontal zero-scroll creation modals on desktop`) su `main`.
+- **Attività completate**:
+  - Implementata la regola tassativa **Desktop Zero Scroll Orizzontale nei Menu, Navigazione, Toolbar, Filtri e Bacheche**:
+    - Divieto assoluto di `overflow-x: auto` e barre di scorrimento orizzontale su menu, header, sidebar, filtri e bacheche (`overflow-x: hidden !important;`).
+    - **Pattern 1 — Raggruppamento in Popover / Dropdown ("Raggruppa")**: consolidamento azioni in popover compatti (es. `+ Crea ▾` popover `#quick-create-menu` e `.row-actions` di tabella raggruppate).
+    - **Pattern 2 — Collasso Adattivo con Priorità Visiva ("Nascondi")**: su laptop e monitor intermedi (`768px - 1180px`), le etichette testuali secondarie (`.density-label`, `.settings-label`, breadcrumb lungo) collassano in modalità solo-icona (`32×32px` con `title` e `aria-label`) per evitare qualsiasi overflow o scorrimento orizzontale.
+    - **Pattern 3 — Wrap Responsivo Multi-Livello ("Inventati qualcos'altro")**: `.toolbar`, `.activity-filters`, `.quote-model-bar` e le barre segmentate utilizzano `flex-wrap: wrap !important; row-gap: 10px; column-gap: 8px;` con ricerca a sinistra, filtri al centro e comandi/esportazioni a destra su due livelli ordinati senza scroll laterale.
+    - **Pattern 4 — Bacheche Kanban Fluide Zero-Scroll**: `.board` e `.board.board-3cols` su desktop sono configurate con `grid-template-columns: repeat(3, minmax(0, 1fr)) !important; overflow-x: hidden !important; width: 100%;` per occupare l'intera larghezza dello schermo senza costringere a scorrere in orizzontale con la rotellina.
+  - Aggiornate e formalizzate le regole nelle skill globali:
+    - `universal-app-layout` (`SKILL.md`, `references/desktop_top10_design_spec.md` Sezione 10, `references/troubleshooting_kb.md` Caso 28).
+    - Sincronizzato il mirror globale `C:\Users\posti\Downloads\Antigravity\SKILLS_ANTIGRAVITY\universal-app-layout\`.
+    - Sincronizzato `mobile-first-app-design` (`references/troubleshooting_kb.md`).
+- **File modificati**:
+  - `layout.css`
+  - `index.html`
+  - `analytics.js`
+  - `enterprise-check.cjs`
+  - `AGENTS.md`
+  - Skill globali: `universal-app-layout` e `mobile-first-app-design` (+ mirror `SKILLS_ANTIGRAVITY`)
+- **Test eseguiti**:
+  - Eseguita l'intera suite di 6 controlli sintattici (`node --check`) e 9 test funzionali (`crm-check.cjs`, `import-check.cjs`, `relationship-check.cjs`, `sales-check.cjs`, `resource-check.cjs`, `unscheduled-check.cjs`, `quotes-check.cjs`, `activities-check.cjs`, `enterprise-check.cjs`) con esito `PASS`.
+  - Audit di layout e mobile responsive (`audit_layout.py` e `audit_mobile_responsive.py`) superati con 0 anomalie.
+- **Problemi aperti**:
+  - Nessuno.
+- **Attività successive consigliate**:
+  - Esecuzione di `pubblica-vercel.cmd` per promuovere l'aggiornamento in produzione su Vercel.
+
 ### Sessione 2026-10-29 (Smartphone Zero Scroll Orizzontale Expanding Pill, Anti Death-Scroll Accordion & Icone Moderne) — Agente: Google Antigravity
 - **Ultimo commit precedente rilevato**: `b5c2387` (`[Antigravity] feat(ui): implement single-button Day/Night mode switch with distinct active color styling`) su `main`.
 - **Attività completate**:
