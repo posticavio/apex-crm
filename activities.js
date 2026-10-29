@@ -733,6 +733,8 @@ function syncMobileShell(){
   const fabMap={activities:'Attività',contatti:'Azienda',lead:'Lead',prospect:'Prospect',clienti:'Cliente',categories:'Categoria',quotes:'Preventivo',projects:'Progetto',analytics:'Obiettivi'};
   fabLabel.textContent=fabMap[view]||'Trattativa';
  }
+ closeQuickCreateDropdown();
+ closeMobileCreateSheet();
  if(document.querySelectorAll){
   document.querySelectorAll('#mobile-bottom-nav [data-view]').forEach(b=>{
    const active=b.dataset.view===view||(b.dataset.view==='contatti'&&isAnagrafiche);
@@ -766,6 +768,45 @@ function syncMobileShell(){
   });
  }
  setMobileDrawer(false);
+}
+
+function openQuickCreateDropdown(){
+ const menu=document.querySelector('#quick-create-menu');
+ const btn=document.querySelector('#quick-create-btn');
+ if(!menu||!btn)return;
+ menu.hidden=false;
+ if(typeof btn.setAttribute==='function')btn.setAttribute('aria-expanded','true');
+}
+
+function closeQuickCreateDropdown(){
+ const menu=document.querySelector('#quick-create-menu');
+ const btn=document.querySelector('#quick-create-btn');
+ if(menu)menu.hidden=true;
+ if(btn&&typeof btn.setAttribute==='function')btn.setAttribute('aria-expanded','false');
+}
+
+function toggleQuickCreateDropdown(){
+ const menu=document.querySelector('#quick-create-menu');
+ if(!menu)return;
+ if(menu.hidden)openQuickCreateDropdown();
+ else closeQuickCreateDropdown();
+}
+
+function openMobileCreateSheet(){
+ const dlg=document.querySelector('#mobile-create-sheet');
+ if(!dlg)return;
+ closeQuickCreateDropdown();
+ setMobileDrawer(false);
+ if(!dlg.open&&typeof dlg.showModal==='function')dlg.showModal();
+ const fab=document.querySelector('#mobile-fab');
+ if(fab&&typeof fab.setAttribute==='function')fab.setAttribute('aria-expanded','true');
+}
+
+function closeMobileCreateSheet(){
+ const dlg=document.querySelector('#mobile-create-sheet');
+ if(dlg?.open&&typeof dlg.close==='function')dlg.close();
+ const fab=document.querySelector('#mobile-fab');
+ if(fab&&typeof fab.setAttribute==='function')fab.setAttribute('aria-expanded','false');
 }
 
 function openSettingsDialog(){
@@ -901,8 +942,12 @@ applyUiPrefs();
 
 document.addEventListener('click',e=>{
  const b=e.target.closest('button');
+ const createDrop=e.target.closest('#quick-create-dropdown');
+ if(!createDrop)closeQuickCreateDropdown();
  if(e.target.id==='drawer-backdrop'){setMobileDrawer(false);return;}
  if(!b)return;
+ if(b.id==='quick-create-btn'){toggleQuickCreateDropdown();hapticTap(6);return;}
+ if(b.dataset.new){closeQuickCreateDropdown();closeMobileCreateSheet();}
  if(b.id==='mobile-menu-btn'){
   const isOpen=document.body?.classList?.contains('drawer-open');
   setMobileDrawer(!isOpen);
@@ -911,7 +956,8 @@ document.addEventListener('click',e=>{
  }
  if(b.id==='drawer-close'){setMobileDrawer(false);return;}
  if(b.id==='sidebar-collapse-btn'){toggleSidebarCollapse();return;}
- if(b.id==='mobile-fab'){hapticTap(12);document.querySelector('#new')?.click();return;}
+ if(b.id==='mobile-fab'){hapticTap(12);openMobileCreateSheet();return;}
+ if(b.id==='mobile-create-close'){closeMobileCreateSheet();return;}
  if(b.id==='open-settings'||b.id==='header-settings-btn'){openSettingsDialog();return;}
  if(b.id==='cmd-trigger-btn'){openCommandPalette();return;}
  if(b.id==='command-close'){document.querySelector('#command-dialog')?.close();return;}
@@ -952,6 +998,8 @@ document.addEventListener('keydown',e=>{
  }else if((e.ctrlKey||e.metaKey)&&key==='b'){
   e.preventDefault?.();
   toggleSidebarCollapse();
+ }else if(key==='escape'){
+  closeQuickCreateDropdown();
  }else if(e.altKey&&!e.ctrlKey&&!e.metaKey){
   const altViews={'1':'oggi','2':'activities','3':'projects','4':'contatti','5':'trattative','6':'quotes','7':'analytics'};
   if(altViews[key]){

@@ -57,6 +57,31 @@ node enterprise-check.cjs
 
 > Mantieni questo registro sintetico, ordinato cronologicamente (sessione più recente in alto) e compatibile sia con Google Antigravity sia con OpenAI Codex.
 
+### Sessione 2026-10-29 (Menu Unificato "+ Crea" Popover Desktop e Action Sheet Mobile) — Agente: Google Antigravity
+- **Ultimo commit precedente rilevato**: `fcf7547` (`[Antigravity] feat(desktop): enforce horizontal zero-scroll creation modals on desktop`) su `main`.
+- **Attività completate**:
+  - Rimossa la dispersione orizzontale dei singoli pulsanti di creazione (`+ Attività`, `+ Opportunità`, `+ Preventivo`, `+ Progetto`, `+ Azienda`).
+  - Implementato un **unico pulsante primario compatto `+ Crea ▾` (`#quick-create-btn`)** con popover menu ancorato (`#quick-create-menu`) sia su Desktop sia su Tablet:
+    - Include icone dedicate semantiche, titoli in evidenza (`Nuova Attività`, `Nuova Opportunità`, `Nuova Azienda`, `Nuovo Preventivo`, `Nuovo Progetto`) e micro-descrizioni.
+    - Supporta chiusura al click esterno o con il tasto `ESC`.
+  - Implementato su Smartphone l'attivazione tramite il pulsante fluttuante `#mobile-fab` di un comodo **Bottom Action Sheet nativo (`#mobile-create-sheet`)** con grabber e touch target ampi (`min-height: 52px`).
+  - Aggiornate e formalizzate le regole e i pattern nelle skill globali:
+    - `universal-app-layout` (`SKILL.md` + `references/desktop_top10_design_spec.md`)
+    - `mobile-first-app-design` (`references/troubleshooting_kb.md` Caso 24)
+- **File modificati**:
+  - `index.html`
+  - `activities.js`
+  - `layout.css`
+  - `AGENTS.md`
+  - Skill globali: `universal-app-layout` e `mobile-first-app-design`
+- **Test eseguiti**:
+  - Eseguita l'intera suite di 6 controlli sintattici (`node --check`) e 9 test funzionali (`crm-check.cjs`, `import-check.cjs`, `relationship-check.cjs`, `sales-check.cjs`, `resource-check.cjs`, `unscheduled-check.cjs`, `quotes-check.cjs`, `activities-check.cjs`, `enterprise-check.cjs`) con esito `PASS`.
+  - Audit di layout e mobile responsive (`audit_layout.py` e `audit_mobile_responsive.py`) superati con 0 anomalie.
+- **Problemi aperti**:
+  - Nessuno.
+- **Attività successive consigliate**:
+  - Esecuzione di `pubblica-vercel.cmd` per promuovere l'aggiornamento in produzione su Vercel.
+
 ### Sessione 2026-10-29 (Desktop Schermate di Creazione Orizzontali Zero-Scroll & Aggiornamento Skill Desktop) — Agente: Google Antigravity
 - **Ultimo commit precedente rilevato**: `da5f02a` (`[Antigravity] feat(mobile): apply Play Store Top 20 mobile UX patterns (Extended FAB, M3 pill nav, segmented controls)`) su `main`.
 - **Attività completate**:
