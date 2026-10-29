@@ -57,6 +57,28 @@ node enterprise-check.cjs
 
 > Mantieni questo registro sintetico, ordinato cronologicamente (sessione più recente in alto) e compatibile sia con Google Antigravity sia con OpenAI Codex.
 
+### Sessione 2026-10-29 (Deploy Vercel & CI) — Agente: Google Antigravity
+- **Ultimo commit precedente rilevato**: `a5b7893` (`[Antigravity] docs: add AGENTS.md coordination protocol and harden .gitignore`) e `81c3d26` (`test: align smartphone card data-label assertion in activities-check`) su `main`.
+- **Attività completate**:
+  - Aggiornata la pipeline CI `.github/workflows/test.yml` per includere tutti i nuovi moduli (`quotes.js`, `activities.js`, `projects.js`, `analytics.js`) e le nuove suite di test (`quotes-check.cjs`, `activities-check.cjs`, `enterprise-check.cjs`).
+  - Integrato il branch `feature/lifecycle-activities-layout` in `main`.
+  - Creati `.vercelignore` (che esclude `private-imports/`, `.git/`, `.github/`, `*-check.cjs`, `.env*`, chiavi private) e lo script `pubblica-vercel.cmd` per eseguire i test automatici prima di ogni deploy.
+  - Collegato il progetto a Vercel (`posticavio-8553s-projects/apex-crm` connesso a `https://github.com/posticavio/apex-crm`) ed eseguito il deploy in produzione su `https://apex-crm-nu.vercel.app`.
+- **File modificati (committati da Antigravity)**:
+  - `.github/workflows/test.yml`
+  - `.gitignore`
+  - `.vercelignore` (nuovo)
+  - `pubblica-vercel.cmd` (nuovo)
+  - `AGENTS.md`
+- **Test eseguiti**:
+  - Eseguita l'intera suite di 6 controlli sintattici (`node --check`) e 9 test funzionali (`crm-check.cjs`, `import-check.cjs`, `relationship-check.cjs`, `sales-check.cjs`, `resource-check.cjs`, `unscheduled-check.cjs`, `quotes-check.cjs`, `activities-check.cjs`, `enterprise-check.cjs`) con esito `PASS`.
+- **Problemi aperti**:
+  - Nessuno.
+- **Attività successive consigliate**:
+  - Completare il cablaggio JavaScript della Command Palette (`#cmd-trigger-btn` / `#command-dialog`) in corso su `index.html` e rieseguire `pubblica-vercel.cmd` + `git push origin main`.
+- **Modifiche non pubblicate**:
+  - Preservata nel working tree locale la modifica work-in-progress su `index.html` (`#cmd-trigger-btn` e `#command-dialog`) appartenente alla sessione Codex in corso (Regola 6).
+
 ### Sessione 2026-10-29 — Agente: Google Antigravity
 - **Ultimo commit precedente rilevato**: `81c3d26` (`test: align smartphone card data-label assertion in activities-check`) su `main`, preceduto da `132cb21` e `ef1a6b0` (autore Git: `posticavio`).
 - **Attività completate**:
