@@ -230,7 +230,7 @@ assert.equal(element('#mobile-subnav').hidden,true,'Mobile subnav hidden on acti
 
 run("setView('lead');render()");
 assert.equal(element('#mobile-subnav').hidden,false,'Mobile subnav visible on lead/anagrafiche views');
-assert.match(element('#content').innerHTML,/data-label="Referente e contatti"/,'Contacts table must include data-label for smartphone cards');
+assert.match(element('#content').innerHTML,/data-label="Contatto"/,'Contacts table must include data-label for smartphone cards');
 
 run("openSettingsDialog()");
 assert.equal(element('#settings-dialog').open,true,'Settings modal opens on mobile/desktop trigger');
