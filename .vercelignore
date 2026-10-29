@@ -1,0 +1,12 @@
+private-imports/
+.git/
+.github/
+*-check.cjs
+.env
+.env.*
+*.pem
+*.key
+node_modules/
+.DS_Store
+Thumbs.db
+*.log
