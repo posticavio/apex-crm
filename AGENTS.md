@@ -40,6 +40,8 @@ node --check quotes.js
 node --check activities.js
 node --check projects.js
 node --check analytics.js
+node --check supabase-sync.js
+node --check crm-mcp-server.js
 node crm-check.cjs
 node import-check.cjs
 node relationship-check.cjs
@@ -49,13 +51,50 @@ node unscheduled-check.cjs
 node quotes-check.cjs
 node activities-check.cjs
 node enterprise-check.cjs
+node cloud-sync-check.cjs
+node mcp-server-check.cjs
 ```
 
 ---
 
 ## Registro di Passaggio tra Agenti (Handoff Log)
+### Sessione 2026-10-30 (Risoluzione Persistenza Multi-Dispositivo con Supabase Real-Time Sync & Server MCP Universale per Antigravity e ChatGPT) — Agente: Google Antigravity
+- **Ultimo commit precedente rilevato**: `564a13e` (`[Antigravity] fix(desktop): ensure '+ Crea' dropdown menu is visible and unclipped in desktop header`) su `main`.
+- **Attività completate**:
+  - **Risoluzione Persistenza Dati e Disponibilità Multi-Dispositivo**:
+    - **Diagnosi**: I dati risiedevano esclusivamente nel `localStorage` del singolo browser, impedendo qualsiasi sincronizzazione tra dispositivi (smartphone, tablet, laptop, desktop) e causando la perdita apparente dei dati al cambio dispositivo o alla pulizia della cache.
+    - **Modulo `supabase-sync.js`**: Implementata la sincronizzazione automatica bidirezionale, safe-additive (zero perdite dati) e offline-resilient con il cloud Supabase (`https://jjkqiatabmxcwvzswygh.supabase.co`).
+    - **Idratazione Istantanea**: All'avvio su qualsiasi dispositivo, carica immediatamente il database cloud, incorporando aziende (`companies`), referenti (`contacts`), storico (`interactions`), preventivi (`quotes`) e lo snapshot completo crittografato dello stato applicativo (`attachments`).
+    - **Salvataggio Automatico Cloud**: Ogni modifica tramite `persist(next)` viene salvata in locale (0ms latenza) e accodata via sync debounced verso Supabase, con gestione offline e riconnessione automatica (`visibilitychange`, `online`).
+    - **UI Cloud Sync Status**: Aggiunto badge dinamico nell'Header desktop e mobile (`#cloud-sync-status`) con indicatore di stato visivo (🟢 `Cloud attivo`, 🟡 `Sincronizzazione in corso...`, ⚡ `Offline (dati protetti in locale)`), click per forzare il sync immediato, e pannello dedicato nel modale Impostazioni (`#settings-dialog`).
+  - **Creazione Server MCP Universale (`crm-mcp-server.js`)**:
+    - **Piena Conformità MCP 2024-11-05**: Implementato il protocollo ufficiale JSON-RPC 2.0 via standard input/output (`stdio`) e server HTTP/SSE opzionale (`--port <numero>`).
+    - **Zero Dipendenze Esterne**: Realizzato in puro Node.js nativo (funziona immediatamente su qualsiasi sistema operativo senza necessitare di `npm install`).
+    - **Compatibilità Totale con Antigravity & ChatGPT**:
+      - Registrato direttamente nella configurazione globale di Antigravity: `C:\Users\posti\.gemini\config\mcp_config.json` (server `apex_crm`).
+      - Creato file di configurazione pronto all'uso per ChatGPT Desktop: `chatgpt_mcp_config.json`.
+      - Redatta guida operativa dettagliata: `MCP-SETUP-GUIDE.md`.
+    - **Suite di 15 Strumenti (Tools) Completi**:
+      - `crm_summary`, `crm_list_companies`, `crm_get_company`, `crm_create_company`, `crm_update_company`, `crm_list_deals`, `crm_create_deal`, `crm_advance_deal`, `crm_list_activities`, `crm_create_activity`, `crm_complete_activity`, `crm_list_quotes`, `crm_list_projects`, `crm_search`, `crm_sync_status`.
+- **File modificati/creati**:
+  - `supabase-sync.js` (nuovo)
+  - `crm-mcp-server.js` (nuovo)
+  - `cloud-sync-check.cjs` (nuovo)
+  - `mcp-server-check.cjs` (nuovo)
+  - `chatgpt_mcp_config.json` (nuovo)
+  - `MCP-SETUP-GUIDE.md` (nuovo)
+  - `index.html`
+  - `app.js`
+  - `layout.css`
+  - `AGENTS.md`
+  - `C:\Users\posti\.gemini\config\mcp_config.json`
+- **Test eseguiti**:
+  - Eseguita l'intera suite di 8 verifiche sintattiche (`node --check`) e 11 test funzionali (`crm-check.cjs`, `import-check.cjs`, `relationship-check.cjs`, `sales-check.cjs`, `resource-check.cjs`, `unscheduled-check.cjs`, `quotes-check.cjs`, `activities-check.cjs`, `enterprise-check.cjs`, `cloud-sync-check.cjs`, `mcp-server-check.cjs`) con esito `PASS` al 100%.
+- **Problemi aperti**:
+  - Nessuno.
+- **Attività successive consigliate**:
+  - Esecuzione di `git push` e `pubblica-vercel.cmd` per promuovere il cloud sync e la nuova release in produzione.
 
-> Mantieni questo registro sintetico, ordinato cronologicamente (sessione più recente in alto) e compatibile sia con Google Antigravity sia con OpenAI Codex.
 
 ### Sessione 2026-10-30 (Desktop Mode Salvaguardia Menu "+ Crea" Popover Visibile & Unclipped nell'Header) — Agente: Google Antigravity
 - **Ultimo commit precedente rilevato**: `f15f45c` (`[Antigravity] feat(desktop): eliminate sidebar scroll completely with compact footer grid and 505px vertical fit`) su `main`.
