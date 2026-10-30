@@ -521,7 +521,7 @@ main {
 header {
   position: sticky;
   top: 0;
-  z-index: 20;
+  z-index: 50;
   height: 54px;
   padding: 0 28px;
   background: rgba(255, 255, 255, 0.86);
@@ -629,7 +629,7 @@ header {
   border-radius: var(--radius-md);
   box-shadow: 0 12px 28px -4px rgba(16, 24, 40, 0.16), 0 4px 10px -2px rgba(16, 24, 40, 0.06);
   padding: 6px;
-  z-index: 100;
+  z-index: 1000;
   display: flex;
   flex-direction: column;
   gap: 2px;
@@ -831,6 +831,73 @@ header {
   background: var(--surface-subtle);
   border-color: var(--line-strong);
   color: var(--ink);
+}
+
+/* Cloud Sync Status Pill (Supabase Multi-Device) */
+.cloud-sync-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 32px;
+  padding: 5px 10px;
+  font-size: 11.5px;
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  color: var(--ink-secondary);
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.cloud-sync-btn:hover:not(:disabled) {
+  background: var(--surface-subtle);
+  border-color: var(--line-strong);
+  color: var(--ink);
+}
+
+.cloud-sync-dot {
+  width: 7.5px;
+  height: 7.5px;
+  border-radius: var(--radius-pill);
+  background: #10b981;
+  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
+  flex-shrink: 0;
+  transition: all 0.25s ease;
+}
+
+.cloud-sync-dot.sync-syncing,
+.cloud-sync-dot.sync-pending {
+  background: #f59e0b;
+  box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.3);
+  animation: pulse-sync 1.2s infinite ease-in-out;
+}
+
+.cloud-sync-dot.sync-offline {
+  background: #94a3b8;
+  box-shadow: none;
+}
+
+.cloud-sync-dot.sync-error {
+  background: #ef4444;
+  box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.25);
+}
+
+@keyframes pulse-sync {
+  0% { transform: scale(0.9); opacity: 0.7; }
+  50% { transform: scale(1.25); opacity: 1; }
+  100% { transform: scale(0.9); opacity: 0.7; }
+}
+
+@media (max-width: 900px) {
+  .cloud-sync-btn .cloud-sync-label {
+    display: none;
+  }
+  .cloud-sync-btn {
+    padding: 5px 7px;
+    min-width: 32px;
+  }
 }
 
 /* Single-Button Day/Night Mode Switch (Changes color on activation) */
@@ -4214,9 +4281,9 @@ details[open] > .mobile-collapsible-summary .chevron {
    "Nel visuale desktop mai menu con scroll in orizzontale: nascondi, raggruppa o usa popover/rail"
    ========================================================================== */
 @media (min-width: 768px) {
-  /* 1. Header & Top Command Bar: Zero Scroll Orizzontale Garantito */
+  /* 1. Header & Top Command Bar: Zero Scroll Orizzontale Garantito con Dropdown e Popover Visibili */
   header {
-    overflow-x: hidden !important;
+    overflow: visible !important;
     max-width: 100vw;
   }
 
@@ -4241,7 +4308,7 @@ details[open] > .mobile-collapsible-summary .chevron {
 
   .header-quick-actions {
     flex-shrink: 0;
-    overflow-x: hidden !important;
+    overflow: visible !important;
   }
 
   /* 2. Sidebar Desktop: ZERO SCROLL ASSOLUTO (Né Verticale né Orizzontale) */

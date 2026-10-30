@@ -57,6 +57,34 @@ node enterprise-check.cjs
 
 > Mantieni questo registro sintetico, ordinato cronologicamente (sessione più recente in alto) e compatibile sia con Google Antigravity sia con OpenAI Codex.
 
+### Sessione 2026-10-30 (Desktop Mode Salvaguardia Menu "+ Crea" Popover Visibile & Unclipped nell'Header) — Agente: Google Antigravity
+- **Ultimo commit precedente rilevato**: `f15f45c` (`[Antigravity] feat(desktop): eliminate sidebar scroll completely with compact footer grid and 505px vertical fit`) su `main`.
+- **Attività completate**:
+  - Risolto il problema del menu di creazione a comparsa nascosto su Desktop (`quando premo crea il menu e nascosto in desktop mode`):
+    - **Diagnosi W3C Overflow**: L'applicazione di `overflow-x: hidden !important` sull'Header (`height: 54px;`) e su `.header-quick-actions` causava il clipping verticale di qualsiasi elemento figlio posizionato in assoluto (`.quick-create-menu` con `top: calc(100% + 6px)`), rendendolo invisibile all'utente all'apertura.
+    - **Risoluzione Overflow Visibile**: Impostato `header { overflow: visible !important; }` e `.header-quick-actions { overflow: visible !important; }` su desktop (`@media (min-width: 768px)`), mantenendo il contenimento anti-scroll orizzontale a monte tramite `html, body { max-width: 100vw; overflow-x: hidden; }` e dimensionamento flessibile dei componenti interni.
+    - **Elevazione z-index**: Elevato `header` a `z-index: 50` e `.quick-create-menu` a `z-index: 1000` per garantire che il menu fluttui sopra intestazioni di tabella fisse e card.
+    - **Test di Unità e Integrazione**: Aggiunti in `enterprise-check.cjs` i test per `openQuickCreateDropdown()`, `closeQuickCreateDropdown()`, `toggleQuickCreateDropdown()` e le asserzioni di visibilità CSS.
+  - Formalizzata la regola nelle skill globali:
+    - `universal-app-layout` (`references/desktop_top10_design_spec.md` Sezione 10.5 e `references/troubleshooting_kb.md` Caso 30).
+    - `mobile-first-app-design` (`references/troubleshooting_kb.md` Caso 30).
+    - Sincronizzato con il mirror `C:\Users\posti\Downloads\Antigravity\SKILLS_ANTIGRAVITY\`.
+- **File modificati**:
+  - `layout.css`
+  - `enterprise-check.cjs`
+  - `app.js`
+  - `index.html`
+  - `supabase-sync.js`
+  - `AGENTS.md`
+  - Skill globali: `universal-app-layout` e `mobile-first-app-design` (+ mirror `SKILLS_ANTIGRAVITY`)
+- **Test eseguiti**:
+  - Eseguita l'intera suite di 7 controlli sintattici (`node --check`) e 9 test funzionali (`crm-check.cjs`, `import-check.cjs`, `relationship-check.cjs`, `sales-check.cjs`, `resource-check.cjs`, `unscheduled-check.cjs`, `quotes-check.cjs`, `activities-check.cjs`, `enterprise-check.cjs`) con esito `PASS`.
+  - Audit di layout e mobile responsive (`audit_layout.py` e `audit_mobile_responsive.py`) superati con 0 anomalie.
+- **Problemi aperti**:
+  - Nessuno.
+- **Attività successive consigliate**:
+  - Esecuzione di `pubblica-vercel.cmd` per promuovere l'aggiornamento in produzione su Vercel.
+
 ### Sessione 2026-10-29 (Sidebar Desktop Zero Scroll Totale, Footer Grid 4 Icone & Riduzione Altezza a 505px) — Agente: Google Antigravity
 - **Ultimo commit precedente rilevato**: `d20ac43` (`[Antigravity] feat(desktop): enforce zero horizontal scroll for menus, toolbars, and boards on desktop`) su `main`.
 - **Attività completate**:

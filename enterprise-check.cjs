@@ -200,10 +200,12 @@ const backup=run("JSON.stringify({version:1,...state})");
 const restored=run("migrate(JSON.parse("+JSON.stringify(backup)+"))");
 run("validate("+JSON.stringify(restored)+")");
 
-// 8. Desktop Zero Horizontal Scroll Enforced on Menus, Navigation, Toolbars & Boards
+// 8. Desktop Zero Horizontal Scroll Enforced & Quick-Create Dropdown Visibility
 const layoutCss = fs.readFileSync(path.join(__dirname, 'layout.css'), 'utf8');
 assert.match(layoutCss, /Desktop Mode Zero Horizontal Scroll Rule/);
-assert.match(layoutCss, /header\s*\{[^}]*overflow-x:\s*hidden\s*!important/);
+assert.match(layoutCss, /header\s*\{[^}]*overflow:\s*visible\s*!important/);
+assert.match(layoutCss, /\.header-quick-actions\s*\{[^}]*overflow:\s*visible\s*!important/);
+assert.match(layoutCss, /\.quick-create-menu\s*\{[^}]*z-index:\s*1000/);
 assert.match(layoutCss, /\.toolbar\s*\{[^}]*overflow-x:\s*hidden\s*!important/);
 assert.match(layoutCss, /\.activity-filters\s*\{[^}]*overflow-x:\s*hidden\s*!important/);
 assert.match(layoutCss, /\.board[^{]*\{[^}]*overflow-x:\s*hidden\s*!important/);
@@ -213,5 +215,15 @@ assert.match(indexHtml, /class="sidebar-tools-grid"/);
 assert.match(indexHtml, /id="density-toggle"[\s\S]*?class="density-label"/);
 assert.match(indexHtml, /id="header-settings-btn"[\s\S]*?class="settings-label"/);
 
-console.log('PASS: projects with milestones and dependency guards, economic margin and hours tracking, revenue targets, budget and weighted forecast, historical revenues, customizable stage playbooks, command palette Cmd+K, desktop zero horizontal scroll menus, dark/AMOLED themes and compact density, CSV/JSON portability.');
+// Quick-create menu toggle test
+run("openQuickCreateDropdown()");
+assert.equal(element('#quick-create-menu').hidden, false);
+run("closeQuickCreateDropdown()");
+assert.equal(element('#quick-create-menu').hidden, true);
+run("toggleQuickCreateDropdown()");
+assert.equal(element('#quick-create-menu').hidden, false);
+run("toggleQuickCreateDropdown()");
+assert.equal(element('#quick-create-menu').hidden, true);
+
+console.log('PASS: projects with milestones and dependency guards, economic margin and hours tracking, revenue targets, budget and weighted forecast, historical revenues, customizable stage playbooks, command palette Cmd+K, quick-create visible dropdown, desktop zero horizontal scroll menus, dark/AMOLED themes and compact density, CSV/JSON portability.');
 

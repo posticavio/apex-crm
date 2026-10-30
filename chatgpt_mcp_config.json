@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "apex_crm": {
+      "command": "node",
+      "args": [
+        "c:\\Users\\posti\\Desktop\\codex\\crm personale\\crm-mcp-server.js"
+      ],
+      "env": {
+        "NODE_ENV": "production"
+      }
+    }
+  }
+}
