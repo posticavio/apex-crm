@@ -243,6 +243,7 @@ const TOOLS = [
         sector: { type: 'string', description: 'Settore merceologico o attività.' },
         primaryPerson: { type: 'string', description: 'Nome e cognome del referente principale.' },
         primaryRole: { type: 'string', description: 'Ruolo del referente principale (es. CEO, Resp. Acquisti).' },
+        leadTemp: { type: 'string', enum: ['hot', 'warm', 'cold'], description: 'Temperatura/Qualifica commerciale: hot (🔥 Caldo), warm (☀️ Tiepido), cold (❄️ Freddo).' },
         notes: { type: 'string', description: 'Note descrittive, contesto iniziale o fonte del contatto.' }
       },
       required: ['company']
@@ -262,6 +263,7 @@ const TOOLS = [
         city: { type: 'string' },
         website: { type: 'string' },
         sector: { type: 'string' },
+        leadTemp: { type: 'string', enum: ['hot', 'warm', 'cold'], description: 'Temperatura/Qualifica: hot, warm, cold.' },
         notes: { type: 'string' },
         stage: { type: 'string', enum: ['Lead', 'Prospect', 'Cliente'] }
       }
@@ -513,6 +515,7 @@ async function executeTool(name, args) {
         id: cid,
         company: args.company.trim(),
         stage: stage,
+        leadTemp: args.leadTemp || 'warm',
         taxId: args.taxId?.trim() || '',
         person: args.primaryPerson?.trim() || '',
         primaryRole: args.primaryRole?.trim() || '',
@@ -576,7 +579,7 @@ async function executeTool(name, args) {
         throw new Error('Azienda non trovata per l’aggiornamento.');
       }
 
-      for (const k of ['email', 'phone', 'address', 'city', 'website', 'sector', 'notes', 'stage']) {
+      for (const k of ['email', 'phone', 'address', 'city', 'website', 'sector', 'notes', 'stage', 'leadTemp']) {
         if (args[k] !== undefined) comp[k] = args[k];
       }
       comp.history = comp.history || [];
@@ -659,6 +662,7 @@ async function executeTool(name, args) {
         service: args.service || 'Automazione',
         salesStage: salesStage,
         stage: stage,
+        leadTemp: args.leadTemp || 'warm',
         setup: Number(args.setup) || 0,
         monthly: Number(args.monthly) || 0,
         problem: args.problem || '',

@@ -4407,3 +4407,889 @@ details[open] > .mobile-collapsible-summary .chevron {
     display: none;
   }
 }
+
+/* ==========================================================================
+   Apex Pro CRM System — Scheda 360°, Touchpoints, Deal Stages & Badges
+   ========================================================================== */
+
+/* 1. Scheda 360° Cockpit Dialog */
+#company-360-dialog {
+  border-radius: var(--radius-lg);
+  width: min(1380px, 96vw);
+  max-width: 96vw;
+  height: min(92dvh, 880px);
+  max-height: 96dvh;
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--line);
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  margin: auto;
+}
+
+#company-360-dialog[open] {
+  display: flex;
+}
+
+#company-360-content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
+.c360-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 24px 14px;
+  border-bottom: 1px solid var(--line-subtle);
+  background: var(--surface-subtle);
+}
+
+.c360-identity {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.c360-avatar {
+  width: 52px;
+  height: 52px;
+  border-radius: var(--radius-md);
+  background: linear-gradient(135deg, var(--blue), var(--indigo));
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 20px;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+  flex-shrink: 0;
+}
+
+.c360-title-block h2 {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin: 0;
+  color: var(--ink);
+}
+
+.c360-title-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.c360-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-size: 13px;
+  color: var(--muted);
+  margin-top: 4px;
+  flex-wrap: wrap;
+}
+
+.c360-meta-row a {
+  color: var(--blue);
+  text-decoration: none;
+}
+
+.c360-meta-row a:hover {
+  text-decoration: underline;
+}
+
+.c360-close {
+  font-size: 24px;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  cursor: pointer;
+  color: var(--muted);
+}
+
+.c360-close:hover {
+  background: var(--surface-hover);
+  color: var(--ink);
+}
+
+/* 2. Barra Azioni Rapide Esecutive */
+.c360-actions-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 24px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--line-subtle);
+  overflow-x: auto;
+  white-space: nowrap;
+}
+
+.c360-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--line);
+  background: var(--surface-subtle);
+  color: var(--ink);
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.c360-action-btn:hover {
+  background: var(--surface-hover);
+  border-color: var(--line-strong);
+}
+
+.c360-action-btn.primary-action {
+  background: var(--blue-soft);
+  color: var(--blue);
+  border-color: var(--blue-border);
+}
+
+.c360-action-btn.whatsapp-action {
+  background: #ecfdf5;
+  color: #047857;
+  border-color: #a7f3d0;
+}
+
+.c360-action-btn.highlight-action {
+  background: linear-gradient(135deg, var(--blue), var(--indigo));
+  color: #ffffff;
+  border-color: transparent;
+  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.2);
+}
+
+.c360-action-btn.highlight-action:hover {
+  opacity: 0.95;
+  transform: translateY(-1px);
+}
+
+/* 3. Statistiche Ribbon */
+.c360-stats-ribbon {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  padding: 12px 24px;
+  background: var(--surface-subtle);
+  border-bottom: 1px solid var(--line-subtle);
+}
+
+.c360-stat-card {
+  padding: 10px 14px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--shadow-sm);
+}
+
+.c360-stat-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+}
+
+.c360-stat-card strong {
+  font-size: 18px;
+  font-weight: 700;
+  font-family: var(--font-display);
+  color: var(--ink);
+  margin: 3px 0 1px;
+}
+
+.c360-stat-card small {
+  font-size: 11px;
+  color: var(--muted);
+}
+
+/* 4. Tab Navigation */
+.c360-tabs {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 24px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--line);
+  overflow-x: auto;
+}
+
+.c360-tab {
+  padding: 11px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted);
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.c360-tab:hover {
+  color: var(--ink);
+}
+
+.c360-tab.active {
+  color: var(--blue);
+  border-bottom-color: var(--blue);
+}
+
+.c360-tab-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px 24px;
+  background: var(--bg);
+}
+
+/* 5. Timeline Feed */
+.c360-quick-log-box {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  margin-bottom: 18px;
+  box-shadow: var(--shadow-sm);
+}
+
+.c360-quick-log-box h4 {
+  margin: 0 0 10px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.c360-quick-log-form {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.c360-quick-log-form select {
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--line);
+  background: var(--surface-subtle);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.c360-quick-log-form input {
+  flex: 1;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--line);
+  background: var(--surface);
+  font-size: 13px;
+  color: var(--ink);
+}
+
+.c360-timeline-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.c360-timeline-item {
+  display: flex;
+  gap: 14px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  box-shadow: var(--shadow-sm);
+  transition: border-color 0.15s ease;
+}
+
+.c360-timeline-item:hover {
+  border-color: var(--line-strong);
+}
+
+.c360-timeline-item.item-touchpoint {
+  border-left: 3px solid var(--blue);
+}
+
+.c360-timeline-icon {
+  font-size: 20px;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-sm);
+  background: var(--surface-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.c360-timeline-content {
+  flex: 1;
+}
+
+.c360-timeline-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.c360-timeline-head strong {
+  font-size: 14px;
+  color: var(--ink);
+}
+
+.c360-timeline-head small {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.c360-timeline-text {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--ink-secondary);
+  margin: 0;
+  white-space: pre-wrap;
+}
+
+/* 6. Referenti Cards */
+.c360-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 14px;
+  margin-top: 14px;
+}
+
+.c360-person-card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow: var(--shadow-sm);
+}
+
+.c360-person-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.c360-person-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: var(--radius-sm);
+  background: var(--blue-soft);
+  color: var(--blue);
+  font-weight: 700;
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.c360-person-head strong {
+  display: block;
+  font-size: 15px;
+  color: var(--ink);
+}
+
+.c360-person-head small {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.c360-person-contacts {
+  font-size: 13px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.c360-person-contacts a {
+  color: var(--blue);
+  text-decoration: none;
+}
+
+.c360-person-actions {
+  display: flex;
+  gap: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--line-subtle);
+}
+
+.btn-micro {
+  padding: 4px 8px;
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: var(--radius-xs);
+  border: 1px solid var(--line);
+  background: var(--surface-subtle);
+  color: var(--ink);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.btn-micro.btn-wa {
+  background: #ecfdf5;
+  color: #047857;
+  border-color: #a7f3d0;
+}
+
+/* 7. Deals & Quotes Lists */
+.c360-deals-list,
+.c360-quotes-list,
+.c360-projects-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.c360-deal-row,
+.c360-quote-row,
+.c360-project-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  padding: 14px 18px;
+  gap: 16px;
+  box-shadow: var(--shadow-sm);
+}
+
+.c360-deal-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.c360-deal-values strong,
+.c360-quote-amounts strong {
+  font-size: 15px;
+  font-family: var(--font-display);
+  color: var(--ink);
+}
+
+/* 8. Anagrafica Info Grid */
+.c360-info-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+}
+
+.c360-info-card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  box-shadow: var(--shadow-sm);
+}
+
+.c360-info-card.full-width {
+  grid-column: span 2;
+}
+
+.c360-info-card h4 {
+  margin: 0 0 12px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink);
+  border-bottom: 1px solid var(--line-subtle);
+  padding-bottom: 6px;
+}
+
+.c360-info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 0;
+  font-size: 13px;
+  border-bottom: 1px solid var(--line-subtle);
+}
+
+.c360-info-row span {
+  color: var(--muted);
+}
+
+.c360-info-row strong {
+  color: var(--ink);
+}
+
+.c360-notes-text {
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--ink-secondary);
+  white-space: pre-wrap;
+  margin: 0;
+}
+
+/* 9. Badges & Indicators */
+.rotting-badge {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.rotting-badge.danger {
+  background: var(--rose-soft);
+  color: var(--rose);
+  border: 1px solid var(--rose-border);
+}
+
+.rotting-badge.warning {
+  background: var(--amber-soft);
+  color: var(--amber);
+  border: 1px solid var(--amber-border);
+}
+
+.temp-badge {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: var(--radius-pill);
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.temp-badge.temp-hot {
+  background: var(--rose-soft);
+  color: var(--rose);
+  border: 1px solid var(--rose-border);
+}
+
+.temp-badge.temp-warm {
+  background: var(--amber-soft);
+  color: var(--amber);
+  border: 1px solid var(--amber-border);
+}
+
+.temp-badge.temp-cold {
+  background: var(--blue-soft);
+  color: var(--blue);
+  border: 1px solid var(--blue-border);
+}
+
+/* 10. Date Shortcuts Bar */
+.date-shortcuts-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+  flex-wrap: wrap;
+}
+
+.date-shortcuts-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+
+.date-chip {
+  padding: 3px 8px;
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: var(--radius-xs);
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--ink);
+  cursor: pointer;
+  transition: all 0.1s ease;
+}
+
+.date-chip:hover {
+  background: var(--blue-soft);
+  color: var(--blue);
+  border-color: var(--blue-border);
+}
+
+/* 11. Logger Interazioni & Channel Chips */
+.channel-selector {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 4px;
+}
+
+.channel-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--line);
+  background: var(--surface-subtle);
+  cursor: pointer;
+}
+
+.channel-chip input {
+  margin: 0;
+}
+
+.outcome-chips-bar {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-top: 4px;
+}
+
+.outcome-chip {
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.outcome-chip:hover {
+  background: var(--surface-hover);
+  border-color: var(--blue);
+}
+
+.highlight-box {
+  background: var(--blue-soft);
+  border: 1px solid var(--blue-border);
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+}
+
+/* 12. Deal Stage Modal */
+.deal-stage-hero {
+  background: var(--surface-subtle);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+}
+
+.deal-stage-hero strong {
+  font-size: 16px;
+  color: var(--ink);
+}
+
+.stage-celebration-box {
+  background: var(--emerald-soft);
+  border: 1px solid var(--emerald-border);
+  border-radius: var(--radius-md);
+  padding: 14px;
+}
+
+.stage-celebration-box h4 {
+  margin: 0 0 6px;
+  color: var(--emerald);
+  font-size: 15px;
+}
+
+.stage-loss-box {
+  background: var(--rose-soft);
+  border: 1px solid var(--rose-border);
+  border-radius: var(--radius-md);
+  padding: 14px;
+}
+
+.stage-loss-box h4 {
+  margin: 0 0 6px;
+  color: var(--rose);
+  font-size: 15px;
+}
+
+/* 13. Dashboard Executive Grid */
+.exec-dashboard-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-top: 18px;
+}
+
+.exec-kpi-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.exec-kpi-item {
+  padding: 10px 12px;
+  background: var(--surface-subtle);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  display: flex;
+  flex-direction: column;
+}
+
+.exec-kpi-item strong {
+  font-size: 20px;
+  font-family: var(--font-display);
+  color: var(--ink);
+  margin: 3px 0 1px;
+}
+
+.exec-kpi-item small {
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.recent-touchpoints-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.touchpoint-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--line-subtle);
+  background: var(--surface-subtle);
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.touchpoint-row:hover {
+  background: var(--surface-hover);
+  border-color: var(--line);
+}
+
+.tp-icon {
+  font-size: 16px;
+  margin-top: 2px;
+}
+
+.tp-body {
+  flex: 1;
+}
+
+.tp-head {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+}
+
+.tp-head strong {
+  color: var(--ink);
+}
+
+.tp-head small {
+  color: var(--muted);
+}
+
+.tp-snippet {
+  margin: 2px 0 0;
+  font-size: 12px;
+  color: var(--ink-secondary);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Dark Mode Overrides for 360° & Pro Features */
+body[data-theme="dark"] #company-360-dialog,
+body[data-theme="amoled"] #company-360-dialog {
+  background: #0d1117;
+  border-color: rgba(255, 255, 255, 0.12);
+  color: #f0f6fc;
+}
+
+body[data-theme="dark"] .c360-header,
+body[data-theme="amoled"] .c360-header {
+  background: #161b22;
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+body[data-theme="dark"] .c360-tab-body,
+body[data-theme="amoled"] .c360-tab-body {
+  background: #090d13;
+}
+
+body[data-theme="dark"] .c360-stat-card,
+body[data-theme="dark"] .c360-person-card,
+body[data-theme="dark"] .c360-deal-row,
+body[data-theme="dark"] .c360-quote-row,
+body[data-theme="dark"] .c360-project-row,
+body[data-theme="dark"] .c360-info-card,
+body[data-theme="dark"] .c360-quick-log-box,
+body[data-theme="dark"] .c360-timeline-item,
+body[data-theme="amoled"] .c360-stat-card,
+body[data-theme="amoled"] .c360-person-card,
+body[data-theme="amoled"] .c360-deal-row,
+body[data-theme="amoled"] .c360-quote-row,
+body[data-theme="amoled"] .c360-project-row,
+body[data-theme="amoled"] .c360-info-card,
+body[data-theme="amoled"] .c360-quick-log-box,
+body[data-theme="amoled"] .c360-timeline-item {
+  background: #12161f;
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+/* Smartphone Adjustments */
+@media (max-width: 767px) {
+  #company-360-dialog {
+    width: 100vw;
+    max-width: 100vw;
+    height: 100dvh;
+    max-height: 100dvh;
+    border-radius: 0;
+    margin: 0;
+  }
+
+  .c360-stats-ribbon {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .c360-info-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .c360-info-card.full-width {
+    grid-column: span 1;
+  }
+
+  .exec-dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .exec-kpi-row {
+    grid-template-columns: 1fr;
+  }
+}
+

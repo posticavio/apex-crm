@@ -42,6 +42,7 @@ node --check projects.js
 node --check analytics.js
 node --check supabase-sync.js
 node --check crm-mcp-server.js
+node --check crm-pro.js
 node crm-check.cjs
 node import-check.cjs
 node relationship-check.cjs
@@ -53,11 +54,58 @@ node activities-check.cjs
 node enterprise-check.cjs
 node cloud-sync-check.cjs
 node mcp-server-check.cjs
+node crm-pro-check.cjs
 ```
 
 ---
 
 ## Registro di Passaggio tra Agenti (Handoff Log)
+### Sessione 2026-11-01 (Apex Pro CRM: Scheda 360°, Quick Touchpoint Logger con Smart Follow-Up, Deal Stage Modal con Motivi di Perdita, Deal Rotting Alert, Lead Scoring Hot/Warm/Cold, WhatsApp 1-Click & Dashboard Executive) — Agente: Google Antigravity
+- **Ultimo commit precedente rilevato**: `10a5300` (`[Antigravity] docs: update handoff log for multi-device sync and MCP server`) su `main`.
+- **Attività completate**:
+  - **Analisi Funzionale CRM Professionale**:
+    - Risolto il divario tra CRM essenziale e piattaforma di classe enterprise (Attio, Twenty CRM, HubSpot, Pipedrive): superato il paradigma del mero form modale di modifica a favore di un cockpit operativo e orientato alle vendite ad alta velocità.
+  - **Scheda Dettaglio Azienda 360° (Company 360° Cockpit & Drawer)** (`crm-pro.js`, `layout.css`, `index.html`):
+    - Implementato `openCompany360(companyId, tab)`: schermata executive a pagina intera/drawer a 6 tab (Timeline & Feed, Referenti, Opportunità, Preventivi, Progetti, Anagrafica & Note).
+    - **Header 360° con Action Ribbon Esecutivo**: monogramma dinamico, badge di fase e temperatura lead, pulsanti rapidi Chiama, Invia Email, WhatsApp, Registra Interazione, + Trattativa, + Preventivo, + Attività, Modifica Dati.
+    - **Stats Ribbon**: 4 KPI in cima (Pipeline Aperta, Canoni Acquisiti MRR, Preventivi Emessi, Follow-up da gestire).
+  - **Logger Rapido Interazioni & Touchpoint ("Quick Interaction Logger")**:
+    - Modale dedicato `#interaction-dialog` con selezione rapida del canale (Telefonata, WhatsApp, Email, Incontro, Nota).
+    - **Esiti Rapidi a 1 Clic**: [Interessato], [Da risentire], [Non risponde], [Fissata demo], [Chiesto preventivo], [Non interessato].
+    - **Smart Follow-Up Automatico**: opzione integrata con scorciatoie di scadenza (+1g, +3g, Lunedì, +1sett) che crea istantaneamente l'attività operativa di promemoria nel modulo `activities`.
+  - **Gestione Avanzamento Trattative Guidata (Deal Stage Modal)**:
+    - Modale guidato `#deal-stage-dialog` per spostare le opportunità tra le 5 fasi della pipeline.
+    - **Motivi di Perdita Strutturati (`lossReason`)**: catalogazione obbligatoria per opportunità perse (Prezzo troppo alto, Concorrenza, Progetto rimandato, Ghosting/Nessuna risposta, Mancanza requisiti).
+    - **Celebrazione Chiusura Vinta**: congratulazioni, conferma economica e conversione automatica dell'azienda in Cliente.
+  - **Alert Inattività & Deal Rotting**:
+    - Rilevamento automatico delle opportunità stagnanti (`calcDealRottingDays`): badge visivo `Inattiva da Xgg` (danger se >= 14 giorni, warning se >= 7 giorni) nella Kanban, nella lista e nella scheda 360°.
+  - **Lead Scoring & Qualificazione Temperatura (BANT Fit)**:
+    - Campo `leadTemp` per contatti Lead e Prospect (Hot, Warm, Cold) con badge visivo atomico, selettore in anagrafica e supporto nel server MCP.
+  - **Scorciatoie Rapide Data (Quick Due Date Shortcuts)**:
+    - Componente riutilizzabile `renderDateShortcuts` con pulsanti a tocco singolo (`Oggi`, `Domani`, `+3 giorni`, `Lunedì`, `+1 sett.`, `+2 sett.`) integrato in tutti i form di attività, scadenze e follow-up.
+  - **Integrazione WhatsApp Web 1-Click**:
+    - Helper `makeWhatsAppUrl` con normalizzazione prefisso internazionale italiano e testi precompilati professionali per primo contatto, follow-up e invio preventivo.
+  - **Dashboard Commerciale Executive Potenziata**:
+    - Metriche di chiusura: **Win Rate %** (Trattative Vinte su Concluse), **Average Deal Size** (Valore medio setup), e contatore trattative a rischio inattività.
+    - Widget **Ultime Interazioni Registrate**: feed rapido degli ultimi touchpoint aziendali con click per aprire direttamente la scheda 360°.
+  - **Integrazione Command Palette (`⌘K`)**:
+    - Azione rapida `⚡ Registra interazione rapida` e apertura istantanea della Scheda 360° per le aziende cercate.
+- **File modificati/creati**:
+  - `crm-pro.js` (nuovo)
+  - `crm-pro-check.cjs` (nuovo)
+  - `index.html`
+  - `app.js`
+  - `activities.js`
+  - `crm-mcp-server.js`
+  - `layout.css`
+  - `AGENTS.md`
+- **Test eseguiti**:
+  - Eseguita l'intera suite di 9 verifiche sintattiche (`node --check`) e 12 test funzionali con esito `PASS` al 100%.
+- **Problemi aperti**:
+  - Nessuno.
+- **Attività successive consigliate**:
+  - Esecuzione di `git push` e avvio di `pubblica-vercel.cmd`.
+
 ### Sessione 2026-10-30 (Risoluzione Persistenza Multi-Dispositivo con Supabase Real-Time Sync & Server MCP Universale per Antigravity e ChatGPT) — Agente: Google Antigravity
 - **Ultimo commit precedente rilevato**: `564a13e` (`[Antigravity] fix(desktop): ensure '+ Crea' dropdown menu is visible and unclipped in desktop header`) su `main`.
 - **Attività completate**:

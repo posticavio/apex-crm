@@ -150,7 +150,7 @@ function openTaskEditor(id=null,overrides={}){
     ${field('dueDate','Data scadenza',item.dueDate,'date')}
     ${field('dueTime','Ora (opzionale)',item.dueTime,'time')}
    </div>
-   ${area('notes','Note e scaletta operativa',item.notes)}
+   ${typeof renderDateShortcuts==='function'?renderDateShortcuts('input[name="dueDate"]'):''}${area('notes','Note e scaletta operativa',item.notes)}
    <h3 class="form-section">Esito e concatenazione prossimo passo</h3>
    ${area('outcome','Esito / Risultato (registrato nello storico aziendale)',item.outcome)}
    <details class="next-task-chain" ${overrides.status==='Completata'?'open':''}>
@@ -832,7 +832,7 @@ function buildCommandItems(q=''){
  const term=String(q||'').trim().toLocaleLowerCase('it');
  const matchText=(...parts)=>!term||parts.filter(Boolean).join(' ').toLocaleLowerCase('it').includes(term);
  const actions=[
-  {group:'Azioni rapide',icon:'＋',label:'Nuova trattativa / opportunità',meta:'Crea opportunità commerciale',cmd:'new-deal'},
+  {group:'Azioni rapide',icon:'⚡',label:'Registra interazione rapida',meta:'Chiamata, WhatsApp, email o incontro',cmd:'quick-touchpoint'},{group:'Azioni rapide',icon:'＋',label:'Nuova trattativa / opportunità',meta:'Crea opportunità commerciale',cmd:'new-deal'},
   {group:'Azioni rapide',icon:'🏢',label:'Nuova azienda / contatto',meta:'Aggiungi anagrafica e referenti',cmd:'new-contact'},
   {group:'Azioni rapide',icon:'☑',label:'Nuova attività operativa',meta:'Pianifica chiamata, demo o follow-up',cmd:'new-task'},
   {group:'Azioni rapide',icon:'▤',label:'Nuovo preventivo',meta:'Crea proposta commerciale con versioni',cmd:'new-quote'},
@@ -856,7 +856,7 @@ function buildCommandItems(q=''){
   icon:'🏢',
   label:c.company,
   meta:`${contactStage(c.id)}${c.person?' · '+c.person:''}`,
-  cmd:`contact:${c.id}`
+  cmd:`c360:${c.id}`
  }));
 
  const dealItems=(state.deals||[]).filter(d=>!isArchived(d)&&matchText(d.title,contact(d.contactId)?.company,d.service,getSalesStage(d))).slice(0,6).map(d=>({
@@ -921,7 +921,7 @@ function runCommandAction(cmd){
  const dlg=typeof document!=='undefined'?document.querySelector('#command-dialog'):null;
  if(dlg?.open&&typeof dlg.close==='function')dlg.close();
  if(!cmd)return false;
- if(cmd==='new-deal'){openEditor('deal');return true;}
+ if(cmd==='quick-touchpoint'){if(typeof openInteractionLogger==='function')openInteractionLogger();return true;}if(cmd.startsWith('c360:')){if(typeof openCompany360==='function')openCompany360(cmd.slice(5));return true;}if(cmd==='new-deal'){openEditor('deal');return true;}
  if(cmd==='new-contact'){openEditor('contact');return true;}
  if(cmd==='new-task'){openTaskEditor();return true;}
  if(cmd==='new-quote'){openQuote();return true;}
