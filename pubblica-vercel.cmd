@@ -12,6 +12,7 @@ echo [1/3] Controllo sintassi e test automatici CRM...
 "%NODE_BIN%" --check activities.js || exit /b 1
 "%NODE_BIN%" --check projects.js || exit /b 1
 "%NODE_BIN%" --check analytics.js || exit /b 1
+"%NODE_BIN%" --check crm-pro.js || exit /b 1
 "%NODE_BIN%" crm-check.cjs || exit /b 1
 "%NODE_BIN%" import-check.cjs || exit /b 1
 "%NODE_BIN%" relationship-check.cjs || exit /b 1
@@ -21,6 +22,7 @@ echo [1/3] Controllo sintassi e test automatici CRM...
 "%NODE_BIN%" quotes-check.cjs || exit /b 1
 "%NODE_BIN%" activities-check.cjs || exit /b 1
 "%NODE_BIN%" enterprise-check.cjs || exit /b 1
+"%NODE_BIN%" crm-pro-check.cjs || exit /b 1
 
 echo [2/3] Collegamento progetto Vercel (apex-crm)...
 "%NODE_BIN%" "%VERCEL_CLI%" --global-config "%VERCEL_GLOBAL_CONFIG%" link --yes --project apex-crm --scope "%VERCEL_SCOPE%" || exit /b 1
