@@ -1013,6 +1013,46 @@ function ensureDemoProjectData(crmState) {
   }
 }
 
+// Helper sanitizzazione testo per evitare leak di commenti HTML o meta tag interni
+function cleanCrmText(text) {
+  if (!text || typeof text !== 'string') return '';
+  return text.replace(/<!--__crm_meta:[\s\S]*?-->/g, '').trim();
+}
+
+function formatCrmReasonOrNotes(reason, notes, fallback = 'Avanzamento commerciale e operativo') {
+  const cleanR = cleanCrmText(reason);
+  if (cleanR) return cleanR;
+  const cleanN = cleanCrmText(notes);
+  if (cleanN) return cleanN;
+  const raw = `${reason || ''} ${notes || ''}`;
+  const m = /<!--__crm_meta:\s*({[\s\S]*?})\s*-->/.exec(raw);
+  if (m) {
+    try {
+      const meta = JSON.parse(m[1]);
+      if (meta.esito === 'positivo_interessato') return 'Allineamento positivo: referente interessato ad approfondire';
+      if (meta.esito === 'richiamare') return 'Referente ha chiesto di risentirsi per aggiornamenti';
+    } catch {}
+  }
+  return fallback;
+}
+
+function formatCrmOutcome(lastOutcome, outcome, fallback = 'In attesa di primo riscontro') {
+  const cleanLO = cleanCrmText(lastOutcome);
+  if (cleanLO) return cleanLO;
+  const cleanO = cleanCrmText(outcome);
+  if (cleanO) return cleanO;
+  const raw = `${lastOutcome || ''} ${outcome || ''}`;
+  const m = /<!--__crm_meta:\s*({[\s\S]*?})\s*-->/.exec(raw);
+  if (m) {
+    try {
+      const meta = JSON.parse(m[1]);
+      if (meta.esito === 'positivo_interessato') return 'Esito positivo: referente interessato alla soluzione';
+      if (meta.esito === 'richiamare') return 'Richiamare referente';
+    } catch {}
+  }
+  return fallback;
+}
+
 // --- 8 ter. HOME VIEW ESECUTIVA (A COLPO D'OCCHIO IN 2 MINUTI) ---
 function renderUnifiedActivityRow(act) {
   const comp = typeof contact === 'function' ? contact(act.contactId) : (state.contacts || []).find(c => c.id === act.contactId);
@@ -1057,9 +1097,9 @@ function renderUnifiedActivityRow(act) {
       <div class="uac-body">
         <h3 class="uac-action-title">${esc(act.title)}</h3>
         <div class="uac-meta-reason">
-          <span class="uac-reason">🎯 <strong>Motivo:</strong> ${esc(act.reason || act.notes || 'Avanzamento commerciale e operativo')}</span>
+          <span class="uac-reason">🎯 <strong>Motivo:</strong> ${esc(formatCrmReasonOrNotes(act.reason, act.notes, 'Avanzamento commerciale e operativo'))}</span>
           <span class="uac-separator">·</span>
-          <span class="uac-last-outcome">💬 <strong>Ultimo esito:</strong> ${esc(act.lastOutcome || act.outcome || 'In attesa di primo riscontro')}</span>
+          <span class="uac-last-outcome">💬 <strong>Ultimo esito:</strong> ${esc(formatCrmOutcome(act.lastOutcome, act.outcome, 'In attesa di primo riscontro'))}</span>
         </div>
       </div>
 

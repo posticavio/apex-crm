@@ -120,11 +120,26 @@
         if (!interactionsByCompany[inter.company_id]) interactionsByCompany[inter.company_id] = [];
         const itype = inter.tipo || 'nota';
         const dateStr = (inter.data_interazione || '').slice(0, 10) || new Date().toISOString().slice(0, 10);
+        
+        // Pulizia commenti e meta JSON interni
+        const rawNote = inter.note || '';
+        let cleanNote = rawNote.replace(/<!--__crm_meta:[\s\S]*?-->/g, '').trim();
+        let metaEsito = '';
+        const metaMatch = /<!--__crm_meta:\s*({[\s\S]*?})\s*-->/.exec(rawNote);
+        if (metaMatch) {
+          try {
+            const parsedMeta = JSON.parse(metaMatch[1]);
+            if (parsedMeta.esito === 'positivo_interessato') metaEsito = 'Allineamento positivo: referente interessato ad approfondire';
+            else if (parsedMeta.esito === 'richiamare') metaEsito = 'Referente ha chiesto di risentirsi per aggiornamenti';
+          } catch {}
+        }
+        if (!cleanNote && metaEsito) cleanNote = metaEsito;
+
         interactionsByCompany[inter.company_id].push({
           date: dateStr,
           channel: itype === 'chiamata' ? 'telefono' : itype,
           person: '',
-          summary: `${inter.titolo || itype}: ${(inter.note || '').slice(0, 300)}`
+          summary: `${inter.titolo || itype}: ${cleanNote.slice(0, 300)}`
         });
 
         const typeMap = {
@@ -150,8 +165,9 @@
           status: actStatus,
           dueDate: (inter.data_prossimo_contatto || inter.data_interazione || '').slice(0, 10),
           priority: actPriority,
-          notes: inter.note || '',
-          outcome: inter.prossimo_passo || ''
+          reason: metaEsito || cleanNote.slice(0, 120),
+          notes: cleanNote,
+          outcome: inter.prossimo_passo || metaEsito || ''
         });
       }
     }

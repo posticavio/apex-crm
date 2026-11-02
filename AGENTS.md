@@ -62,6 +62,31 @@ node crm-rapid-check.cjs
 ---
 
 ## Registro di Passaggio tra Agenti (Handoff Log)
+### Sessione 2026-11-02 (Sanitizzazione Motivo e Note Attività: Bonifica Commenti HTML `__crm_meta` in UI e Sincronizzazione Supabase) — Agente: Google Antigravity
+- **Ultimo commit precedente rilevato**: `94e7156` (`[Antigravity] fix(parisi): mark first discovery call as completed with positive outcome and align project cockpit`) su `main`.
+- **Diagnosi del Problema segnalato dall'utente ("su attivita martino parisi viene fuor 🎯 Motivo: <!--__crm_meta:{...}-->")**:
+  - In Supabase, le interazioni storiche contenevano commenti HTML interni con metadati serializzati in JSON (`<!--__crm_meta:{"stato":"da_fare","esito":"positivo_interessato",...}-->`).
+  - Quando l'interfaccia renderizzava la riga attività (`renderUnifiedActivityRow` in `crm-pro.js`), se `reason` non era valorizzato ricorreva al fallback su `notes`, applicando `esc(act.notes)`. Questo trasformava il commento HTML in testo visibile grezzo a video.
+  - Inoltre, `transformSupabaseToCrm()` in `supabase-sync.js` importava `inter.note` senza strip preventivo dei tag di commento.
+- **Attività completate**:
+  - **Sanitizzazione & Formattazione Intelligente in `crm-pro.js`**:
+    - Implementate funzioni `cleanCrmText(text)`, `formatCrmReasonOrNotes(reason, notes)` e `formatCrmOutcome(lastOutcome, outcome)`.
+    - Rimosso qualsiasi leak di commenti HTML o JSON meta-tag, estraendo automaticamente esiti semantici comprensibili per l'utente (*"Allineamento positivo: referente interessato ad approfondire"*).
+  - **Sanitizzazione in `supabase-sync.js`**:
+    - Estesa `transformSupabaseToCrm()` per filtrare all'origine qualsiasi commento `<!--__crm_meta:...-->` prima dell'assegnazione a `summary`, `notes` e `reason`.
+  - **Bonifica Dati Supabase**:
+    - Eseguito script di pulizia PATCH sulle righe della tabella `interactions` di Supabase e risalvato lo snapshot pulito.
+- **File modificati**:
+  - `crm-pro.js`
+  - `supabase-sync.js`
+  - `AGENTS.md`
+- **Test eseguiti**:
+  - `node --check crm-pro.js`
+  - `node --check supabase-sync.js`
+  - `cloud-sync-check.cjs`
+  - `crm-rapid-check.cjs`
+  - `crm-pro-check.cjs`
+  - `activities-check.cjs` (tutti con esito `PASS` al 100%).
 ### Sessione 2026-11-02 (Martino Parisi: Chiusura Call Conoscitiva con Esito Positivo e Allineamento Stato Commessa) — Agente: Google Antigravity
 - **Ultimo commit precedente rilevato**: `924a3c8` (`[Antigravity] feat(campaigns): auto-sync Gmail sent emails to prospect companies and schedule immediate next-step activities`) su `main`.
 - **Diagnosi del Problema segnalato dall'utente ("ma martino parisi non puo essere non completata la prima call conoscitiva")**:
