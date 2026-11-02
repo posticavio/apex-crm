@@ -647,9 +647,9 @@ async function executeTool(name, args) {
 
       const cid = comp.id;
       const deals = (state.deals || []).filter(d => d.contactId === cid);
-      const activities = (state.activities || []).filter(a => a.companyId === cid);
+      const activities = (state.activities || []).filter(a => a.companyId === cid || a.contactId === cid);
       const quotes = (state.quotes || []).filter(q => q.companyId === cid || q.contactId === cid);
-      const projects = (state.projects || []).filter(p => p.companyId === cid);
+      const projects = (state.projects || []).filter(p => p.companyId === cid || p.contactId === cid);
 
       return {
         azienda: comp,
@@ -1018,7 +1018,7 @@ async function executeTool(name, args) {
     case 'crm_list_projects': {
       let projects = state.projects || [];
       if (args.company_id) {
-        projects = projects.filter(p => p.companyId === args.company_id);
+        projects = projects.filter(p => p.companyId === args.company_id || p.contactId === args.company_id);
       }
       if (args.status && args.status !== 'all') {
         projects = projects.filter(p => p.status === args.status);
@@ -1026,16 +1026,26 @@ async function executeTool(name, args) {
       return {
         count: projects.length,
         projects: projects.map(p => {
-          const comp = (state.contacts || []).find(c => c.id === p.companyId);
+          const comp = (state.contacts || []).find(c => c.id === (p.companyId || p.contactId));
           return {
             id: p.id,
-            titolo: p.title,
+            titolo: p.title || p.name,
             azienda: comp ? comp.company : 'N/D',
             stato: p.status,
-            budgetEuro: p.budget,
-            costiEuro: p.costs,
-            oreErogate: p.hoursSpent,
-            oreStimate: p.hoursEstimated,
+            budgetEuro: p.budget || (p.budgetCents ? p.budgetCents / 100 : 0),
+            costiEuro: p.costs || (p.costCents ? p.costCents / 100 : 0),
+            oreErogate: p.loggedHours || p.hoursSpent || 0,
+            oreStimate: p.estimatedHours || p.hoursEstimated || 0,
+            obiettivoCliente: p.clientGoal || '',
+            origine: p.origin || '',
+            situazioneAttuale: p.currentStatusSummary || '',
+            ultimoEsito: p.lastOutcome || '',
+            prossimoPasso: p.nextStep || 'Prossimo passo da definire',
+            scadenzaProssimoPasso: p.nextDue || 'Da definire',
+            inAttesaDi: p.waitingFor || '',
+            linkDrive: p.driveUrl || '',
+            linkEmail: p.emailThreadUrl || '',
+            linkCalendar: p.calendarUrl || '',
             milestones: p.milestones || []
           };
         })
