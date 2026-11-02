@@ -127,14 +127,29 @@
           summary: `${inter.titolo || itype}: ${(inter.note || '').slice(0, 300)}`
         });
 
+        const typeMap = {
+          'chiamata': 'Chiamata',
+          'meeting': 'Incontro / Demo',
+          'incontro': 'Incontro / Demo',
+          'email': 'Email',
+          'followup': 'Follow-up',
+          'follow-up': 'Follow-up',
+          'nota': 'Altro',
+          'task': 'Altro'
+        };
+        const actType = typeMap[itype.toLowerCase()] || 'Altro';
+        const actStatus = (inter.stato || '').toLowerCase() === 'completata' ? 'Completata' : 'Da fare';
+        const actPriority = (inter.priorita || '').toLowerCase() === 'alta' ? 'Alta' : (inter.priorita || '').toLowerCase() === 'bassa' ? 'Bassa' : 'Media';
+
         activitiesList.push({
           id: inter.id,
+          contactId: inter.company_id,
           companyId: inter.company_id,
-          title: inter.titolo || `Attività ${itype}`,
-          type: itype === 'chiamata' ? 'chiamata' : itype === 'meeting' ? 'meeting' : 'email',
-          status: inter.stato === 'completata' ? 'completata' : 'da_fare',
+          title: inter.titolo || `Attività ${actType}`,
+          type: actType,
+          status: actStatus,
           dueDate: (inter.data_prossimo_contatto || inter.data_interazione || '').slice(0, 10),
-          priority: 'media',
+          priority: actPriority,
           notes: inter.note || '',
           outcome: inter.prossimo_passo || ''
         });
@@ -289,8 +304,12 @@
       // Unisci attività (activities)
       if (Array.isArray(cloudState.activities)) {
         for (const ca of cloudState.activities) {
-          if (!merged.activities.some(a => a.id === ca.id)) {
-            merged.activities.push(ca);
+          if (!ca || typeof ca !== 'object') continue;
+          const a = { ...ca };
+          if (!a.contactId && a.companyId) a.contactId = a.companyId;
+          if (!a.companyId && a.contactId) a.companyId = a.contactId;
+          if (!merged.activities.some(x => x.id === a.id)) {
+            merged.activities.push(a);
           }
         }
       }
@@ -361,7 +380,76 @@
       }
     }
 
+    // Sanitizzazione finale di integrità relazionale:
+    const validContactIds = new Set(merged.contacts.map(c => c.id));
+    const actTypeMap = {
+      'chiamata': 'Chiamata',
+      'email': 'Email',
+      'meeting': 'Incontro / Demo',
+      'incontro': 'Incontro / Demo',
+      'followup': 'Follow-up',
+      'follow-up': 'Follow-up',
+      'task': 'Altro',
+      'nota': 'Altro'
+    };
+    const actStatusMap = {
+      'da_fare': 'Da fare',
+      'da fare': 'Da fare',
+      'in_corso': 'In corso',
+      'in corso': 'In corso',
+      'completata': 'Completata',
+      'annullata': 'Annullata'
+    };
+    const actPriorityMap = {
+      'alta': 'Alta',
+      'media': 'Media',
+      'bassa': 'Bassa'
+    };
+
+    merged.activities = (merged.activities || [])
+      .filter(a => a && typeof a === 'object' && typeof a.id === 'string' && a.id)
+      .map(a => {
+        if (!a.contactId && a.companyId) a.contactId = a.companyId;
+        if (!a.companyId && a.contactId) a.companyId = a.contactId;
+        const lowType = (a.type || '').toLowerCase();
+        if (actTypeMap[lowType]) a.type = actTypeMap[lowType];
+        if (!['Chiamata','Email','Incontro / Demo','Follow-up','Analisi / Offerta','Onboarding / Consegna','Customer Care / Check-in','Altro'].includes(a.type)) a.type = 'Altro';
+        const lowStatus = (a.status || '').toLowerCase();
+        if (actStatusMap[lowStatus]) a.status = actStatusMap[lowStatus];
+        if (!['Da fare','In corso','Completata','Annullata'].includes(a.status)) a.status = 'Da fare';
+        const lowPri = (a.priority || '').toLowerCase();
+        if (actPriorityMap[lowPri]) a.priority = actPriorityMap[lowPri];
+        if (!['Alta','Media','Bassa'].includes(a.priority)) a.priority = 'Media';
+        return a;
+      })
+      .filter(a => typeof a.contactId === 'string' && validContactIds.has(a.contactId));
+
+    const salesStageMap = {
+      'primo contatto': 'Trattativa',
+      'analisi esigenze': 'Trattativa',
+      'demo / proposta': 'Offerta',
+      'negoziazione': 'Offerta'
+    };
+    merged.deals = (merged.deals || [])
+      .filter(d => d && typeof d === 'object' && typeof d.id === 'string' && validContactIds.has(d.contactId))
+      .map(d => {
+        if (d.salesStage) {
+          const low = d.salesStage.toLowerCase();
+          if (salesStageMap[low]) d.salesStage = salesStageMap[low];
+          if (!['Nuovo contatto','Trattativa','Offerta','Vinta','Persa'].includes(d.salesStage)) {
+            d.salesStage = d.stage === 'Cliente' ? 'Vinta' : d.stage === 'Prospect' ? 'Trattativa' : 'Nuovo contatto';
+          }
+        }
+        return d;
+      });
+    merged.quotes = (merged.quotes || []).filter(q => q && typeof q === 'object' && typeof q.id === 'string' && validContactIds.has(q.contactId));
+    merged.projects = (merged.projects || []).filter(p => p && typeof p === 'object' && typeof p.id === 'string' && validContactIds.has(p.contactId));
+
     return merged;
+  }
+
+  function isUuid(val) {
+    return typeof val === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(val);
   }
 
   /**
@@ -377,13 +465,19 @@
       updateStatusUI('syncing', 'Sincronizzazione...', 'Invio dati al cloud...');
 
       // 1. Prepara e salva lo snapshot completo in attachments
-      const firstCompId = state.contacts?.[0]?.id || '3c39207e-1874-42a2-b14f-818806835ff4';
+      const firstValidComp = (state.contacts || []).find(c => isUuid(c?.id));
+      const firstCompId = firstValidComp ? firstValidComp.id : '3c39207e-1874-42a2-b14f-818806835ff4';
       const cleanSnapshot = {
         contacts: state.contacts || [],
         deals: state.deals || [],
         categories: state.categories || [],
         quotes: state.quotes || [],
-        activities: state.activities || [],
+        activities: (state.activities || []).map(a => {
+          const act = { ...a };
+          if (!act.contactId && act.companyId) act.contactId = act.companyId;
+          if (!act.companyId && act.contactId) act.companyId = act.contactId;
+          return act;
+        }),
         projects: state.projects || [],
         finance: state.finance || null,
         playbooks: state.playbooks || null,
@@ -402,8 +496,7 @@
         await apiFetch(`attachments?id=eq.${existing[0].id}`, {
           method: 'PATCH',
           body: JSON.stringify({
-            file_url: dataUri,
-            company_id: firstCompId
+            file_url: dataUri
           })
         });
       } else {
@@ -420,6 +513,7 @@
 
       // 2. Upsert tabelle relazionali per compatibilità con Obsidian e query SQL/REST
       for (const comp of (state.contacts || [])) {
+        if (!isUuid(comp?.id)) continue;
         const stageVal = (comp.stage || '').toLowerCase() === 'cliente' ? 'cliente' : 'prospect';
         const compPayload = {
           id: comp.id,
@@ -543,13 +637,13 @@
         localStorage.setItem(STORAGE_KEY, JSON.stringify(merged));
         localStorage.setItem(LAST_SYNC_KEY, new Date().toISOString());
       }
-      if (typeof window !== 'undefined' && window.state) {
-        Object.assign(window.state, merged);
-      }
-
-      // Re-render dell'interfaccia se presente
-      if (typeof window !== 'undefined' && typeof window.render === 'function') {
-        window.render();
+      if (typeof window !== 'undefined') {
+        if (typeof window.applySyncedState === 'function') {
+          window.applySyncedState(merged);
+        } else if (window.state) {
+          Object.assign(window.state, merged);
+          if (typeof window.render === 'function') window.render();
+        }
       }
 
       const syncTime = formatTime();

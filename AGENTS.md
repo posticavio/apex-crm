@@ -62,6 +62,49 @@ node crm-rapid-check.cjs
 ---
 
 ## Registro di Passaggio tra Agenti (Handoff Log)
+### Sessione 2026-11-02 (Risoluzione Blocco Desktop & Auto-Healing Sync: Correzione Dual-Mapping contactId/companyId, Normalizzazione salesStage, Protezione Foreign Key Supabase e Ripristino Istantaneo) — Agente: Google Antigravity
+- **Ultimo commit precedente rilevato**: `31cf05b` (`[Antigravity] feat(mcp): support dual contactId/companyId mapping and executive project fields in crm_list_projects and crm_get_company`) su `main`.
+- **Diagnosi del Problema segnalato dall'utente ("Sembrerebbe che sul desktop non funziona la app")**:
+  - `transformSupabaseToCrm()` in `supabase-sync.js` mappava le interazioni di Supabase impostando `companyId: inter.company_id` ma omettendo `contactId`.
+  - In `activities.js`, la validazione richiedeva tassativamente `contactId` corrispondente a un'azienda in `contacts`.
+  - Al contempo, 20 opportunità create per le campagne email avevano `salesStage: 'Primo contatto'` o `'Analisi esigenze'` anziché `'Trattativa'` o `'Nuovo contatto'`, violando la validazione delle fasi di vendita in `app.js`.
+  - Di conseguenza, alla prima sincronizzazione cloud o al ricaricamento della pagina, `validate(parsed)` generava un'eccezione, attivando `loadError = true` in `app.js`. Questo bloccava l'intera interfaccia desktop con il messaggio di backup e impediva qualsiasi salvataggio.
+  - Inoltre, `pushToCloud()` su Supabase falliva nel salvare gli attachment poiché `company_id` riceveva un ID non UUID (`contact-b2b-demo-send-01`), violando la foreign key constraint di PostgreSQL.
+- **Attività completate**:
+  - **Auto-Healing e Resilienza in `app.js` (`migrate()` & `validate()`)**:
+    - Esteso `migrate(data)` per auto-riparare le attività: assegna `contactId = a.contactId || a.companyId`, normalizza `type` ('Chiamata', 'Email', 'Incontro / Demo', 'Altro'), `status` ('Da fare', 'Completata', 'In corso', 'Annullata') e `priority` ('Alta', 'Media', 'Bassa').
+    - Normalizza le fasi commerciali (`salesStage`) non standard mappando 'Primo contatto' e 'Analisi esigenze' a 'Trattativa', evitando crash di validazione.
+    - Filtra attività e opportunità orfane i cui `contactId` non appartengono all'anagrafica aziendale.
+    - In caso di eccezione durante il caricamento da `localStorage`, tenta un ciclo di auto-riparazione preventiva prima di dichiarare `loadError`.
+    - Esposte `window.state = state;` e `window.applySyncedState(next)` per consentire la re-idratazione e il re-render istantaneo da Supabase senza ricaricare la pagina.
+  - **Correzione Mapping e Sanitizzazione in `supabase-sync.js`**:
+    - `transformSupabaseToCrm()`: valorizza sia `contactId` che `companyId`, con tipi e stati conformi.
+    - `mergeCrmStates()`: sanifica integralmente attività, trattative, preventivi e progetti, garantendo coerenza relazionale e rimozione di riferimenti orfani.
+    - `pushToCloud()`: eliminata la sovrascrittura di `company_id` durante il `PATCH` dell'attachment; isolati gli upsert relazionali solo per ID conformi allo standard UUID (PostgreSQL).
+  - **Correzione Fase Commerciale in `campaigns.js`**:
+    - Impostato `salesStage: 'Trattativa'` per tutte le trattative B2B collegate a campagne attive.
+  - **Riparazione Snapshot Cloud e Server MCP (`crm-mcp-server.js`)**:
+    - Eseguito script di sanitizzazione dello snapshot remoto in Supabase (`attachments`), ripristinando le 7 attività e le 20 trattative.
+    - Aggiornato `saveCrmSnapshot()` in `crm-mcp-server.js` con patch sicura per UUID.
+  - **Verifica Live Headless Chrome**:
+    - Eseguito test su Chrome headless via CDP su `file:///index.html`: confermati 0 errori di console e 0 eccezioni.
+- **File modificati**:
+  - `app.js`
+  - `campaigns.js`
+  - `supabase-sync.js`
+  - `crm-mcp-server.js`
+  - `cloud-sync-check.cjs`
+  - `AGENTS.md`
+- **Test eseguiti**:
+  - 10 verifiche sintattiche (`node --check`) superate con 0 errori.
+  - 13 banchi di prova funzionali completati con esito `PASS` al 100%:
+    - `crm-check.cjs`, `import-check.cjs`, `relationship-check.cjs`, `sales-check.cjs`, `resource-check.cjs`, `unscheduled-check.cjs`, `quotes-check.cjs`, `activities-check.cjs`, `enterprise-check.cjs`, `cloud-sync-check.cjs`, `mcp-server-check.cjs`, `crm-pro-check.cjs`, `crm-rapid-check.cjs`.
+- **Problemi aperti**:
+  - Nessuno.
+- **Attività successive consigliate**:
+  - Esecuzione di `git add`, `git commit` e `git push` su GitHub.
+  - Esecuzione del deploy di produzione su Vercel (`pubblica-vercel.cmd`).
+
 ### Sessione 2026-11-02 (Integrazione Email Inviate Gmail → Anagrafiche Prospect, Trattative e Attività Operative) — Agente: Google Antigravity
 - **Ultimo commit precedente rilevato**: `31cf05b` (`[Antigravity] feat(mcp): support dual contactId/companyId mapping and executive project fields in crm_list_projects and crm_get_company`) su `main`.
 - **Attività completate**:

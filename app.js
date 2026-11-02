@@ -32,14 +32,47 @@ function advanceSalesDeal(id,target){
 }
 
 function migrate(data){
- if(!data||!Array.isArray(data.deals))return data;
- for(const d of data.deals){
-  if(!d||typeof d!=='object')continue;
-  const previous=d.stage;
-  if(['Primo contatto','Analisi esigenze','Demo / Proposta','Negoziazione'].includes(previous))d.stage='Prospect';
-  if(previous==='Vinto')d.stage='Cliente';
-  if(previous==='Perso'){d.stage='Prospect';d.salesStage='Persa';d.archived=true;}
-  if(d.stage!==previous){d.history=Array.isArray(d.history)?d.history:[];d.history.push({date:today(),text:'Fase precedente: '+previous});}
+ if(!data||typeof data!=='object')return data;
+ if(Array.isArray(data.deals)){
+  for(const d of data.deals){
+   if(!d||typeof d!=='object')continue;
+   const previous=d.stage;
+   if(['Primo contatto','Analisi esigenze','Demo / Proposta','Negoziazione'].includes(previous))d.stage='Prospect';
+   if(previous==='Vinto')d.stage='Cliente';
+   if(previous==='Perso'){d.stage='Prospect';d.salesStage='Persa';d.archived=true;}
+   if(d.stage!==previous){d.history=Array.isArray(d.history)?d.history:[];d.history.push({date:today(),text:'Fase precedente: '+previous});}
+   if(d.salesStage){
+    const smap = {'primo contatto':'Trattativa','analisi esigenze':'Trattativa','demo / proposta':'Offerta','negoziazione':'Offerta'};
+    const low = d.salesStage.toLowerCase();
+    if(smap[low]) d.salesStage = smap[low];
+    if(typeof salesStages !== 'undefined' && !salesStages.includes(d.salesStage)){
+     d.salesStage = d.stage === 'Cliente' ? 'Vinta' : d.stage === 'Prospect' ? 'Trattativa' : 'Nuovo contatto';
+    }
+   }
+  }
+ }
+ const validContactIds = new Set((Array.isArray(data.contacts)?data.contacts:[]).filter(c=>c&&c.id).map(c=>c.id));
+ if(Array.isArray(data.activities)){
+  const typeMap = {'chiamata':'Chiamata','email':'Email','meeting':'Incontro / Demo','incontro':'Incontro / Demo','followup':'Follow-up','follow-up':'Follow-up','task':'Altro','nota':'Altro'};
+  const statusMap = {'da_fare':'Da fare','da fare':'Da fare','in_corso':'In corso','in corso':'In corso','completata':'Completata','annullata':'Annullata'};
+  const priorityMap = {'alta':'Alta','media':'Media','bassa':'Bassa'};
+  data.activities = data.activities.filter(a => a && typeof a === 'object').map(a => {
+   if (!a.contactId && a.companyId) a.contactId = a.companyId;
+   if (!a.companyId && a.contactId) a.companyId = a.contactId;
+   const lowType = (a.type || '').toLowerCase();
+   if (typeMap[lowType]) a.type = typeMap[lowType];
+   if (typeof activityTypes !== 'undefined' && !activityTypes.includes(a.type)) a.type = 'Altro';
+   const lowStatus = (a.status || '').toLowerCase();
+   if (statusMap[lowStatus]) a.status = statusMap[lowStatus];
+   if (typeof activityStatuses !== 'undefined' && !activityStatuses.includes(a.status)) a.status = 'Da fare';
+   const lowPri = (a.priority || '').toLowerCase();
+   if (priorityMap[lowPri]) a.priority = priorityMap[lowPri];
+   if (typeof activityPriorities !== 'undefined' && !activityPriorities.includes(a.priority)) a.priority = 'Media';
+   return a;
+  }).filter(a => typeof a.id === 'string' && a.id && typeof a.contactId === 'string' && validContactIds.has(a.contactId));
+ }
+ if(Array.isArray(data.deals)){
+  data.deals = data.deals.filter(d => d && typeof d === 'object' && typeof d.id === 'string' && validContactIds.has(d.contactId));
  }
  return data;
 }
@@ -52,7 +85,41 @@ const money=n=>new Intl.NumberFormat('it-IT',{style:'currency',currency:'EUR',ma
 const date=v=>v?new Intl.DateTimeFormat('it-IT',{day:'numeric',month:'short'}).format(new Date(v+'T12:00:00')):'Senza data';
 let state={contacts:[],deals:[],categories:[],quotes:[],activities:[],projects:[],finance:null,playbooks:null,campaigns:[],reconciliation:null},view='oggi',editing=null,search='',filter='',taskFilter='all',pipelineLayout='board',sortOrder='name',categoryFilter='';
 let loadError=false;
-try{const saved=localStorage.getItem(KEY);if(saved){const parsed=migrate(JSON.parse(saved));validate(parsed);state={contacts:[],deals:[],categories:[],quotes:[],activities:[],projects:[],finance:null,playbooks:null,campaigns:[],reconciliation:null,...parsed};}}catch(e){loadError=true;}
+try{
+ const saved=localStorage.getItem(KEY);
+ if(saved){
+  let parsed=migrate(JSON.parse(saved));
+  try{
+   validate(parsed);
+  }catch(valErr){
+   console.warn('[CRM] Ripristino automatico dati all’avvio:', valErr.message);
+   parsed=migrate(parsed);
+   validate(parsed);
+  }
+  state={contacts:[],deals:[],categories:[],quotes:[],activities:[],projects:[],finance:null,playbooks:null,campaigns:[],reconciliation:null,...parsed};
+ }
+}catch(e){
+ console.error('[CRM] Errore di caricamento:', e);
+ loadError=true;
+}
+if(typeof window!=='undefined'){
+ window.state=state;
+ window.validate=validate;
+ window.render=render;
+ window.applySyncedState=function(next){
+  if(!next||typeof next!=='object')return;
+  try{
+   const healed=migrate(next);
+   validate(healed);
+   state=healed;
+   window.state=state;
+   loadError=false;
+   render();
+  }catch(err){
+   console.warn('[CRM] applySyncedState validazione non riuscita:', err);
+  }
+ };
+}
 function validate(data){
  if(!data||!Array.isArray(data.contacts)||!Array.isArray(data.deals))throw Error('Formato non valido');
  validateCategories(data);if(typeof validateQuotes==='function')validateQuotes(data);if(typeof validateActivities==='function')validateActivities(data);if(typeof validateProjects==='function')validateProjects(data);if(typeof validateFinance==='function')validateFinance(data);if(typeof validatePlaybooks==='function')validatePlaybooks(data);if(typeof validateCampaigns==='function')validateCampaigns(data);
@@ -61,7 +128,7 @@ function validate(data){
  const dids=new Set();
  for(const d of data.deals){if(!d||typeof d.id!=='string'||dids.has(d.id)||!ids.has(d.contactId)||typeof d.title!=='string'||!d.title.trim()||!stages.includes(d.stage)||!Number.isFinite(d.setup)||d.setup<0||!Number.isFinite(d.monthly)||d.monthly<0)throw Error('Trattativa non valida');dids.add(d.id);validateResources(d);for(const k of ['problem','process','solution','tools','benefit','next','due','service','referentId','referentName','lossReason','salesClosedOn'])if(d[k]!=null&&typeof d[k]!=='string')throw Error('Campo non valido');if(d.salesStage!=null&&!salesStages.includes(d.salesStage))throw Error('Fase commerciale non valida');if(d.due&&!validDate(d.due))throw Error('Data non valida');if(d.history!=null&&(!Array.isArray(d.history)||d.history.some(h=>!h||typeof h.text!=='string'||typeof h.date!=='string')))throw Error('Storico non valido');}
 }
-function persist(next){if(loadError){toast('Importa un backup valido o ripristina i dati prima di salvare.');return false;}try{localStorage.setItem(KEY,JSON.stringify(next));state=next;if(typeof CrmCloudSync!=='undefined'&&typeof CrmCloudSync.queueSync==='function')CrmCloudSync.queueSync(next);return true;}catch(e){toast('Salvataggio non riuscito: controlla spazio e permessi del browser.');return false;}}
+function persist(next){if(loadError){toast('Importa un backup valido o ripristina i dati prima di salvare.');return false;}try{localStorage.setItem(KEY,JSON.stringify(next));state=next;if(typeof window!=='undefined')window.state=state;if(typeof CrmCloudSync!=='undefined'&&typeof CrmCloudSync.queueSync==='function')CrmCloudSync.queueSync(next);return true;}catch(e){toast('Salvataggio non riuscito: controlla spazio e permessi del browser.');return false;}}
 function toast(t){$('#toast').textContent=t;$('#toast').style.display='block';clearTimeout(toast.timer);toast.timer=setTimeout(()=>$('#toast').style.display='none',4200);}
 const contact=id=>state.contacts.find(c=>c.id===id);
 const openDeals=()=>state.deals.filter(d=>!['Vinta','Persa'].includes(getSalesStage(d))&&!isArchived(d));

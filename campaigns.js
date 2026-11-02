@@ -607,7 +607,7 @@ function syncGmailSendsToProspects(crmState) {
           title: `Automazione processi — ${send.companyName}`,
           service: 'Automazione',
           stage: 'Prospect',
-          salesStage: send.status === 'replied' ? 'Analisi esigenze' : 'Primo contatto',
+          salesStage: 'Trattativa',
           setup: 1500,
           monthly: 0,
           problem: send.notes || 'Automazione e digitalizzazione flussi operativi.',

@@ -71,7 +71,8 @@ assert.strictEqual(c1.referents.length, 1, 'Il secondo contatto deve essere nei 
 assert.strictEqual(c1.referents[0].name, 'Luigi Bianchi');
 assert.strictEqual(transformed.activities.length, 1, 'Dovrebbe creare 1 attività da interazioni');
 assert.strictEqual(transformed.activities[0].title, 'Primo contatto telefonico');
-assert.strictEqual(transformed.activities[0].status, 'completata');
+assert.strictEqual(transformed.activities[0].contactId, 'comp-1', 'L\'attività deve avere il contactId associato');
+assert.ok(['completata', 'Completata'].includes(transformed.activities[0].status), 'Stato attività completata');
 console.log('PASS: transformSupabaseToCrm');
 
 // 2. Test mergeCrmStates con localState vuoto (nuovo dispositivo/smartphone)

@@ -144,7 +144,8 @@ async function getCrmData() {
 
 // Salva snapshot aggiornato su Supabase
 async function saveCrmSnapshot(state) {
-  const firstCompId = state.contacts?.[0]?.id || '3c39207e-1874-42a2-b14f-818806835ff4';
+  const validUuidComp = (state.contacts || []).find(c => typeof c?.id === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(c.id));
+  const firstCompId = validUuidComp ? validUuidComp.id : '3c39207e-1874-42a2-b14f-818806835ff4';
   const cleanSnapshot = {
     contacts: state.contacts || [],
     deals: state.deals || [],
@@ -165,8 +166,7 @@ async function saveCrmSnapshot(state) {
   const existing = await supabaseRequest(`attachments?nome_file=eq.${encodeURIComponent(CLOUD_STATE_FILE)}&limit=1`).catch(() => []);
   if (existing && existing.length > 0) {
     await supabaseRequest(`attachments?id=eq.${existing[0].id}`, 'PATCH', {
-      file_url: dataUri,
-      company_id: firstCompId
+      file_url: dataUri
     });
   } else {
     await supabaseRequest('attachments', 'POST', {
