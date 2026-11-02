@@ -414,13 +414,217 @@ function getSeedDemoCampaign() {
   };
 }
 
-// Inizializza le campagne nello stato se non presenti
+// Inizializza le campagne nello stato se non presenti e sincronizza anagrafiche e attività
 function ensureCampaignsInState(crmState) {
   if (!crmState) return;
   crmState.campaigns = Array.isArray(crmState.campaigns) ? crmState.campaigns : [];
   if (!crmState.campaigns.some(c => c.id === 'campaign-demo-b2b-2026')) {
     crmState.campaigns.unshift(getSeedDemoCampaign());
   }
+  syncGmailSendsToProspects(crmState);
+}
+
+// Sincronizza le email inviate da Gmail con le anagrafiche dei Prospect e le relative attività operative
+function syncGmailSendsToProspects(crmState) {
+  if (!crmState || !Array.isArray(crmState.campaigns)) return { addedCompanies: 0, addedActivities: 0 };
+  crmState.contacts = Array.isArray(crmState.contacts) ? crmState.contacts : [];
+  crmState.activities = Array.isArray(crmState.activities) ? crmState.activities : [];
+  crmState.deals = Array.isArray(crmState.deals) ? crmState.deals : [];
+
+  const todayStr = typeof today === 'function' ? today() : new Date().toISOString().slice(0, 10);
+  let addedCompanies = 0;
+  let addedActivities = 0;
+
+  for (const camp of crmState.campaigns) {
+    for (const send of (camp.sends || [])) {
+      // 1. Verifica se l'azienda esiste già in anagrafica
+      let comp = crmState.contacts.find(c => 
+        (send.contactId && c.id === send.contactId) ||
+        (c.company && send.companyName && c.company.toLowerCase().trim() === send.companyName.toLowerCase().trim()) ||
+        (c.email && send.recipientEmail && c.email.toLowerCase().trim() === send.recipientEmail.toLowerCase().trim())
+      );
+
+      if (!comp) {
+        // Registra nuova azienda come Prospect
+        const cid = send.contactId || ('contact-b2b-' + send.id);
+        comp = {
+          id: cid,
+          company: send.companyName,
+          stage: 'Prospect',
+          leadTemp: send.status === 'replied' ? 'Hot' : 'Warm',
+          person: send.recipientName,
+          primaryRole: send.recipientRole || 'Referente',
+          email: send.recipientEmail,
+          phone: send.recipientPhone || '',
+          address: '',
+          city: 'Veneto',
+          country: 'Italia',
+          website: '',
+          sector: 'Manifattura e Servizi B2B',
+          source: 'Gmail (Email inviata)',
+          notes: `Azienda contattata via Gmail il ${send.sentAt}. ${send.notes || ''}`,
+          history: [
+            {
+              date: send.sentAt,
+              kind: 'gmail-send',
+              text: `Gmail: inviata email a ${send.recipientName} (${send.recipientEmail}). ${send.notes || ''}`
+            }
+          ],
+          referents: [
+            {
+              id: 'ref-' + send.id,
+              name: send.recipientName,
+              role: send.recipientRole || 'Referente',
+              email: send.recipientEmail,
+              phone: send.recipientPhone || '',
+              preferred: 'Email / Telefono',
+              notes: 'Referente primo contatto Gmail'
+            }
+          ],
+          categoryMode: 'auto',
+          manualCategoryIds: [],
+          resources: []
+        };
+        crmState.contacts.push(comp);
+        send.contactId = cid;
+        addedCompanies++;
+      } else {
+        send.contactId = comp.id;
+        if (comp.stage === 'Lead' || !comp.stage) {
+          comp.stage = 'Prospect'; // Promosso a Prospect per email inviata
+        }
+      }
+
+      // 2. Registra l'attività dell'email inviata (Completata)
+      const sentActId = 'act-send-' + send.id;
+      if (!crmState.activities.some(a => a.id === sentActId || (a.sourceId && a.sourceId === send.sourceId))) {
+        crmState.activities.push({
+          id: sentActId,
+          contactId: comp.id,
+          dealId: '',
+          quoteId: '',
+          title: `Prima email: ${send.notes ? send.notes.replace(/^Inviat[ao]\s*/i, '').slice(0, 48) : 'Presentazione inviata'}`,
+          type: 'Email',
+          priority: 'Media',
+          status: 'Completata',
+          dueDate: send.sentAt,
+          completedAt: send.sentAt,
+          referentName: send.recipientName,
+          notes: send.notes || 'Inviata presentazione via Gmail.',
+          outcome: 'Email inviata con successo via Gmail',
+          source: 'Gmail',
+          sourceId: send.sourceId || ('gmail-' + send.id)
+        });
+        addedActivities++;
+      }
+
+      // 3. Registra l'attività operativa successiva ("Da fare")
+      const followupActId = 'act-followup-' + send.id;
+      if (!crmState.activities.some(a => a.id === followupActId || (a.contactId === comp.id && ['Da fare', 'In corso'].includes(a.status)))) {
+        if (send.status === 'opt_out') {
+          // Nessun ricontatto programmato: rispetto assoluto dell'opt-out
+        } else if (send.status === 'replied' && send.agreedDate) {
+          crmState.activities.push({
+            id: followupActId,
+            contactId: comp.id,
+            dealId: '',
+            quoteId: '',
+            title: `Ricontatto concordato con ${send.recipientName}`,
+            type: 'Chiamata',
+            priority: 'Alta',
+            status: 'Da fare',
+            dueDate: send.agreedDate,
+            reason: 'Accordo commerciale esplicito con il cliente ("Sentiamoci tra un mese")',
+            lastOutcome: send.notes,
+            referentName: send.recipientName,
+            notes: `Risposta ricevuta via Gmail: "${send.notes}". Rispettare rigorosamente la scadenza concordata.`,
+            source: 'Gmail'
+          });
+          addedActivities++;
+        } else if (send.status === 'replied') {
+          crmState.activities.push({
+            id: followupActId,
+            contactId: comp.id,
+            dealId: '',
+            quoteId: '',
+            title: `Rispondere a richiesta tecnica di ${send.recipientName}`,
+            type: 'Email',
+            priority: 'Alta',
+            status: 'Da fare',
+            dueDate: todayStr,
+            reason: 'Risposta ricevuta via Gmail: richiesta approfondimento tecnico',
+            lastOutcome: send.notes,
+            referentName: send.recipientName,
+            notes: `Inviare documentazione tecnica richiesta da ${send.recipientName}. Dettagli: ${send.notes}`,
+            source: 'Gmail'
+          });
+          addedActivities++;
+        } else if (send.status === 'called') {
+          crmState.activities.push({
+            id: followupActId,
+            contactId: comp.id,
+            dealId: '',
+            quoteId: '',
+            title: `Richiamare ${send.recipientName} (esito: risentire)`,
+            type: 'Chiamata',
+            priority: 'Media',
+            status: 'Da fare',
+            dueDate: todayStr,
+            reason: 'Chiamata svolta in precedenza: la segretaria ha indicato di risentire',
+            lastOutcome: send.notes,
+            referentName: send.recipientName,
+            notes: `Chiamata precedente: ${send.notes}`,
+            source: 'Chiamata'
+          });
+          addedActivities++;
+        } else {
+          // Status 'sent': suggerimento chiamata di follow-up per assenza di risposta oltre la cadenza
+          crmState.activities.push({
+            id: followupActId,
+            contactId: comp.id,
+            dealId: '',
+            quoteId: '',
+            title: `Chiamata di follow-up: sollecito presentazione inviata`,
+            type: 'Chiamata',
+            priority: 'Alta',
+            status: 'Da fare',
+            dueDate: todayStr,
+            reason: `Nessun riscontro rilevato all'email del ${send.sentAt}`,
+            lastOutcome: `Email inviata il ${send.sentAt} (${send.recipientEmail})`,
+            referentName: `${send.recipientName} (${send.recipientPhone || 'Numero da verificare'})`,
+            notes: `Contattare referente per verificare ricezione presentazione e disponibilità a breve confronto. Note invio: ${send.notes}`,
+            source: 'Gmail'
+          });
+          addedActivities++;
+        }
+      }
+
+      // 4. Collega Deal di vendita in fase Prospect se mancante
+      if (!crmState.deals.some(d => d.contactId === comp.id)) {
+        crmState.deals.push({
+          id: 'deal-b2b-' + send.id,
+          contactId: comp.id,
+          title: `Automazione processi — ${send.companyName}`,
+          service: 'Automazione',
+          stage: 'Prospect',
+          salesStage: send.status === 'replied' ? 'Analisi esigenze' : 'Primo contatto',
+          setup: 1500,
+          monthly: 0,
+          problem: send.notes || 'Automazione e digitalizzazione flussi operativi.',
+          process: 'Discovery con ' + send.recipientName,
+          solution: 'Applicativo web su misura Apex Digital.',
+          tools: 'Applicativo web, AI',
+          benefit: 'Riduzione tempi manuali e velocizzazione preventivi.',
+          next: send.status === 'replied' ? 'Approfondire richiesta con cliente' : 'Chiamata di follow-up per presentare demo',
+          due: todayStr,
+          archived: false,
+          history: [{ date: send.sentAt, text: `Origine Gmail: inviata email a ${send.recipientName}` }]
+        });
+      }
+    }
+  }
+
+  return { addedCompanies, addedActivities };
 }
 
 // Calcola le chiamate suggerite da una campagna rispettando le regole commerciali
@@ -530,6 +734,7 @@ if (typeof module !== 'undefined' && module.exports) {
     getSeedDemoCampaign,
     ensureCampaignsInState,
     getCampaignSuggestedCalls,
+    syncGmailSendsToProspects,
     recordCampaignEmailReply,
     recordCampaignCallCompleted,
     recordCampaignOptOut

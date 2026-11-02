@@ -239,7 +239,8 @@
       finance: localState?.finance || null,
       playbooks: localState?.playbooks || null,
       campaigns: [...(localState?.campaigns || [])],
-      reconciliation: localState?.reconciliation || null
+      reconciliation: localState?.reconciliation || null,
+      scratchpad: [...(localState?.scratchpad || [])]
     };
 
     // 1. Integra snapshot cloud se presente
@@ -318,6 +319,15 @@
       if (!merged.reconciliation && cloudState.reconciliation) {
         merged.reconciliation = cloudState.reconciliation;
       }
+
+      // Scratchpad (Note Rapide / Second Brain)
+      if (Array.isArray(cloudState.scratchpad)) {
+        for (const note of cloudState.scratchpad) {
+          if (!merged.scratchpad.some(n => n.id === note.id)) {
+            merged.scratchpad.push(note);
+          }
+        }
+      }
     }
 
     // 2. Integra dati relazionali Supabase diretti (es. aziende inserite da altri strumenti)
@@ -379,6 +389,7 @@
         playbooks: state.playbooks || null,
         campaigns: state.campaigns || [],
         reconciliation: state.reconciliation || null,
+        scratchpad: state.scratchpad || [],
         _updatedAt: new Date().toISOString()
       };
 

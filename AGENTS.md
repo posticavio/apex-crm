@@ -62,6 +62,31 @@ node crm-rapid-check.cjs
 ---
 
 ## Registro di Passaggio tra Agenti (Handoff Log)
+### Sessione 2026-11-02 (Integrazione Email Inviate Gmail → Anagrafiche Prospect, Trattative e Attività Operative) — Agente: Google Antigravity
+- **Ultimo commit precedente rilevato**: `31cf05b` (`[Antigravity] feat(mcp): support dual contactId/companyId mapping and executive project fields in crm_list_projects and crm_get_company`) su `main`.
+- **Attività completate**:
+  - **Sincronizzazione Invii Gmail con Anagrafiche Prospect (`syncGmailSendsToProspects`)** in `campaigns.js`:
+    - Rilevate tutte le 20 aziende con email effettive inviate via Gmail.
+    - Create e registrate automaticamente in anagrafica `contacts` come **Prospect** tutte le aziende mancanti con referente, ruolo, email, recapito telefonico (o "Numero da verificare"), provenienza Gmail e storico cronologico dell'invio.
+    - Portato il database a **24 aziende** (inclusi Martino Parisi S.r.l., Cattini Srl, CERIN Spa, CMM Meccanica).
+  - **Generazione e Concatenazione Attività Operative e Trattative**:
+    - **Attività completate**: registrata per ogni azienda l'attività di tipo *Email* con data effettiva di invio e identificativo `sourceId`.
+    - **Attività da fare (Next Step)**:
+      - *Aziende senza risposta oltre la cadenza*: creata attività prioritaria *Chiamata di follow-up / sollecito* con data prevista oggi, motivo e dettagli referente.
+      - *Aziende con risposta e accordo esplicito (es. Roberto Da Ros - Officine Meccaniche Trevisane)*: pianificata attività *Ricontatto concordato* rispettando rigorosamente la data accordata (+20/30 giorni).
+      - *Aziende con richiesta tecnica (es. Matteo De Bona - Automazioni Meccatroniche Belluno)*: pianificata attività *Inviare documentazione tecnica protocollo Modbus*.
+      - *Aziende con chiamata svolta (es. Imballaggi Cartotecnici Berici)*: registrata chiamata completata e follow-up *Richiamare segretaria martedì*.
+      - *Aziende con Opt-out (es. Verniciature Industriali Venete)*: nessun ricontatto automatico pianificato in conformità alla volontà del cliente.
+    - Create 22 trattative commerciali collegate in fase Prospect per presidiare la pipeline (valore pipeline aggiornato a 34.300 €).
+  - **Sincronizzazione Cloud Supabase**:
+    - Eseguito aggiornamento sicuro e snapshot salvato sia nelle tabelle relazionali che nel payload di backup.
+- **File modificati**:
+  - `campaigns.js`
+  - `supabase-sync.js`
+  - `AGENTS.md`
+- **Test eseguiti**:
+  - Tutti i 10 controlli sintattici e tutti i 13 banchi di prova funzionali completati con esito `PASS` al 100%.
+
 ### Sessione 2026-11-02 (Apex CRM Rapido & Aggiornabile da ChatGPT: Workflow 2 Minuti, Home Esecutiva, Cockpit Progetti 7 Punti, Campagne Email, Inserimento Vocale MCP con Idempotenza & Checkpoint Quotidiano) — Agente: Google Antigravity
 - **Ultimo commit precedente rilevato**: `fcf03c7` (`[Antigravity] feat(crm-pro): add WhatsApp 1-click and executive KPIs to dashboard`) su `main`.
 - **Specifiche Progettuali Riferimento**: redatto documento completo di architettura e linee guida in `UX-SPEC.md`.
