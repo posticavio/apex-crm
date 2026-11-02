@@ -237,7 +237,9 @@
       activities: [...(localState?.activities || [])],
       projects: [...(localState?.projects || [])],
       finance: localState?.finance || null,
-      playbooks: localState?.playbooks || null
+      playbooks: localState?.playbooks || null,
+      campaigns: [...(localState?.campaigns || [])],
+      reconciliation: localState?.reconciliation || null
     };
 
     // 1. Integra snapshot cloud se presente
@@ -304,6 +306,18 @@
       // Finance & Playbooks
       if (!merged.finance && cloudState.finance) merged.finance = cloudState.finance;
       if (!merged.playbooks && cloudState.playbooks) merged.playbooks = cloudState.playbooks;
+
+      // Campaigns & Reconciliation
+      if (Array.isArray(cloudState.campaigns)) {
+        for (const cc of cloudState.campaigns) {
+          if (!merged.campaigns.some(c => c.id === cc.id)) {
+            merged.campaigns.push(cc);
+          }
+        }
+      }
+      if (!merged.reconciliation && cloudState.reconciliation) {
+        merged.reconciliation = cloudState.reconciliation;
+      }
     }
 
     // 2. Integra dati relazionali Supabase diretti (es. aziende inserite da altri strumenti)
@@ -363,6 +377,8 @@
         projects: state.projects || [],
         finance: state.finance || null,
         playbooks: state.playbooks || null,
+        campaigns: state.campaigns || [],
+        reconciliation: state.reconciliation || null,
         _updatedAt: new Date().toISOString()
       };
 

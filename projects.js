@@ -39,6 +39,10 @@ function validateProjects(data){
   if(p.dealId&&!data.deals.some(d=>d.id===p.dealId&&d.contactId===p.contactId))throw Error('Opportunità progetto incoerente');
   if(p.quoteId&&!(data.quotes||[]).some(q=>q.id===p.quoteId&&q.contactId===p.contactId))throw Error('Preventivo progetto incoerente');
   if(p.notes!=null&&typeof p.notes!=='string')throw Error('Note progetto non valide');
+  for(const k of ['clientGoal','origin','currentStatusSummary','lastOutcome','nextStep','nextDue','waitingFor','driveUrl','emailThreadUrl','calendarUrl']){
+   if(p[k]!=null&&typeof p[k]!=='string')throw Error('Note progetto non valide');
+  }
+  if(p.nextDue&&!validDate(p.nextDue))throw Error('Data consegna progetto non valida');
   if(!Array.isArray(p.milestones))throw Error('Milestone progetto non valide');
   const mids=new Set();
   for(const m of p.milestones){
@@ -99,7 +103,7 @@ function openProjectEditor(id=null,overrides={}){
    const mid='ms-init-'+(i+1);
    return {id:mid,title:m.title,dueDate:typeof addDays==='function'?addDays(today(),m.offsetDays):today(),done:false,dependsOn:i>0?'ms-init-'+i:''};
   }),
-  notes:overrides.notes||''
+  notes:overrides.notes||'',clientGoal:existing?.clientGoal||overrides.clientGoal||'',origin:existing?.origin||overrides.origin||'',currentStatusSummary:existing?.currentStatusSummary||overrides.currentStatusSummary||'',lastOutcome:existing?.lastOutcome||overrides.lastOutcome||'',nextStep:existing?.nextStep||overrides.nextStep||'',nextDue:existing?.nextDue||overrides.nextDue||'',waitingFor:existing?.waitingFor||overrides.waitingFor||'',driveUrl:existing?.driveUrl||overrides.driveUrl||'',emailThreadUrl:existing?.emailThreadUrl||overrides.emailThreadUrl||'',calendarUrl:existing?.calendarUrl||overrides.calendarUrl||''
  };
  projectSession={id:existing?.id||null,snap:existing?JSON.stringify(existing):null,msSeq:item.milestones.length};
  $('#project-title').textContent=existing?'Modifica progetto':'Nuovo progetto / commessa';
@@ -130,7 +134,7 @@ function openProjectEditor(id=null,overrides={}){
    ${field('costEur','Costo operativo / fornitura (€)',(item.costCents/100).toFixed(2),'number')}
    ${field('estimatedHours','Ore stimate',item.estimatedHours,'number')}
    ${field('loggedHours','Ore effettive erogate',item.loggedHours,'number')}
-   ${area('notes','Note di progetto, ambienti e consegne',item.notes)}
+   ${area('notes','Note tecniche ed ambienti',item.notes)}<h3 class="form-section">Quadro Esecutivo (Obiettivi, Situazione &amp; Prossimo Passo)</h3>${area('clientGoal','Che cosa vuole ottenere il cliente (Obiettivo di business)',item.clientGoal)}${area('origin','Come e quando è nato il progetto',item.origin)}${area('currentStatusSummary','Situazione attuale e ultima comunicazione rilevante',item.currentStatusSummary)}${area('lastOutcome','Cosa è stato fatto e con quale esito',item.lastOutcome)}${field('nextStep','Prossimo passo concreto',item.nextStep,'text',true)}${field('nextDue','Data del prossimo passo (vuoto per "Da definire")',item.nextDue,'date')}${typeof renderDateShortcuts==='function'?renderDateShortcuts('input[name="nextDue"]'):''}${area('waitingFor','Cosa aspettiamo (dal cliente o da altri) e quando ricontrollare',item.waitingFor)}<h3 class="form-section">Collegamenti Risorse &amp; Documenti</h3>${field('driveUrl','Cartella o documento Google Drive (URL)',item.driveUrl,'url',true)}${field('emailThreadUrl','Thread Gmail / Email (URL)',item.emailThreadUrl,'url',true)}${field('calendarUrl','Evento Calendario (URL)',item.calendarUrl,'url',true)}
   </div>
   <h3 class="form-section" style="margin:18px 0 10px">Milestone, scadenze e dipendenze</h3>
   <div id="project-milestones">${item.milestones.map((m,i)=>milestoneRowHtml(i,m,item.milestones)).join('')}</div>
@@ -190,7 +194,7 @@ function saveProject(formOrValues){
    estimatedHours,
    loggedHours,
    milestones,
-   notes:data.notes||''
+   notes:data.notes||'',clientGoal:data.clientGoal||'',origin:data.origin||'',currentStatusSummary:data.currentStatusSummary||'',lastOutcome:data.lastOutcome||'',nextStep:data.nextStep||'',nextDue:data.nextDue||'',waitingFor:data.waitingFor||'',driveUrl:data.driveUrl||'',emailThreadUrl:data.emailThreadUrl||'',calendarUrl:data.calendarUrl||''
   };
   const idx=next.projects.findIndex(x=>x.id===record.id);
   if(idx<0)next.projects.push(record);else next.projects[idx]=record;
@@ -386,6 +390,71 @@ function projectsGanttTable(rows){
    </tr>`;
   }).join('')}</tbody>
  </table></div>`:empty('Nessun progetto attivo','Avvia una commessa per monitorare consegne, milestone, dipendenze e marginalità dei clienti.','+ Nuovo progetto','project')}</div>`;
+}
+
+function renderProjectExecutiveCockpit(p) {
+  if (!p) return '';
+  const c = typeof contact === 'function' ? contact(p.contactId) : null;
+  const prog = projectProgress(p);
+  const nextDateFormatted = p.nextDue ? (typeof date === 'function' ? date(p.nextDue) : p.nextDue) : '';
+  const nextBadge = p.nextDue ? `<span class="pill ${p.nextDue <= (typeof today === 'function' ? today() : '') ? 'red' : 'blue'}">${esc(nextDateFormatted)}</span>` : `<span class="pill amber">Da definire</span>`;
+
+  return `
+    <article class="project-cockpit-card" data-project-id="${esc(p.id)}">
+      <div class="project-cockpit-head">
+        <div class="project-cockpit-title-wrap">
+          <span class="pill ${projectStatusPill(p.status)}">${esc(p.status)}</span>
+          <h3 class="project-cockpit-title">${esc(p.name)}</h3>
+          <p class="project-cockpit-client">Azienda: <strong>${esc(c?.company || 'Azienda')}</strong></p>
+        </div>
+        <div class="project-cockpit-actions">
+          <button type="button" class="text-button" data-edit-project="${esc(p.id)}">✏️ Modifica</button>
+        </div>
+      </div>
+
+      <div class="project-cockpit-grid">
+        <div class="project-cockpit-item">
+          <span class="pci-label">🎯 1. Cosa vuole ottenere il cliente</span>
+          <p class="pci-value">${esc(p.clientGoal || 'Da specificare negli obiettivi di business.')}</p>
+        </div>
+
+        <div class="project-cockpit-item">
+          <span class="pci-label">🌱 2. Come e quando è nato il progetto</span>
+          <p class="pci-value">${esc(p.origin || (p.startDate ? 'Avviato il ' + p.startDate : 'Origine da documentare.'))}</p>
+        </div>
+
+        <div class="project-cockpit-item">
+          <span class="pci-label">💬 3. Situazione attuale &amp; ultima comunicazione</span>
+          <p class="pci-value">${esc(p.currentStatusSummary || p.notes || 'In fase di esecuzione operativa.')}</p>
+        </div>
+
+        <div class="project-cockpit-item">
+          <span class="pci-label">✅ 4. Cosa è stato fatto e con quale esito</span>
+          <p class="pci-value">${esc(p.lastOutcome || (prog > 0 ? `${prog}% completato (${p.loggedHours} ore erogate).` : 'Attività preliminari in corso.'))}</p>
+        </div>
+
+        <div class="project-cockpit-item highlight-next">
+          <span class="pci-label">⚡ 5. Attività aperte e prossimo passo</span>
+          <p class="pci-value">
+            <strong>${esc(p.nextStep || 'Prossimo passo da definire')}</strong>
+            ${nextBadge}
+          </p>
+        </div>
+
+        <div class="project-cockpit-item">
+          <span class="pci-label">⏳ 6. Cosa aspettiamo (dal cliente o da altri)</span>
+          <p class="pci-value ${p.waitingFor ? 'text-amber' : ''}">${esc(p.waitingFor || 'Nessun blocco attivo: avanzamento autonomo.')}</p>
+        </div>
+      </div>
+
+      <div class="project-cockpit-links-row">
+        <span class="pcl-title">📎 Risorse collegate:</span>
+        ${p.driveUrl ? `<a href="${esc(p.driveUrl)}" target="_blank" rel="noopener noreferrer" class="link-chip drive-link">📁 Google Drive ↗</a>` : '<span class="link-chip disabled">📁 Drive non collegato</span>'}
+        ${p.emailThreadUrl ? `<a href="${esc(p.emailThreadUrl)}" target="_blank" rel="noopener noreferrer" class="link-chip email-link">✉️ Thread Gmail ↗</a>` : '<span class="link-chip disabled">✉️ Gmail non collegato</span>'}
+        ${p.calendarUrl ? `<a href="${esc(p.calendarUrl)}" target="_blank" rel="noopener noreferrer" class="link-chip cal-link">📅 Calendario ↗</a>` : ''}
+      </div>
+    </article>
+  `;
 }
 
 function contactProjectsSection(contactId){

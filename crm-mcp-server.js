@@ -154,6 +154,8 @@ async function saveCrmSnapshot(state) {
     projects: state.projects || [],
     finance: state.finance || null,
     playbooks: state.playbooks || null,
+    campaigns: state.campaigns || [],
+    reconciliation: state.reconciliation || null,
     _updatedAt: new Date().toISOString()
   };
 
@@ -174,6 +176,79 @@ async function saveCrmSnapshot(state) {
       file_url: dataUri
     });
   }
+}
+
+// Risoluzione espressioni temporali in lingua italiana nel fuso Europe/Rome (senza date inventate)
+function resolveItalianRelativeDate(text, referenceDate = new Date()) {
+  if (!text) return '';
+  const romeFormatter = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Rome' });
+  const romeTodayStr = romeFormatter.format(referenceDate);
+  const lower = text.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+
+  if (lower.includes('oggi')) return romeTodayStr;
+  if (lower.includes('domani')) {
+    const d = new Date(romeTodayStr + 'T12:00:00Z');
+    d.setUTCDate(d.getUTCDate() + 1);
+    return d.toISOString().slice(0, 10);
+  }
+  if (lower.includes('dopodomani')) {
+    const d = new Date(romeTodayStr + 'T12:00:00Z');
+    d.setUTCDate(d.getUTCDate() + 2);
+    return d.toISOString().slice(0, 10);
+  }
+
+  const daysMap = {
+    'domenica': 0, 'lunedi': 1, 'martedi': 2,
+    'mercoledi': 3, 'giovedi': 4,
+    'venerdi': 5, 'sabato': 6
+  };
+  for (const [dayName, targetDay] of Object.entries(daysMap)) {
+    const regex = new RegExp(`\\b${dayName}\\b`, 'i');
+    if (regex.test(lower)) {
+      const curDate = new Date(romeTodayStr + 'T12:00:00Z');
+      const curDay = curDate.getUTCDay();
+      let diff = targetDay - curDay;
+      if (diff <= 0) diff += 7;
+      curDate.setUTCDate(curDate.getUTCDate() + diff);
+      return curDate.toISOString().slice(0, 10);
+    }
+  }
+
+  const weekMatch = lower.match(/tra\s+(\d+|un['’]a?|due|tre)\s+settiman/i);
+  if (weekMatch) {
+    const w = weekMatch[1];
+    const num = (w.startsWith('un') ? 1 : w === 'due' ? 2 : w === 'tre' ? 3 : parseInt(w, 10)) || 1;
+    const d = new Date(romeTodayStr + 'T12:00:00Z');
+    d.setUTCDate(d.getUTCDate() + (num * 7));
+    return d.toISOString().slice(0, 10);
+  }
+
+  const monthMatch = lower.match(/tra\s+(\d+|un)\s+mes/i);
+  if (monthMatch) {
+    const m = monthMatch[1];
+    const num = (m === 'un' ? 1 : parseInt(m, 10)) || 1;
+    const d = new Date(romeTodayStr + 'T12:00:00Z');
+    d.setUTCDate(d.getUTCDate() + (num * 30));
+    return d.toISOString().slice(0, 10);
+  }
+
+  const daysMatch = lower.match(/tra\s+(\d+)\s+giorn/i);
+  if (daysMatch) {
+    const num = parseInt(daysMatch[1], 10) || 1;
+    const d = new Date(romeTodayStr + 'T12:00:00Z');
+    d.setUTCDate(d.getUTCDate() + num);
+    return d.toISOString().slice(0, 10);
+  }
+
+  const itDateMatch = lower.match(/\b(\d{1,2})[\/\-\.](\d{1,2})(?:[\/\-\.](\d{4}))?\b/);
+  if (itDateMatch) {
+    const day = itDateMatch[1].padStart(2, '0');
+    const month = itDateMatch[2].padStart(2, '0');
+    const year = itDateMatch[3] || new Date().getFullYear().toString();
+    return `${year}-${month}-${day}`;
+  }
+
+  return '';
 }
 
 // Definizione di tutti i Tools MCP esposti
@@ -398,6 +473,83 @@ const TOOLS = [
       type: 'object',
       properties: {},
       required: []
+    }
+  },
+  {
+    name: 'crm_log_voice_touchpoint',
+    description: 'Registra una sintesi vocale dettata post-telefonata (es. «Ho parlato con Parisi, aspettano il preventivo entro venerdì»). Identifica azienda, referente e progetto, estrae esito e prossimo passo con data (fuso Europe/Rome), aggiorna lo storico e l’attività, garantisce idempotenza anti-duplicati con source_id e pone domande mirate solo in caso di reale ambiguità.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        transcript: { type: 'string', description: 'Trascrizione dell’audio o sintesi vocale dettata dall’utente.' },
+        source_id: { type: 'string', description: 'Identificativo univoco sorgente per idempotenza (es. id messaggio, hash o timestamp audio).' },
+        channel: { type: 'string', enum: ['chiamata', 'incontro', 'whatsapp', 'email', 'nota'], description: 'Canale della comunicazione (default: chiamata).' },
+        project_id: { type: 'string', description: 'ID facoltativo del progetto a cui associare la nota se noto.' }
+      },
+      required: ['transcript']
+    }
+  },
+  {
+    name: 'crm_reconcile_daily',
+    description: 'Esegue il processo di riconciliazione quotidiana (attivato da ChatGPT Automation via MCP o scheduler backend). Riconcilia lo stato delle campagne, rileva scadenze concordate, calcola chiamate suggerite, elenca attese verso clienti e individua posizioni con "Prossimo passo da definire" senza duplicare dati.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        source: { type: 'string', description: 'Identificativo del sistema/scheduler che avvia la riconciliazione (default: chatgpt_daily_scheduler).' },
+        check_date: { type: 'string', description: 'Data di riferimento per il controllo (YYYY-MM-DD).' }
+      }
+    }
+  },
+  {
+    name: 'crm_list_campaigns',
+    description: 'Elenca le campagne email attive, il conteggio invii effettivi, le risposte rilevate e le chiamate di ricontatto suggerite secondo l’intervallo configurato.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        campaign_id: { type: 'string', description: 'Filtra per specifica campagna (opzionale).' }
+      }
+    }
+  },
+  {
+    name: 'crm_record_campaign_send',
+    description: 'Registra un invio effettivo di email per una campagna (le bozze sono escluse). Salva azienda, destinatario, data invio e sourceId.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        campaign_id: { type: 'string', description: 'ID della campagna.' },
+        company_name: { type: 'string', description: 'Nome dell’azienda destinataria.' },
+        recipient_name: { type: 'string', description: 'Nome della persona destinataria.' },
+        recipient_email: { type: 'string', description: 'Indirizzo email del destinatario.' },
+        recipient_phone: { type: 'string', description: 'Numero di telefono del destinatario.' },
+        sent_at: { type: 'string', description: 'Data effettiva di invio (YYYY-MM-DD).' },
+        source_id: { type: 'string', description: 'ID identificativo della fonte (es. ID messaggio Gmail).' },
+        notes: { type: 'string', description: 'Note opzionali sull’invio.' }
+      },
+      required: ['campaign_id', 'company_name', 'recipient_email']
+    }
+  },
+  {
+    name: 'crm_record_email_reply',
+    description: 'Registra la ricezione di una risposta da parte del cliente a un’email di campagna. Se il cliente concorda una data o periodo ("Sentiamoci tra un mese"), la imposta come scadenza confermata e annulla il ricontatto automatico.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        campaign_id: { type: 'string', description: 'ID della campagna.' },
+        company_name: { type: 'string', description: 'Nome dell’azienda.' },
+        reply_date: { type: 'string', description: 'Data di ricezione della risposta (YYYY-MM-DD).' },
+        agreed_date: { type: 'string', description: 'Eventuale data concordata per il risentirsi (YYYY-MM-DD).' },
+        opt_out: { type: 'boolean', description: 'True se il cliente richiede di non essere più contattato.' },
+        notes: { type: 'string', description: 'Sintesi del contenuto della risposta.' }
+      },
+      required: ['campaign_id', 'company_name']
+    }
+  },
+  {
+    name: 'crm_list_pending_next_steps',
+    description: 'Elenca tutte le posizioni aperte (trattative, commesse, progetti) prive di un prossimo passo con data definita, contrassegnate come "Prossimo passo da definire" senza date inventate.',
+    inputSchema: {
+      type: 'object',
+      properties: {}
     }
   }
 ];
@@ -932,6 +1084,354 @@ async function executeTool(name, args) {
           interazioni: interactions?.length || 0
         },
         snapshotStatoCloud: 'Attivo e aggiornato'
+      };
+    }
+
+    case 'crm_log_voice_touchpoint': {
+      const transcript = (args.transcript || '').trim();
+      if (!transcript) throw new Error('Trascrizione audio o sintesi vocale obbligatoria.');
+      const sourceId = (args.source_id || '').trim();
+      state.reconciliation = state.reconciliation || { processedSourceIds: [] };
+      state.reconciliation.processedSourceIds = state.reconciliation.processedSourceIds || [];
+
+      // 1. Idempotency Check
+      if (sourceId && state.reconciliation.processedSourceIds.includes(sourceId)) {
+        return {
+          success: true,
+          status: 'idempotent_duplicate',
+          message: 'Sintesi vocale già elaborata in precedenza con questo ID sorgente. Nessun duplicato creato.',
+          source_id: sourceId
+        };
+      }
+
+      // 2. Identify Company
+      const comps = state.contacts || [];
+      const lower = transcript.toLowerCase();
+      let matchedComp = null;
+      for (const c of comps) {
+        const nameParts = (c.company || '').toLowerCase().split(/[\s,\.\-]+/).filter(w => w.length > 2 && !['srl', 'spa', 's.r.l.', 's.p.a.'].includes(w));
+        if (nameParts.some(part => lower.includes(part))) {
+          matchedComp = c;
+          break;
+        }
+      }
+
+      if (!matchedComp) {
+        return {
+          success: false,
+          status: 'clarification_needed',
+          question: 'Non ho individuato con certezza l\'azienda nella sintesi vocale. A quale azienda si riferisce la telefonata?',
+          transcript: transcript
+        };
+      }
+
+      // 3. Ambiguity Check for Projects
+      const companyProjects = (state.projects || []).filter(p => p.contactId === matchedComp.id && p.status !== 'completato');
+      if (companyProjects.length > 1 && !args.project_id) {
+        const matchesInTranscript = companyProjects.filter(p => lower.includes(p.name.toLowerCase()));
+        if (matchesInTranscript.length !== 1) {
+          return {
+            success: false,
+            status: 'clarification_needed',
+            question: `L'azienda "${matchedComp.company}" ha più progetti aperti in corso: ${companyProjects.map(p => `"${p.name}"`).join(', ')}. A quale progetto si riferisce questo aggiornamento?`,
+            azienda: matchedComp.company,
+            progettiAperti: companyProjects.map(p => ({ id: p.id, name: p.name }))
+          };
+        }
+      }
+
+      // 4. Identify Referent / Person
+      let personName = matchedComp.person || '';
+      const referents = matchedComp.referents || [];
+      for (const r of referents) {
+        const first = (r.name || '').toLowerCase().split(' ')[0];
+        if (first && lower.includes(first)) {
+          personName = r.name;
+          break;
+        }
+      }
+
+      // 5. Extract Due Date and Next Step
+      const resolvedDue = resolveItalianRelativeDate(transcript);
+      let nextActionTitle = '';
+      if (lower.includes('preventivo') || lower.includes('offerta')) {
+        nextActionTitle = 'Inviare preventivo dettagliato e proposta';
+      } else if (lower.includes('demo') || lower.includes('incontro')) {
+        nextActionTitle = 'Svolgere incontro / demo di approfondimento';
+      } else if (lower.includes('richiamare') || lower.includes('riprova') || lower.includes('risentire')) {
+        nextActionTitle = 'Richiamare referente per aggiornamento';
+      } else {
+        nextActionTitle = 'Follow-up e prossimo passo operativo';
+      }
+
+      // 6. Record interaction in company history
+      matchedComp.history = matchedComp.history || [];
+      const historyEntry = {
+        date: todayStr,
+        kind: 'voice-touchpoint',
+        sourceId: sourceId || null,
+        text: `Colloquio (${args.channel || 'chiamata'}): ${transcript}`
+      };
+      matchedComp.history.push(historyEntry);
+
+      // 7. Update deal or project
+      const openDeal = (state.deals || []).find(d => d.contactId === matchedComp.id && !['Vinta', 'Persa'].includes(d.salesStage) && !d.archived);
+      if (openDeal) {
+        openDeal.next = nextActionTitle;
+        openDeal.due = resolvedDue;
+        openDeal.history = openDeal.history || [];
+        openDeal.history.push({ date: todayStr, text: `Aggiornamento vocale: ${transcript} · Prossimo passo: ${nextActionTitle} (${resolvedDue || 'Da definire'})` });
+      }
+
+      const openProject = (state.projects || []).find(p => p.contactId === matchedComp.id && p.status !== 'completato');
+      if (openProject) {
+        openProject.lastOutcome = transcript;
+        openProject.nextStep = nextActionTitle;
+        openProject.nextDue = resolvedDue;
+      }
+
+      // 8. Create or update activity
+      state.activities = state.activities || [];
+      const newActId = crypto.randomUUID();
+      state.activities.push({
+        id: newActId,
+        contactId: matchedComp.id,
+        dealId: openDeal?.id || '',
+        title: nextActionTitle,
+        type: lower.includes('preventivo') ? 'Analisi / Offerta' : 'Chiamata',
+        status: 'Da fare',
+        dueDate: resolvedDue,
+        priority: 'Alta',
+        reason: 'Aggiornamento da colloquio vocale',
+        lastOutcome: transcript,
+        source: 'ChatGPT Voice / Audio',
+        sourceId: sourceId || null,
+        notes: transcript
+      });
+
+      // 9. Mark campaign call completed if matching company
+      if (state.campaigns) {
+        for (const camp of state.campaigns) {
+          const send = (camp.sends || []).find(s => s.companyName && s.companyName.toLowerCase().includes(matchedComp.company.toLowerCase().slice(0, 6)));
+          if (send && !send.callCompletedAt) {
+            send.status = 'called';
+            send.callCompletedAt = todayStr;
+          }
+        }
+      }
+
+      if (sourceId) {
+        state.reconciliation.processedSourceIds.push(sourceId);
+      }
+
+      await saveCrmSnapshot(state);
+
+      return {
+        success: true,
+        azienda: matchedComp.company,
+        referente: personName,
+        canale: args.channel || 'chiamata',
+        esitoRegistrato: transcript,
+        prossimoPasso: nextActionTitle,
+        scadenza: resolvedDue || 'Da definire',
+        statoScadenza: resolvedDue ? 'Scadenza impostata' : 'Prossimo passo da definire (nessuna data arbitraria inventata)',
+        attivitaCreataId: newActId
+      };
+    }
+
+    case 'crm_reconcile_daily': {
+      const checkDate = args.check_date || todayStr;
+      state.campaigns = state.campaigns || [];
+      state.reconciliation = state.reconciliation || { processedSourceIds: [] };
+
+      let suggestedCallsCount = 0;
+      const suggestedList = [];
+      for (const camp of state.campaigns) {
+        for (const s of (camp.sends || [])) {
+          if (s.status === 'called' || s.status === 'opt_out' || s.agreedDate) continue;
+          if (s.sentAt && s.sentAt <= checkDate) {
+            suggestedCallsCount++;
+            suggestedList.push({ company: s.companyName, recipient: s.recipientName, sentAt: s.sentAt });
+          }
+        }
+      }
+
+      const waitingItems = [];
+      for (const p of (state.projects || [])) {
+        if (p.waitingFor && p.status !== 'completato') {
+          const comp = (state.contacts || []).find(c => c.id === p.contactId);
+          waitingItems.push({ company: comp?.company || 'N/D', project: p.name, waitingFor: p.waitingFor });
+        }
+      }
+
+      const pendingNextSteps = [];
+      for (const d of (state.deals || [])) {
+        if (!['Vinta', 'Persa'].includes(d.salesStage) && !d.archived && (!d.due || !d.next)) {
+          const comp = (state.contacts || []).find(c => c.id === d.contactId);
+          pendingNextSteps.push({ type: 'deal', id: d.id, company: comp?.company || 'N/D', title: d.title, next: d.next || 'Mancante' });
+        }
+      }
+      for (const p of (state.projects || [])) {
+        if (p.status !== 'completato' && (!p.nextDue || !p.nextStep)) {
+          const comp = (state.contacts || []).find(c => c.id === p.contactId);
+          pendingNextSteps.push({ type: 'project', id: p.id, company: comp?.company || 'N/D', title: p.name, next: p.nextStep || 'Mancante' });
+        }
+      }
+
+      const checkpoint = {
+        checkpointId: crypto.randomUUID(),
+        scheduler: args.source || 'chatgpt_daily_scheduler',
+        date: checkDate,
+        timestamp: new Date().toISOString(),
+        suggestedCallsCount,
+        waitingForReplyCount: waitingItems.length,
+        pendingNextStepsCount: pendingNextSteps.length,
+        status: 'completato_con_successo'
+      };
+
+      state.reconciliation.lastCheckpoint = checkpoint;
+      await saveCrmSnapshot(state);
+
+      return {
+        success: true,
+        schedulerResponsabile: 'ChatGPT Automation via MCP (Schedulatore Unico)',
+        checkpoint: checkpoint,
+        ricontattiSuggeriti: suggestedList.slice(0, 10),
+        inAttesaDiRisposta: waitingItems,
+        posizioniDaDefinire: pendingNextSteps
+      };
+    }
+
+    case 'crm_list_campaigns': {
+      state.campaigns = state.campaigns || [];
+      let list = state.campaigns;
+      if (args.campaign_id) {
+        list = list.filter(c => c.id === args.campaign_id);
+      }
+      return {
+        count: list.length,
+        campaigns: list.map(c => ({
+          id: c.id,
+          name: c.name,
+          canale: c.channel || 'email',
+          dataInizio: c.sentDate,
+          cadenzaGiorni: c.cadenceDays || 4,
+          conteggioGiorniLavorativi: c.countBusinessDays !== false,
+          ultimoControlloPosta: c.lastEmailCheck || 'Mai controllata',
+          totaleInvii: (c.sends || []).length,
+          risposteRicevute: (c.sends || []).filter(s => s.status === 'replied').length,
+          chiamateSvolte: (c.sends || []).filter(s => s.status === 'called').length,
+          optOut: (c.sends || []).filter(s => s.status === 'opt_out').length
+        }))
+      };
+    }
+
+    case 'crm_record_campaign_send': {
+      state.campaigns = state.campaigns || [];
+      const camp = state.campaigns.find(c => c.id === args.campaign_id);
+      if (!camp) throw new Error(`Campagna con ID "${args.campaign_id}" non trovata.`);
+
+      const sendId = crypto.randomUUID();
+      const sendRecord = {
+        id: sendId,
+        contactId: '',
+        companyName: args.company_name.trim(),
+        recipientName: args.recipient_name || '',
+        recipientRole: 'Referente',
+        recipientEmail: args.recipient_email.trim(),
+        recipientPhone: args.recipient_phone || '',
+        sentAt: args.sent_at || todayStr,
+        status: 'sent',
+        replyReceivedAt: null,
+        callCompletedAt: null,
+        agreedDate: null,
+        notes: args.notes || '',
+        sourceId: args.source_id || null
+      };
+
+      camp.sends = camp.sends || [];
+      camp.sends.push(sendRecord);
+      await saveCrmSnapshot(state);
+
+      return {
+        success: true,
+        message: `Invio email registrato con successo per ${args.company_name}.`,
+        send: sendRecord
+      };
+    }
+
+    case 'crm_record_email_reply': {
+      state.campaigns = state.campaigns || [];
+      const camp = state.campaigns.find(c => c.id === args.campaign_id);
+      if (!camp) throw new Error(`Campagna con ID "${args.campaign_id}" non trovata.`);
+
+      const send = (camp.sends || []).find(s => (s.companyName || '').toLowerCase().includes(args.company_name.toLowerCase().trim()));
+      if (!send) throw new Error(`Azienda "${args.company_name}" non trovata negli invii della campagna.`);
+
+      if (args.opt_out) {
+        send.status = 'opt_out';
+        send.notes = [send.notes, 'Opt-out richiesto dal cliente.'].filter(Boolean).join(' | ');
+      } else {
+        send.status = 'replied';
+        send.replyReceivedAt = args.reply_date || todayStr;
+        if (args.agreed_date) {
+          send.agreedDate = args.agreed_date;
+        }
+        if (args.notes) {
+          send.notes = [send.notes, args.notes].filter(Boolean).join(' | ');
+        }
+      }
+
+      camp.lastEmailCheck = new Date().toISOString().slice(0, 16).replace('T', ' ore ');
+      await saveCrmSnapshot(state);
+
+      return {
+        success: true,
+        azienda: send.companyName,
+        stato: send.status,
+        dataRisposta: send.replyReceivedAt,
+        dataConcordata: send.agreedDate || null,
+        suggerimentoAutomaticoAnnullato: true,
+        messaggio: args.agreed_date ? `Accordo concordato per il ${args.agreed_date}. Ricontatto automatico annullato.` : (args.opt_out ? 'Opt-out registrato: ricontatti automatici interrotti.' : 'Risposta registrata con successo.')
+      };
+    }
+
+    case 'crm_list_pending_next_steps': {
+      const pending = [];
+      for (const d of (state.deals || [])) {
+        if (!['Vinta', 'Persa'].includes(d.salesStage) && !d.archived && (!d.due || !d.next)) {
+          const comp = (state.contacts || []).find(c => c.id === d.contactId);
+          pending.push({
+            tipo: 'trattativa',
+            id: d.id,
+            azienda: comp?.company || 'N/D',
+            titolo: d.title,
+            fase: d.salesStage,
+            prossimoPasso: d.next || 'Da definire',
+            scadenza: d.due || 'Da definire',
+            motivo: 'Scadenza non definita (da organizzare senza date inventate)'
+          });
+        }
+      }
+      for (const p of (state.projects || [])) {
+        if (p.status !== 'completato' && (!p.nextDue || !p.nextStep)) {
+          const comp = (state.contacts || []).find(c => c.id === p.contactId);
+          pending.push({
+            tipo: 'progetto',
+            id: p.id,
+            azienda: comp?.company || 'N/D',
+            titolo: p.name,
+            stato: p.status,
+            prossimoPasso: p.nextStep || 'Da definire',
+            scadenza: p.nextDue || 'Da definire',
+            motivo: 'Prossimo passo o scadenza da pianificare'
+          });
+        }
+      }
+
+      return {
+        count: pending.length,
+        posizioniDaDefinire: pending
       };
     }
 

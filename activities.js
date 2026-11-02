@@ -68,7 +68,7 @@ function validateActivities(data){
   if(a.dueTime&&!validTime(a.dueTime))throw Error('Orario attività non valido');
   if(a.dealId&&!data.deals.some(d=>d.id===a.dealId&&d.contactId===a.contactId))throw Error('Opportunità attività incoerente');
   if(a.quoteId&&!(data.quotes||[]).some(q=>q.id===a.quoteId&&q.contactId===a.contactId))throw Error('Preventivo attività incoerente');
-  for(const k of ['referentId','referentName','notes','outcome','createdAt','completedAt','lifecycleStage'])if(a[k]!=null&&typeof a[k]!=='string')throw Error('Campo attività non valido');
+  for(const k of ['referentId','referentName','notes','outcome','createdAt','completedAt','lifecycleStage','reason','lastOutcome','lastContactDate','source','sourceId','waitingFor','projectId'])if(a[k]!=null&&typeof a[k]!=='string')throw Error('Campo attività non valido');
   if(a.createdAt&&!validDate(a.createdAt))throw Error('Data creazione attività non valida');
   if(a.completedAt&&!validDate(a.completedAt))throw Error('Data completamento attività non valida');
  }

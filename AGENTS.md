@@ -43,6 +43,7 @@ node --check analytics.js
 node --check supabase-sync.js
 node --check crm-mcp-server.js
 node --check crm-pro.js
+node --check campaigns.js
 node crm-check.cjs
 node import-check.cjs
 node relationship-check.cjs
@@ -55,11 +56,86 @@ node enterprise-check.cjs
 node cloud-sync-check.cjs
 node mcp-server-check.cjs
 node crm-pro-check.cjs
+node crm-rapid-check.cjs
 ```
 
 ---
 
 ## Registro di Passaggio tra Agenti (Handoff Log)
+### Sessione 2026-11-02 (Apex CRM Rapido & Aggiornabile da ChatGPT: Workflow 2 Minuti, Home Esecutiva, Cockpit Progetti 7 Punti, Campagne Email, Inserimento Vocale MCP con Idempotenza & Checkpoint Quotidiano) — Agente: Google Antigravity
+- **Ultimo commit precedente rilevato**: `fcf03c7` (`[Antigravity] feat(crm-pro): add WhatsApp 1-click and executive KPIs to dashboard`) su `main`.
+- **Specifiche Progettuali Riferimento**: redatto documento completo di architettura e linee guida in `UX-SPEC.md`.
+- **Attività completate**:
+  - **Paradigma Operativo 2 Minuti & Home Esecutiva** (`crm-pro.js`, `index.html`, `layout.css`, `app.js`):
+    - Superato l'obbligo di attraversare menu multipli o compilare form: la schermata principale presenta a colpo d'occhio cosa fare e su quali commesse intervenire.
+    - **Sezione 1 — Azioni Immediati da Fare**: attività scadute e con scadenza odierna evidenziate con referente, azienda, motivo, data prevista e ultimo esito registrato.
+    - **Sezione 2 — Commesse e Progetti Attivi**: cockpit orizzontale a card con cliente, stato sintetico, prossimo passo, cosa aspettiamo e link diretti ai documenti (Google Drive, Gmail, Calendar).
+    - **Sezione 3 — Ricontatti Commerciali Suggeriti**: aziende da richiamare a seguito di campagne email senza risposta oltre la cadenza configurata.
+    - **Sezione 4 — Viste Rapide Consultabili a 1 Clic**: tab a tocco rapido per visualizzare senza ricaricare *"Cosa è cambiato"*, *"Aspettiamo una risposta"* (con blocker e chi deve rispondere) e *"Posizioni da definire"* (senza date arbitrarie inventate).
+    - Preservati filtri, scroll e stato della pagina dopo ogni interazione.
+  - **Cockpit Esecutivo di Progetto a 7 Punti Chiave** (`projects.js`, `crm-pro.js`):
+    - Implementato per tutte le commesse (incluso caso demo Martino Parisi S.r.l.) il riepilogo a 7 risposte obbligatorie:
+      1. *Obiettivo concreto per il cliente*: scopo tangibile del progetto.
+      2. *Origine*: canale o accordo che ha originato la commessa.
+      3. *Situazione e ultima comunicazione*: sintesi del punto della situazione e data ultimo scambio.
+      4. *Ultimo esito*: risultato dell'ultima conversazione/incontro.
+      5. *Prossimo passo*: azione concreta e data concordata o *"Prossimo passo da definire"*.
+      6. *Cosa aspettiamo e da chi*: attese esplicite (preventivo, decisione, materiali) con soggetto responsabile.
+      7. *Link diretti collegati*: pulsanti sicuri per Google Drive, thread Gmail e Calendar.
+  - **Modulo Campagne Email & Suggerimenti Ricontatto** (`campaigns.js`):
+    - Campagna demo con 20 invii effettivi dichiarati (nessuna bozza conteggiata come invio).
+    - Algoritmo di calcolo flessibile e configurabile per intervalli in **giorni lavorativi** (esclusi sab/dom) vs **giorni solari** (default 4 giorni lavorativi).
+    - Filtro intelligente ricontatti: esclude automaticamente aziende che hanno risposto, chiamate già completate o opt-out.
+    - **Pulsante "Chiama" a 1 Clic**: collegamento `tel:` diretto al dialer telefonico. Se il recapito è assente mostra *"Numero da verificare"* senza inventare numeri. Cliccare *"Chiama"* non chiude arbitrariamente l'attività.
+    - **Pulsante "Prepara sollecito"**: apre il modale `#followup-draft-dialog` con anteprima bozza contestualizzata, email destinatario verificata e link mailto/Gmail; l'apertura della bozza non equivale a invio.
+    - **Regola di Precedenza Accordi Commerciali**: accordo esplicito con il cliente (*"Sentiamoci tra un mese"*) o decisione utente sovrascrive istantaneamente la cadenza automatica. Una richiesta di opt-out interrompe qualsiasi ulteriore ricontatto.
+    - Data e ora trasparente di *Ultimo controllo posta*.
+  - **Server MCP Universale ChatGPT & Antigravity Potenziato (21 Strumenti)** (`crm-mcp-server.js`):
+    - Aggiunti 6 nuovi tools MCP dedicati al flusso conversazionale e vocale:
+      - `crm_log_voice_touchpoint`: riceve la trascrizione post-colloquio (es. *«Ho parlato con Parisi, aspettano il preventivo entro venerdì»*), individua azienda, referente e progetto, estrae la data relativa con fuso `Europe/Rome`, registra l'esito nello storico, aggiorna il prossimo passo e crea l'attività.
+      - `crm_reconcile_daily`: processo di riconciliazione quotidiana affidabile con schedulatore unico documentato (ChatGPT Daily Scheduler), rilevamento ricontatti, posizioni in attesa e checkpoint con `crypto.randomUUID()`.
+      - `crm_list_campaigns`: riepilogo campagne, invii, risposte, chiamate e cadenze.
+      - `crm_record_campaign_send`: registrazione nuovi invii con `source_id` anti-duplicato.
+      - `crm_record_email_reply`: acquisizione risposte con supporto data concordata o opt-out.
+      - `crm_list_pending_next_steps`: posizioni aperte contrassegnate come *"Prossimo passo da definire"*.
+    - **Idempotenza e Protezione Anti-Duplicati**: controllo `source_id` su `reconciliation.processedSourceIds` per elaborare in sicurezza ritrasmissioni o riprese dopo errori di rete.
+    - **Gestione Ambiguità a Domanda Singola**: se un'azienda ha più progetti aperti e la sintesi non specifica il progetto, l'MCP pone una singola domanda mirata senza inventare dati.
+  - **Sincronizzazione Multi-Dispositivo Estesa** (`supabase-sync.js`):
+    - Aggiornati `cleanSnapshot` e `mergeCrmStates` per garantire la conservazione e la convergenza cloud di `campaigns` e `reconciliation`.
+- **File creati/modificati**:
+  - `UX-SPEC.md` (nuovo)
+  - `campaigns.js` (nuovo)
+  - `crm-rapid-check.cjs` (nuovo)
+  - `crm-mcp-server.js`
+  - `crm-pro.js`
+  - `projects.js`
+  - `activities.js`
+  - `supabase-sync.js`
+  - `app.js`
+  - `index.html`
+  - `layout.css`
+  - `AGENTS.md`
+- **Test eseguiti**:
+  - 10 verifiche sintattiche (`node --check`) superate con 0 errori.
+  - 13 banchi di prova funzionali completati con esito `PASS` al 100%:
+    - `crm-check.cjs`
+    - `import-check.cjs`
+    - `relationship-check.cjs`
+    - `sales-check.cjs`
+    - `resource-check.cjs`
+    - `unscheduled-check.cjs`
+    - `quotes-check.cjs`
+    - `activities-check.cjs`
+    - `enterprise-check.cjs`
+    - `cloud-sync-check.cjs`
+    - `mcp-server-check.cjs`
+    - `crm-pro-check.cjs`
+    - `crm-rapid-check.cjs` (tutti gli 8 scenari del GOAL validati)
+- **Problemi aperti**:
+  - Nessuno. L'applicazione è pronta all'uso e rispetta rigorosamente tutti i vincoli operativi.
+- **Attività successive consigliate**:
+  - Esecuzione del commit semantico e `git push` su GitHub.
+  - Esecuzione di `pubblica-vercel.cmd` per promuovere la versione in produzione su Vercel.
 ### Sessione 2026-11-01 (Apex Pro CRM: Scheda 360°, Quick Touchpoint Logger con Smart Follow-Up, Deal Stage Modal con Motivi di Perdita, Deal Rotting Alert, Lead Scoring Hot/Warm/Cold, WhatsApp 1-Click & Dashboard Executive) — Agente: Google Antigravity
 - **Ultimo commit precedente rilevato**: `10a5300` (`[Antigravity] docs: update handoff log for multi-device sync and MCP server`) su `main`.
 - **Attività completate**:

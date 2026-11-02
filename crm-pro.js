@@ -870,10 +870,700 @@ function renderExecutiveMetrics() {
   `;
 }
 
+// --- 8 bis. STRUTTURA DATI PROGETTI E SCHEDA ESECUTIVA ---
+function ensureDemoProjectData(crmState) {
+  if (!crmState || !Array.isArray(crmState.contacts)) return;
+  crmState.projects = Array.isArray(crmState.projects) ? crmState.projects : [];
+  crmState.activities = Array.isArray(crmState.activities) ? crmState.activities : [];
+
+  // 1. Martino Parisi S.r.l.
+  const parisi = crmState.contacts.find(c => (c.company || '').toLowerCase().includes('parisi'));
+  if (parisi && !crmState.projects.some(p => p.contactId === parisi.id)) {
+    crmState.projects.push({
+      id: 'project-parisi-automazione',
+      contactId: parisi.id,
+      dealId: (crmState.deals || []).find(d => d.contactId === parisi.id)?.id || '',
+      quoteId: '',
+      name: 'Automazione flussi e preventivazione rapida — Parisi',
+      status: 'In corso',
+      startDate: '2026-10-03',
+      endDate: '',
+      budgetCents: 0,
+      costCents: 0,
+      estimatedHours: 40,
+      loggedHours: 6,
+      milestones: [
+        { id: 'ms-p1', title: 'Analisi flussi doganali e archiviazione', dueDate: '2026-10-20', done: true, dependsOn: '' },
+        { id: 'ms-p2', title: 'Definizione requisiti e prototipo preventivatore rapido', dueDate: '', done: false, dependsOn: 'ms-p1' },
+        { id: 'ms-p3', title: 'Collaudo operativo e formazione referenti', dueDate: '', done: false, dependsOn: 'ms-p2' }
+      ],
+      clientGoal: 'Automatizzare la ricezione richieste doganali e la preventivazione rapida riducendo i tempi manuali di gestione file e archiviazione.',
+      origin: 'Contatto avviato via Gmail a inizio ottobre 2026 a seguito di presentazione delle soluzioni AI e automazione documentale.',
+      currentStatusSummary: 'Call esplorativa concordata per il 20/10/2026. Esito della call da riconciliare con Andrea Zanatta.',
+      lastOutcome: 'Andrea Zanatta ha richiesto una proposta operativa e l’analisi dei flussi interni.',
+      nextStep: 'Verificare l’esito della call del 20 ottobre e concordare il follow-up',
+      nextDue: '',
+      waitingFor: 'In attesa di riscontro da Andrea Zanatta su disponibilità slot per revisione requisiti.',
+      driveUrl: 'https://drive.google.com/drive/folders/apex-parisi-automazioni',
+      emailThreadUrl: 'https://mail.google.com/mail/u/0/#all/1a101fb411e24e3e',
+      calendarUrl: '',
+      notes: 'Richiesta integrazione con sistemi documentali doganali.'
+    });
+
+    if (!crmState.activities.some(a => a.contactId === parisi.id && a.status !== 'Completata')) {
+      crmState.activities.push({
+        id: 'act-parisi-followup-call',
+        contactId: parisi.id,
+        dealId: (crmState.deals || []).find(d => d.contactId === parisi.id)?.id || '',
+        title: 'Verificare l’esito della call del 20 ottobre e concordare il follow-up',
+        type: 'Chiamata',
+        priority: 'Alta',
+        status: 'Da fare',
+        dueDate: '',
+        reason: 'Call del 20/10/2026 da verificare con Andrea Zanatta',
+        lastOutcome: 'Andrea Zanatta ha confermato ricezione invito Teams per il 20/10 ore 17:00',
+        referentId: parisi.referents?.[0]?.id || '',
+        referentName: parisi.person || 'Andrea Zanatta',
+        notes: 'Verificare se la call esplorativa si è svolta e se procedere con la proposta formale.',
+        source: 'Notion e Gmail',
+        createdAt: '2026-10-27'
+      });
+    }
+  }
+
+  // 2. Cattini Srl
+  const cattini = crmState.contacts.find(c => (c.company || '').toLowerCase().includes('cattini'));
+  if (cattini && !crmState.projects.some(p => p.contactId === cattini.id)) {
+    crmState.projects.push({
+      id: 'project-cattini-rdo',
+      contactId: cattini.id,
+      dealId: (crmState.deals || []).find(d => d.contactId === cattini.id)?.id || '',
+      quoteId: '',
+      name: 'Gestione RDO e archiviazione disegni — Cattini',
+      status: 'Pianificato',
+      startDate: '2026-10-16',
+      endDate: '',
+      budgetCents: 150000,
+      costCents: 0,
+      estimatedHours: 30,
+      loggedHours: 2,
+      milestones: [
+        { id: 'ms-c1', title: 'Confronto tecnico con colleghi e demo RDO', dueDate: '', done: false, dependsOn: '' },
+        { id: 'ms-c2', title: 'Verifica compatibilità ERP SAP Business One', dueDate: '', done: false, dependsOn: 'ms-c1' }
+      ],
+      clientGoal: 'Sviluppare un applicativo web per gestione RDO e archiviazione disegni tecnici con riduzione attività manuali e compatibilità ERP SAP B1.',
+      origin: 'Contatto avviato il 30/09/2026 a seguito di invio presentazione. Proposta economica iniziale di 1.500 euro lordi formulata il 03/10.',
+      currentStatusSummary: 'Paolo Cattini ha espresso interesse ma deve confrontarsi con i colleghi per confermare la data della demo.',
+      lastOutcome: 'Paolo Cattini propone di risentirsi per concordare la demo dopo allineamento interno.',
+      nextStep: 'Ricontattare Paolo Cattini per concordare la demo RDO con i colleghi',
+      nextDue: '',
+      waitingFor: 'In attesa che Paolo Cattini si confronti con i colleghi per confermare la disponibilità per la demo.',
+      driveUrl: '',
+      emailThreadUrl: 'https://mail.google.com/mail/u/0/#all/1a0e87b9332450e7',
+      calendarUrl: '',
+      notes: 'Interesse per integrazione SAP Business One da quantificare a parte.'
+    });
+
+    if (!crmState.activities.some(a => a.contactId === cattini.id && a.status !== 'Completata')) {
+      crmState.activities.push({
+        id: 'act-cattini-demo-followup',
+        contactId: cattini.id,
+        dealId: (crmState.deals || []).find(d => d.contactId === cattini.id)?.id || '',
+        title: 'Ricontattare Paolo Cattini per concordare la demo RDO con i colleghi',
+        type: 'Chiamata',
+        priority: 'Media',
+        status: 'Da fare',
+        dueDate: '',
+        reason: 'Follow-up demo gestione RDO e archiviazione disegni',
+        lastOutcome: 'Paolo deve allinearsi con i colleghi per definire la data',
+        referentId: '',
+        referentName: cattini.person || 'Paolo Cattini',
+        notes: 'Chiedere a Paolo esito del confronto con i colleghi per fissare lo slot demo.',
+        source: 'Notion e Gmail',
+        createdAt: '2026-10-27'
+      });
+    }
+  }
+}
+
+// --- 8 ter. HOME VIEW ESECUTIVA (A COLPO D'OCCHIO IN 2 MINUTI) ---
+function renderUnifiedActivityRow(act) {
+  const comp = typeof contact === 'function' ? contact(act.contactId) : (state.contacts || []).find(c => c.id === act.contactId);
+  const proj = act.projectId ? (state.projects || []).find(p => p.id === act.projectId) : (state.projects || []).find(p => p.contactId === act.contactId);
+  const deal = act.dealId ? (state.deals || []).find(d => d.id === act.dealId) : null;
+
+  const phone = (act.referentId && comp?.referents ? comp.referents.find(r => r.id === act.referentId)?.phone : '') || comp?.phone || (comp?.referents && comp.referents[0]?.phone) || '';
+  const refName = (act.referentId && comp?.referents ? comp.referents.find(r => r.id === act.referentId)?.name : '') || comp?.person || (comp?.referents && comp.referents[0]?.name) || '';
+
+  const todayStr = typeof today === 'function' ? today() : new Date().toISOString().slice(0, 10);
+  const isOverdue = act.dueDate && act.dueDate < todayStr;
+  const isToday = act.dueDate && act.dueDate === todayStr;
+  const isUnscheduled = !act.dueDate;
+
+  const dateBadge = isUnscheduled
+    ? `<span class="pill amber">⚡ Prossimo passo da definire</span>`
+    : isOverdue
+      ? `<span class="pill red">🚨 Scaduta (${typeof date === 'function' ? date(act.dueDate) : act.dueDate})</span>`
+      : isToday
+        ? `<span class="pill blue">📅 Oggi</span>`
+        : `<span class="pill">${typeof date === 'function' ? date(act.dueDate) : act.dueDate}</span>`;
+
+  const priorityClass = act.priority === 'Alta' ? 'red' : act.priority === 'Media' ? 'amber' : '';
+
+  return `
+    <article class="unified-activity-card ${isOverdue ? 'act-overdue' : ''}" data-act-id="${esc(act.id)}">
+      <div class="uac-header">
+        <div class="uac-company-proj">
+          <button type="button" class="text-button uac-comp-btn" data-open-360="${esc(comp?.id || '')}">
+            🏢 <strong>${esc(comp?.company || 'Azienda')}</strong>
+          </button>
+          ${proj ? `<span class="uac-proj-tag">· 🚀 ${esc(proj.name)}</span>` : deal ? `<span class="uac-deal-tag">· ▥ ${esc(deal.title)}</span>` : ''}
+          ${refName ? `<span class="uac-person-tag">👤 ${esc(refName)}</span>` : ''}
+        </div>
+        <div class="uac-badges">
+          ${dateBadge}
+          <span class="pill ${priorityClass}">${esc(act.priority || 'Media')}</span>
+          <span class="pill">${esc(act.type || 'Attività')}</span>
+        </div>
+      </div>
+
+      <div class="uac-body">
+        <h3 class="uac-action-title">${esc(act.title)}</h3>
+        <div class="uac-meta-reason">
+          <span class="uac-reason">🎯 <strong>Motivo:</strong> ${esc(act.reason || act.notes || 'Avanzamento commerciale e operativo')}</span>
+          <span class="uac-separator">·</span>
+          <span class="uac-last-outcome">💬 <strong>Ultimo esito:</strong> ${esc(act.lastOutcome || act.outcome || 'In attesa di primo riscontro')}</span>
+        </div>
+      </div>
+
+      <div class="uac-actions-cluster">
+        ${phone
+          ? `<a href="tel:${esc(phone.replace(/[^+\d]/g, ''))}" class="uac-op-btn op-call" title="Chiama ${esc(refName)} al ${esc(phone)}">📞 Chiama (${esc(phone)})</a>`
+          : `<span class="uac-op-btn op-call disabled" title="Nessun recapito telefonico diretto presente nelle fonti">📞 Numero da verificare</span>`}
+        
+        <button type="button" class="uac-op-btn op-followup" data-prepare-followup="${esc(act.id)}" data-comp-id="${esc(comp?.id || '')}">✉️ Prepara sollecito</button>
+        <button type="button" class="uac-op-btn op-touchpoint" data-quick-touchpoint="${esc(comp?.id || '')}" data-act-id="${esc(act.id)}">⚡ Registra esito</button>
+        <button type="button" class="uac-op-btn op-details" data-open-360="${esc(comp?.id || '')}">Scheda 360° ↗</button>
+      </div>
+    </article>
+  `;
+}
+
+function renderExecutiveHomeView() {
+  if (typeof ensureCampaignsInState === 'function') ensureCampaignsInState(state);
+  ensureDemoProjectData(state);
+
+  const todayStr = typeof today === 'function' ? today() : new Date().toISOString().slice(0, 10);
+  const openActivities = (state.activities || []).filter(a => ['Da fare', 'In corso'].includes(a.status));
+  const overdueTasks = openActivities.filter(a => a.dueDate && a.dueDate < todayStr);
+  const todayTasks = openActivities.filter(a => a.dueDate && a.dueDate === todayStr);
+  const upcomingTasks = openActivities.filter(a => a.dueDate && a.dueDate > todayStr);
+  const unscheduledTasks = openActivities.filter(a => !a.dueDate);
+
+  const activeProjects = (state.projects || []).filter(p => ['In corso', 'Pianificato', 'In revisione'].includes(p.status));
+
+  // Campagna e Ricontatti suggeriti
+  const camp = (state.campaigns || [])[0];
+  const suggestedCalls = camp && typeof getCampaignSuggestedCalls === 'function' ? getCampaignSuggestedCalls(camp, state) : [];
+
+  // Attese dal cliente
+  const waitingProjects = (state.projects || []).filter(p => p.waitingFor && p.status !== 'Completato');
+  const waitingDeals = (state.deals || []).filter(d => d.waitingFor && !['Vinta', 'Persa'].includes(d.salesStage) && !d.archived);
+
+  // Posizioni da definire (aperte senza data o senza prossimo passo)
+  const pendingDeals = (state.deals || []).filter(d => !['Vinta', 'Persa'].includes(d.salesStage) && !d.archived && (!d.due || !d.next));
+  const pendingProjects = (state.projects || []).filter(p => p.status !== 'Completato' && (!p.nextDue || !p.nextStep));
+
+  // Feed ultimi aggiornamenti (Cosa è cambiato)
+  const recentFeed = (state.contacts || []).flatMap(c => {
+    return (c.history || []).map(h => ({ ...h, companyName: c.company, companyId: c.id }));
+  }).sort((a, b) => (b.date || '').localeCompare(a.date || '')).slice(0, 6);
+
+  return `
+    <div class="executive-home">
+      <!-- 1. Header Ribbon Metriche Operative a 1 Clic -->
+      <div class="exec-action-ribbon" role="region" aria-label="Riepilogo operativo immediato">
+        <div class="exec-ribbon-card ${overdueTasks.length ? 'urgent' : ''}">
+          <span class="ribbon-label">Da fare subito</span>
+          <strong>${(overdueTasks.length + todayTasks.length).toString().padStart(2, '0')}</strong>
+          <small>${overdueTasks.length} scadute · ${todayTasks.length} oggi</small>
+        </div>
+
+        <div class="exec-ribbon-card">
+          <span class="ribbon-label">Progetti attivi</span>
+          <strong>${activeProjects.length.toString().padStart(2, '0')}</strong>
+          <small>Commesse in esecuzione</small>
+        </div>
+
+        <div class="exec-ribbon-card ${suggestedCalls.length ? 'highlight' : ''}">
+          <span class="ribbon-label">Ricontatti suggeriti</span>
+          <strong>${suggestedCalls.length.toString().padStart(2, '0')}</strong>
+          <small>Campagna email B2B (4gg cadenza)</small>
+        </div>
+
+        <div class="exec-ribbon-card">
+          <span class="ribbon-label">In attesa risposta</span>
+          <strong>${(waitingProjects.length + waitingDeals.length).toString().padStart(2, '0')}</strong>
+          <small>In attesa dal cliente</small>
+        </div>
+
+        <div class="exec-ribbon-card">
+          <span class="ribbon-label">Da definire</span>
+          <strong>${(unscheduledTasks.length + pendingDeals.length + pendingProjects.length).toString().padStart(2, '0')}</strong>
+          <small>Senza scadenza inventata</small>
+        </div>
+      </div>
+
+      <!-- 2. SEZIONE 1: Azioni Imminenti e Attività da Fare -->
+      <section class="home-operative-section" id="sec-tasks">
+        <div class="section-head">
+          <div>
+            <h2 class="section-title">⚡ Attività da Fare e In Corso</h2>
+            <p class="section-sub">Azioni operative concrete con motivo, referente ed esito precedente (ordinate per scadenza e priorità).</p>
+          </div>
+          <div class="section-actions">
+            <button type="button" class="primary" data-new="task">+ Nuova attività</button>
+          </div>
+        </div>
+
+        <div class="unified-tasks-stack">
+          ${[...overdueTasks, ...todayTasks, ...upcomingTasks, ...unscheduledTasks].length
+            ? [...overdueTasks, ...todayTasks, ...upcomingTasks, ...unscheduledTasks].map(renderUnifiedActivityRow).join('')
+            : '<div class="empty-state-card"><p>Nessuna attività in corso. Ottimo lavoro! Tutte le posizioni operative sono allineate.</p></div>'}
+        </div>
+      </section>
+
+      <!-- 3. SEZIONE 2: Progetti Attivi e in Corso -->
+      <section class="home-operative-section" id="sec-projects">
+        <div class="section-head">
+          <div>
+            <h2 class="section-title">🚀 Progetti e Commesse in Corso</h2>
+            <p class="section-sub">Stato sintetico, obiettivo di business, cosa aspettiamo e prossimo passo con scadenza.</p>
+          </div>
+          <div class="section-actions">
+            <button type="button" class="text-button" data-view="projects">Tutti i progetti ↗</button>
+            <button type="button" class="primary" data-new="project">+ Nuovo progetto</button>
+          </div>
+        </div>
+
+        <div class="projects-cockpit-stack">
+          ${activeProjects.length
+            ? activeProjects.map(p => typeof renderProjectExecutiveCockpit === 'function' ? renderProjectExecutiveCockpit(p) : `<div class="card"><strong>${esc(p.name)}</strong></div>`).join('')
+            : '<div class="empty-state-card"><p>Nessun progetto in corso. Avvia una nuova commessa da un’opportunità vinta!</p></div>'}
+        </div>
+      </section>
+
+      <!-- 4. SEZIONE 3: Ricontatti Commerciali Suggeriti da Campagne -->
+      <section class="home-operative-section" id="sec-campaigns">
+        <div class="section-head">
+          <div>
+            <h2 class="section-title">✉️ Ricontatti Commerciali e Campagne Email</h2>
+            <p class="section-sub">Aziende con email inviata e nessuna risposta rilevata entro l'intervallo configurato (4 giorni lavorativi).</p>
+          </div>
+          <div class="section-actions">
+            <button type="button" class="secondary" id="btn-open-campaign-settings">⚙ Configura intervallo</button>
+            <button type="button" class="text-button" data-view="campaigns">Vista completa campagne ↗</button>
+          </div>
+        </div>
+
+        ${camp ? `
+          <div class="campaign-summary-banner">
+            <div class="csb-left">
+              <strong>${esc(camp.name)}</strong>
+              <small>${camp.sends.length} invii effettivi · ${(camp.sends || []).filter(s => s.status === 'replied').length} risposte · ${(camp.sends || []).filter(s => s.status === 'called').length} chiamate svolte</small>
+            </div>
+            <div class="csb-right">
+              <span class="csb-check-tag">📡 Ultimo controllo posta: <strong>${esc(camp.lastEmailCheck || 'Oggi ore 08:30')}</strong> (Fonte Gmail verificata)</span>
+            </div>
+          </div>
+        ` : ''}
+
+        <div class="suggested-calls-list">
+          ${suggestedCalls.length ? suggestedCalls.map(s => `
+            <div class="suggested-call-row" data-send-id="${esc(s.sendId)}">
+              <div class="scr-info">
+                <div class="scr-title-line">
+                  <strong>🏢 ${esc(s.companyName)}</strong>
+                  <span class="scr-person">👤 ${esc(s.recipientName)} (${esc(s.recipientRole)})</span>
+                </div>
+                <p class="scr-status">${esc(s.statusText)}</p>
+                <small class="scr-notes">${esc(s.notes)}</small>
+              </div>
+              <div class="scr-actions">
+                ${s.recipientPhone
+                  ? `<a href="tel:${esc(s.recipientPhone.replace(/[^+\d]/g, ''))}" class="uac-op-btn op-call">📞 Chiama (${esc(s.recipientPhone)})</a>`
+                  : `<span class="uac-op-btn op-call disabled">📞 Numero da verificare</span>`}
+                <button type="button" class="uac-op-btn op-followup" data-prepare-campaign-followup="${esc(s.sendId)}" data-campaign-id="${esc(s.campaignId)}">✉️ Prepara sollecito</button>
+                <button type="button" class="uac-op-btn op-touchpoint" data-log-campaign-call="${esc(s.sendId)}" data-campaign-id="${esc(s.campaignId)}">⚡ Registra esito chiamata</button>
+                <button type="button" class="text-button text-muted" data-campaign-optout="${esc(s.sendId)}" data-campaign-id="${esc(s.campaignId)}" title="Interrompe tutti i ricontatti verso questa azienda">Opt-out</button>
+              </div>
+            </div>
+          `).join('') : '<div class="empty-state-card"><p>Nessuna chiamata da svolgere: tutte le aziende della campagna hanno risposto o sono già state contattate.</p></div>'}
+        </div>
+      </section>
+
+      <!-- 5. SEZIONE 4: Viste Consultabili Rapide (Accordion / Tab Compatti) -->
+      <section class="home-consultable-tabs" aria-label="Sezioni consultabili rapide">
+        <details class="consultable-section" open>
+          <summary class="consultable-summary">
+            <span>🕒 <strong>Cosa è cambiato</strong> (${recentFeed.length} aggiornamenti recenti)</span>
+            <small>Novità acquisite da ChatGPT, note vocali e sincronizzazione</small>
+          </summary>
+          <div class="consultable-content">
+            <div class="recent-feed-stack">
+              ${recentFeed.length ? recentFeed.map(f => `
+                <div class="feed-entry" data-open-360="${esc(f.companyId)}">
+                  <span class="feed-date">${typeof date === 'function' ? date(f.date) : f.date}</span>
+                  <strong class="feed-comp">${esc(f.companyName)}</strong>
+                  <span class="feed-text">${esc(f.text)}</span>
+                </div>
+              `).join('') : '<p class="text-muted">Nessun evento recente.</p>'}
+            </div>
+          </div>
+        </details>
+
+        <details class="consultable-section">
+          <summary class="consultable-summary">
+            <span>⏳ <strong>Aspettiamo una risposta</strong> (${waitingProjects.length + waitingDeals.length} posizioni)</span>
+            <small>Elementi in attesa di decisione o riscontro da clienti e partner</small>
+          </summary>
+          <div class="consultable-content">
+            <div class="waiting-stack">
+              ${[...waitingProjects.map(p => ({ type: 'Progetto', compId: p.contactId, title: p.name, wait: p.waitingFor })), ...waitingDeals.map(d => ({ type: 'Opportunità', compId: d.contactId, title: d.title, wait: d.waitingFor }))].map(w => {
+                const comp = (state.contacts || []).find(c => c.id === w.compId);
+                return `
+                  <div class="waiting-entry">
+                    <span class="pill">${w.type}</span>
+                    <strong class="company-link" data-open-360="${esc(w.compId)}">${esc(comp?.company || 'Azienda')}</strong>
+                    <span class="waiting-title">(${esc(w.title)}):</span>
+                    <p class="waiting-desc text-amber">⏳ ${esc(w.wait)}</p>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          </div>
+        </details>
+
+        <details class="consultable-section">
+          <summary class="consultable-summary">
+            <span>❓ <strong>Da definire / Da chiarire</strong> (${unscheduledTasks.length + pendingDeals.length + pendingProjects.length} posizioni)</span>
+            <small>Posizioni aperte senza data di follow-up o con prossimo passo da organizzare</small>
+          </summary>
+          <div class="consultable-content">
+            <div class="pending-stack">
+              ${unscheduledTasks.map(a => {
+                const comp = (state.contacts || []).find(c => c.id === a.contactId);
+                return `
+                  <div class="pending-entry">
+                    <span class="pill amber">Attività</span>
+                    <strong>${esc(comp?.company || 'Azienda')}</strong>: ${esc(a.title)}
+                    <button type="button" class="text-button" data-edit-task="${esc(a.id)}">+ Pianifica scadenza</button>
+                  </div>
+                `;
+              }).join('')}
+              ${pendingDeals.map(d => {
+                const comp = (state.contacts || []).find(c => c.id === d.contactId);
+                return `
+                  <div class="pending-entry">
+                    <span class="pill">Opportunità</span>
+                    <strong>${esc(comp?.company || 'Azienda')}</strong>: ${esc(d.title)} (Prossimo passo: ${esc(d.next || 'Da definire')})
+                    <button type="button" class="text-button" data-edit-deal="${esc(d.id)}">+ Imposta data</button>
+                  </div>
+                `;
+              }).join('')}
+              ${pendingProjects.map(p => {
+                const comp = (state.contacts || []).find(c => c.id === p.contactId);
+                return `
+                  <div class="pending-entry">
+                    <span class="pill">Progetto</span>
+                    <strong>${esc(comp?.company || 'Azienda')}</strong>: ${esc(p.name)}
+                    <button type="button" class="text-button" data-edit-project="${esc(p.id)}">+ Imposta data</button>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          </div>
+        </details>
+      </section>
+    </div>
+  `;
+}
+
+// --- 8 quater. MODALE PREPARA SOLLECITO & FOLLOW-UP ---
+let currentFollowupContext = null;
+
+function openFollowupDraft(activityId = null, companyId = null, campaignSendId = null, campaignId = null) {
+  const dlg = document.querySelector('#followup-draft-dialog');
+  if (!dlg) return;
+
+  let comp = null;
+  let recipientEmail = '';
+  let recipientName = '';
+  let subject = '';
+  let contextText = '';
+
+  if (campaignSendId && campaignId) {
+    const camp = (state.campaigns || []).find(c => c.id === campaignId);
+    const send = (camp?.sends || []).find(s => s.id === campaignSendId);
+    if (send) {
+      recipientEmail = send.recipientEmail || '';
+      recipientName = send.recipientName || '';
+      subject = `Apex Digital — Follow-up presentazione per ${send.companyName}`;
+      contextText = `Come seguito alla nostra precedente email di presentazione per ${send.companyName}, desideravo sapere se ha avuto modo di esaminare la documentazione.`;
+      currentFollowupContext = { type: 'campaign', campaignId, campaignSendId, companyName: send.companyName, recipientEmail };
+    }
+  } else {
+    const act = activityId ? (state.activities || []).find(a => a.id === activityId) : null;
+    const cid = companyId || act?.contactId;
+    comp = cid ? (state.contacts || []).find(c => c.id === cid) : null;
+    const proj = act?.projectId ? (state.projects || []).find(p => p.id === act.projectId) : (state.projects || []).find(p => p.contactId === cid);
+
+    recipientEmail = comp?.email || (comp?.referents && comp.referents[0]?.email) || '';
+    recipientName = comp?.person || (comp?.referents && comp.referents[0]?.name) || 'Gentile Referente';
+    subject = `Apex Digital — Aggiornamento su ${proj?.name || act?.title || comp?.company || 'servizi'}`;
+    contextText = act?.lastOutcome || act?.notes || 'In merito al nostro recente confronto e ai prossimi passi concordati.';
+    currentFollowupContext = { type: 'activity', activityId, companyId: cid, recipientEmail };
+  }
+
+  const defaultBody = `Gentile ${recipientName},\n\nle scrivo da Apex Digital per verificare insieme lo stato di avanzamento.\n\n${contextText}\n\nRimango a sua completa disposizione per qualsiasi chiarimento o per un breve aggiornamento telefonico.\n\nCordiali saluti,\nApex Digital`;
+
+  const fieldsContainer = document.querySelector('#followup-draft-fields');
+  if (fieldsContainer) {
+    fieldsContainer.innerHTML = `
+      <div class="field-grid">
+        <label class="field full">Destinatario verificato *
+          <input type="email" id="followup-recipient" value="${esc(recipientEmail)}" placeholder="email@azienda.it" required>
+        </label>
+        <label class="field full">Oggetto email *
+          <input type="text" id="followup-subject" value="${esc(subject)}" required>
+        </label>
+        <label class="field full">Corpo del sollecito / bozza (modificabile) *
+          <textarea id="followup-body" rows="6" required>${esc(defaultBody)}</textarea>
+        </label>
+        <p class="category-help full">Nota di sicurezza: L'apertura della bozza o del client di posta NON segna l'email come inviata. Potrai revisionare e inviare l'email in piena autonomia.</p>
+      </div>
+    `;
+  }
+
+  dlg.showModal();
+}
+
+// --- 8 quinquies. DETTATURA VOCALE RAPIDA & PARSER CLIENT ---
+function parseVoiceTranscriptClient(transcript) {
+  if (!transcript) return null;
+  const lower = transcript.toLowerCase();
+
+  // 1. Cerca azienda
+  let matchedComp = null;
+  for (const c of (state.contacts || [])) {
+    const parts = (c.company || '').toLowerCase().split(/[\s,\.\-]+/).filter(w => w.length > 2 && !['srl', 'spa', 's.r.l.', 's.p.a.'].includes(w));
+    if (parts.some(p => lower.includes(p))) {
+      matchedComp = c;
+      break;
+    }
+  }
+
+  // 2. Cerca referente
+  let matchedPerson = matchedComp?.person || '';
+  if (matchedComp?.referents) {
+    for (const r of matchedComp.referents) {
+      const first = (r.name || '').toLowerCase().split(' ')[0];
+      if (first && lower.includes(first)) {
+        matchedPerson = r.name;
+        break;
+      }
+    }
+  }
+
+  // 3. Progetto
+  const matchedProject = matchedComp ? (state.projects || []).find(p => p.contactId === matchedComp.id && p.status !== 'Completato') : null;
+
+  // 4. Risoluzione data Europe/Rome
+  let resolvedDue = '';
+  if (typeof resolveItalianRelativeDate === 'function') {
+    resolvedDue = resolveItalianRelativeDate(transcript);
+  } else {
+    // Fallback date resolution
+    const todayStr = typeof today === 'function' ? today() : new Date().toISOString().slice(0, 10);
+    if (lower.includes('oggi')) resolvedDue = todayStr;
+    else if (lower.includes('domani')) resolvedDue = typeof addDays === 'function' ? addDays(todayStr, 1) : '';
+    else if (lower.includes('venerdì') || lower.includes('venerdi')) resolvedDue = getOffsetDate(4);
+    else if (lower.includes('lunedì') || lower.includes('lunedi')) resolvedDue = typeof getNextMondayDate === 'function' ? getNextMondayDate() : '';
+    else if (lower.includes('tra un mese')) resolvedDue = typeof addDays === 'function' ? addDays(todayStr, 30) : '';
+  }
+
+  // 5. Prossimo passo
+  let nextStep = '';
+  if (lower.includes('preventivo') || lower.includes('offerta')) {
+    nextStep = 'Inviare preventivo dettagliato e proposta';
+  } else if (lower.includes('demo') || lower.includes('incontro')) {
+    nextStep = 'Svolgere incontro / demo di approfondimento';
+  } else if (lower.includes('richiamare') || lower.includes('riprova') || lower.includes('risentire')) {
+    nextStep = 'Richiamare referente per aggiornamento';
+  } else {
+    nextStep = 'Follow-up operativo post colloquio';
+  }
+
+  return {
+    comp: matchedComp,
+    person: matchedPerson,
+    project: matchedProject,
+    outcome: transcript,
+    nextStep,
+    resolvedDue
+  };
+}
+
+function openVoiceInputDialog() {
+  const dlg = document.querySelector('#voice-input-dialog');
+  if (!dlg) return;
+
+  const textInput = document.querySelector('#voice-transcript-text');
+  const previewBox = document.querySelector('#voice-live-preview');
+  const previewContent = document.querySelector('#voice-preview-content');
+
+  if (textInput) textInput.value = '';
+  if (previewBox) previewBox.hidden = true;
+
+  dlg.showModal();
+}
+
+// --- 8 sexies. VISTA CAMPAGNE EMAIL ---
+let campaignFilterStatus = 'all';
+
+function campaignsView() {
+  if (typeof ensureCampaignsInState === 'function') ensureCampaignsInState(state);
+  const camp = (state.campaigns || [])[0];
+  if (!camp) return '<div class="panel"><p>Nessuna campagna attiva.</p></div>';
+
+  const sends = camp.sends || [];
+  const replied = sends.filter(s => s.status === 'replied');
+  const called = sends.filter(s => s.status === 'called');
+  const optOut = sends.filter(s => s.status === 'opt_out');
+  const suggestedCalls = typeof getCampaignSuggestedCalls === 'function' ? getCampaignSuggestedCalls(camp, state) : [];
+
+  let visibleSends = sends;
+  if (campaignFilterStatus === 'suggested') {
+    const sugIds = new Set(suggestedCalls.map(s => s.sendId));
+    visibleSends = sends.filter(s => sugIds.has(s.id));
+  } else if (campaignFilterStatus === 'replied') {
+    visibleSends = replied;
+  } else if (campaignFilterStatus === 'called') {
+    visibleSends = called;
+  } else if (campaignFilterStatus === 'opt_out') {
+    visibleSends = optOut;
+  }
+
+  return `
+    <div class="stats">
+      <div class="stat">
+        <span class="stat-label">Email Inviate</span>
+        <strong>${sends.length}</strong>
+        <small>Invii effettivi (bozze escluse)</small>
+      </div>
+      <div class="stat">
+        <span class="stat-label">Risposte Ricevute</span>
+        <strong>${replied.length}</strong>
+        <small>${sends.length > 0 ? Math.round((replied.length / sends.length) * 100) : 0}% tasso di risposta</small>
+      </div>
+      <div class="stat">
+        <span class="stat-label">Chiamate Svolte</span>
+        <strong>${called.length}</strong>
+        <small>Follow-up telefonici completati</small>
+      </div>
+      <div class="stat accent">
+        <span class="stat-label">Chiamate Suggerite</span>
+        <strong>${suggestedCalls.length}</strong>
+        <small>Nessuna risposta dopo ${camp.cadenceDays} ${camp.countBusinessDays !== false ? 'gg lavorativi' : 'gg'}</small>
+      </div>
+    </div>
+
+    <div class="toolbar">
+      <div class="filter-pills-bar" role="group" aria-label="Filtro invii campagna">
+        <button type="button" class="date-chip ${campaignFilterStatus === 'all' ? 'active' : ''}" data-camp-filter="all">Tutti gli invii (${sends.length})</button>
+        <button type="button" class="date-chip ${campaignFilterStatus === 'suggested' ? 'active' : ''}" data-camp-filter="suggested">Chiamata suggerita (${suggestedCalls.length})</button>
+        <button type="button" class="date-chip ${campaignFilterStatus === 'replied' ? 'active' : ''}" data-camp-filter="replied">Hanno risposto (${replied.length})</button>
+        <button type="button" class="date-chip ${campaignFilterStatus === 'called' ? 'active' : ''}" data-camp-filter="called">Chiamata svolta (${called.length})</button>
+        <button type="button" class="date-chip ${campaignFilterStatus === 'opt_out' ? 'active' : ''}" data-camp-filter="opt_out">Opt-out (${optOut.length})</button>
+      </div>
+      <div class="list-controls">
+        <button type="button" class="secondary" id="btn-open-campaign-settings">⚙ Configura intervallo</button>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">
+        <h2>${esc(camp.name)}</h2>
+        <small>📡 Ultimo controllo posta: <strong>${esc(camp.lastEmailCheck || 'Oggi ore 08:30')}</strong></small>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Azienda / Destinatario</th>
+              <th>Data Invio</th>
+              <th>Stato Invio</th>
+              <th>Esito &amp; Note</th>
+              <th>Azioni Rapide</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${visibleSends.map(s => {
+              const isSuggested = suggestedCalls.some(sc => sc.sendId === s.id);
+              return `
+                <tr>
+                  <td>
+                    <strong>${esc(s.companyName)}</strong><br>
+                    <small>👤 ${esc(s.recipientName)} (${esc(s.recipientRole || 'Referente')}) · <a href="mailto:${esc(s.recipientEmail)}">${esc(s.recipientEmail)}</a></small>
+                  </td>
+                  <td data-label="Data Invio">${typeof date === 'function' ? date(s.sentAt) : s.sentAt}</td>
+                  <td data-label="Stato Invio">
+                    ${s.status === 'opt_out'
+                      ? '<span class="pill red">🛑 Opt-out</span>'
+                      : s.status === 'called'
+                        ? '<span class="pill green">✓ Chiamata svolta</span>'
+                        : s.status === 'replied'
+                          ? '<span class="pill blue">✉ Risposta ricevuta</span>'
+                          : isSuggested
+                            ? '<span class="pill red">📞 Chiamata suggerita</span>'
+                            : '<span class="pill">In attesa</span>'}
+                  </td>
+                  <td data-label="Esito & Note">
+                    <small>${esc(s.notes || 'Inviata presentazione standard B2B')}</small>
+                    ${s.agreedDate ? `<br><small class="text-amber">Accordo concordato per il: ${s.agreedDate}</small>` : ''}
+                  </td>
+                  <td class="cell-actions">
+                    <div class="row-actions">
+                      ${s.recipientPhone
+                        ? `<a href="tel:${esc(s.recipientPhone.replace(/[^+\d]/g, ''))}" class="text-button" title="Chiama">📞 Chiama</a>`
+                        : '<span class="text-muted" style="font-size:11px">Numero da verificare</span>'}
+                      <button type="button" class="text-button" data-prepare-campaign-followup="${esc(s.id)}" data-campaign-id="${esc(camp.id)}">✉ Sollecito</button>
+                      <button type="button" class="text-button" data-log-campaign-call="${esc(s.id)}" data-campaign-id="${esc(camp.id)}">⚡ Esito</button>
+                    </div>
+                  </td>
+                </tr>
+              `;
+            }).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  `;
+}
+
 // --- 9. EVENT LISTENERS E HOOKS GLOBALI ---
+if (typeof document !== 'undefined') {
 document.addEventListener('click', e => {
   const b = e.target.closest('button, [data-open-360]');
   if (!b) return;
+
+  // Filtro rapido fase azienda (Lead, Prospect, Cliente)
+  if (b.dataset.companyFilter !== undefined) {
+    filter = b.dataset.companyFilter;
+    if (typeof render === 'function') render();
+    return;
+  }
 
   // Apertura Scheda 360°
   if (b.dataset.open360) {
@@ -977,6 +1667,197 @@ document.addEventListener('click', e => {
     }
     return;
   }
+
+  // Apertura Modale Dettatura Vocale Rapida
+  if (b.id === 'voice-trigger-btn') {
+    openVoiceInputDialog();
+    return;
+  }
+
+  // Apertura Modale Prepara Sollecito
+  if (b.dataset.prepareFollowup) {
+    openFollowupDraft(b.dataset.prepareFollowup, b.dataset.compId);
+    return;
+  }
+
+  // Sollecito da campagna
+  if (b.dataset.prepareCampaignFollowup) {
+    openFollowupDraft(null, null, b.dataset.prepareCampaignFollowup, b.dataset.campaignId);
+    return;
+  }
+
+  // Registra esito chiamata campagna
+  if (b.dataset.logCampaignCall) {
+    const sendId = b.dataset.logCampaignCall;
+    const campId = b.dataset.campaignId;
+    if (typeof recordCampaignCallCompleted === 'function') {
+      recordCampaignCallCompleted(campId, sendId, 'Chiamata di follow-up effettuata dall’utente.');
+      if (typeof toast === 'function') toast('Chiamata registrata come completata.');
+      if (typeof render === 'function') render();
+    }
+    return;
+  }
+
+  // Opt-out campagna
+  if (b.dataset.campaignOptout) {
+    const sendId = b.dataset.campaignOptout;
+    const campId = b.dataset.campaignId;
+    if (typeof recordCampaignOptOut === 'function') {
+      recordCampaignOptOut(campId, sendId, 'Richiesta esplicita di non essere ricontattato.');
+      if (typeof toast === 'function') toast('Opt-out registrato: ricontatti automatici interrotti.');
+      if (typeof render === 'function') render();
+    }
+    return;
+  }
+
+  // Filtri campagna
+  if (b.dataset.campFilter) {
+    campaignFilterStatus = b.dataset.campFilter;
+    if (typeof render === 'function') render();
+    return;
+  }
+
+  // Apertura impostazioni cadenza campagna
+  if (b.id === 'btn-open-campaign-settings') {
+    const dlg = document.querySelector('#campaign-settings-dialog');
+    if (dlg) dlg.showModal();
+    return;
+  }
+
+  // Azioni dentro il modale Prepara Sollecito
+  if (b.id === 'followup-open-mailto') {
+    const to = document.querySelector('#followup-recipient')?.value || '';
+    const su = document.querySelector('#followup-subject')?.value || '';
+    const body = document.querySelector('#followup-body')?.value || '';
+    window.location.href = `mailto:${encodeURIComponent(to)}?subject=${encodeURIComponent(su)}&body=${encodeURIComponent(body)}`;
+    return;
+  }
+
+  if (b.id === 'followup-open-gmail') {
+    const to = document.querySelector('#followup-recipient')?.value || '';
+    const su = document.querySelector('#followup-subject')?.value || '';
+    const body = document.querySelector('#followup-body')?.value || '';
+    window.open(`https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(to)}&su=${encodeURIComponent(su)}&body=${encodeURIComponent(body)}`, '_blank', 'noopener,noreferrer');
+    return;
+  }
+
+  if (b.id === 'followup-mark-sent') {
+    const to = document.querySelector('#followup-recipient')?.value || '';
+    const su = document.querySelector('#followup-subject')?.value || '';
+    const body = document.querySelector('#followup-body')?.value || '';
+
+    if (currentFollowupContext?.type === 'campaign') {
+      const campId = currentFollowupContext.campaignId;
+      const sendId = currentFollowupContext.campaignSendId;
+      if (typeof recordCampaignEmailReply === 'function') {
+        const camp = (state.campaigns || []).find(c => c.id === campId);
+        const send = (camp?.sends || []).find(s => s.id === sendId);
+        if (send) {
+          send.status = 'sent';
+          send.sentAt = today();
+          send.notes = [send.notes, `Inviato sollecito: ${su}`].filter(Boolean).join(' | ');
+          persist(state);
+        }
+      }
+    } else if (currentFollowupContext?.companyId) {
+      const cid = currentFollowupContext.companyId;
+      const nextState = structuredClone(state);
+      const comp = (nextState.contacts || []).find(c => c.id === cid);
+      if (comp) {
+        comp.history = comp.history || [];
+        comp.history.push({
+          date: today(),
+          kind: 'email-sent',
+          text: `Inviato sollecito email a ${to}: ${su}`
+        });
+
+        // Crea follow-up a 4 giorni
+        nextState.activities = nextState.activities || [];
+        nextState.activities.push({
+          id: crypto.randomUUID(),
+          contactId: cid,
+          title: `Verifica riscontro sollecito inviato a ${to}`,
+          type: 'Follow-up',
+          priority: 'Media',
+          status: 'Da fare',
+          dueDate: getOffsetDate(4),
+          reason: `Attesa riscontro sollecito email inviato il ${today()}`,
+          notes: body
+        });
+        persist(nextState);
+      }
+    }
+
+    document.querySelector('#followup-draft-dialog')?.close();
+    if (typeof toast === 'function') toast('Sollecito registrato come inviato (+4gg attesa pianificata).');
+    if (typeof render === 'function') render();
+    return;
+  }
+
+  // Microfono per dettatura vocale
+  if (b.id === 'btn-toggle-mic') {
+    const statusEl = document.querySelector('#voice-mic-status');
+    const textInput = document.querySelector('#voice-transcript-text');
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+    if (!SpeechRecognition) {
+      if (statusEl) statusEl.textContent = 'Dettatura vocale non supportata dal browser corrente. Incolla il testo manualmente.';
+      return;
+    }
+
+    try {
+      const recognition = new SpeechRecognition();
+      recognition.lang = 'it-IT';
+      recognition.interimResults = false;
+      recognition.maxAlternatives = 1;
+
+      if (statusEl) statusEl.textContent = 'Ascolto in corso... Parla pure!';
+      recognition.start();
+
+      recognition.onresult = (evt) => {
+        const transcript = evt.results[0][0].transcript;
+        if (textInput) {
+          textInput.value = transcript;
+          textInput.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+        if (statusEl) statusEl.textContent = 'Trascrizione completata con successo!';
+      };
+
+      recognition.onerror = (err) => {
+        if (statusEl) statusEl.textContent = `Errore microfono: ${err.error}`;
+      };
+    } catch (e) {
+      if (statusEl) statusEl.textContent = `Impossibile avviare il microfono: ${e.message}`;
+    }
+    return;
+  }
+});
+
+// Listener dinamico input per Live Preview del Voice Parser
+document.addEventListener('input', e => {
+  if (e.target.id === 'voice-transcript-text') {
+    const text = e.target.value.trim();
+    const previewBox = document.querySelector('#voice-live-preview');
+    const previewContent = document.querySelector('#voice-preview-content');
+    if (!text) {
+      if (previewBox) previewBox.hidden = true;
+      return;
+    }
+
+    const parsed = parseVoiceTranscriptClient(text);
+    if (previewBox) previewBox.hidden = false;
+    if (previewContent && parsed) {
+      previewContent.innerHTML = `
+        <div class="v-preview-grid">
+          <div><strong>Azienda rilevata:</strong> ${parsed.comp ? `<span class="pill green">🏢 ${esc(parsed.comp.company)}</span>` : '<span class="pill red">Da specificare</span>'}</div>
+          <div><strong>Referente:</strong> ${esc(parsed.person || 'Principale')}</div>
+          <div><strong>Progetto:</strong> ${parsed.project ? `<span class="pill blue">🚀 ${esc(parsed.project.name)}</span>` : '<span class="pill">Generale</span>'}</div>
+          <div><strong>Prossimo passo:</strong> <strong>${esc(parsed.nextStep)}</strong></div>
+          <div><strong>Scadenza calcolata (Europe/Rome):</strong> ${parsed.resolvedDue ? `<span class="pill blue">${parsed.resolvedDue}</span>` : '<span class="pill amber">Da definire (nessuna data inventata)</span>'}</div>
+        </div>
+      `;
+    }
+  }
 });
 
 // Listener per cambio fase dinamico dentro il Deal Stage Modal
@@ -1002,7 +1883,7 @@ document.addEventListener('change', e => {
   }
 });
 
-// Listener submit form interazioni
+// Listener submit form interazioni, vocale e impostazioni campagne
 document.addEventListener('submit', e => {
   if (e.target.id === 'interaction-form') {
     e.preventDefault();
@@ -1014,4 +1895,103 @@ document.addEventListener('submit', e => {
     saveDealStageFromForm(new FormData(e.target));
     return;
   }
+  if (e.target.id === 'voice-input-form') {
+    e.preventDefault();
+    const text = document.querySelector('#voice-transcript-text')?.value?.trim();
+    if (!text) return;
+    const parsed = parseVoiceTranscriptClient(text);
+    if (!parsed || !parsed.comp) {
+      if (typeof toast === 'function') toast('Specifica l’azienda all’interno della nota vocale (es. Parisi o Cattini).');
+      return;
+    }
+
+    const nextState = structuredClone(state);
+    const comp = (nextState.contacts || []).find(c => c.id === parsed.comp.id);
+    if (comp) {
+      comp.history = comp.history || [];
+      comp.history.push({
+        date: today(),
+        kind: 'voice-touchpoint',
+        text: `Colloquio vocale: ${text}`
+      });
+
+      // Aggiorna attività o creane una nuova
+      nextState.activities = nextState.activities || [];
+      nextState.activities.push({
+        id: crypto.randomUUID(),
+        contactId: comp.id,
+        title: parsed.nextStep,
+        type: 'Chiamata',
+        priority: 'Alta',
+        status: 'Da fare',
+        dueDate: parsed.resolvedDue || '',
+        reason: 'Aggiornamento da colloquio vocale',
+        lastOutcome: text,
+        notes: text,
+        source: 'Voice Audio Touchpoint'
+      });
+
+      // Aggiorna deal o project se presente
+      const openDeal = (nextState.deals || []).find(d => d.contactId === comp.id && !['Vinta', 'Persa'].includes(d.salesStage) && !d.archived);
+      if (openDeal) {
+        openDeal.next = parsed.nextStep;
+        openDeal.due = parsed.resolvedDue || '';
+      }
+
+      const openProj = (nextState.projects || []).find(p => p.contactId === comp.id && p.status !== 'Completato');
+      if (openProj) {
+        openProj.lastOutcome = text;
+        openProj.nextStep = parsed.nextStep;
+        openProj.nextDue = parsed.resolvedDue || '';
+      }
+
+      if (persist(nextState)) {
+        document.querySelector('#voice-input-dialog')?.close();
+        if (typeof toast === 'function') toast(`Aggiornamento registrato per ${comp.company}. Prossimo passo: ${parsed.nextStep}.`);
+        if (typeof render === 'function') render();
+      }
+    }
+    return;
+  }
+
+  if (e.target.id === 'campaign-settings-form') {
+    e.preventDefault();
+    const cadence = parseInt(document.querySelector('#campaign-cadence-input')?.value || '4', 10);
+    const dayType = document.querySelector('#campaign-daytype-select')?.value || 'business';
+
+    if (state.campaigns && state.campaigns[0]) {
+      state.campaigns[0].cadenceDays = cadence;
+      state.campaigns[0].countBusinessDays = dayType === 'business';
+      persist(state);
+    }
+    document.querySelector('#campaign-settings-dialog')?.close();
+    if (typeof toast === 'function') toast(`Regole ricontatti aggiornate: ${cadence} giorni ${dayType === 'business' ? 'lavorativi' : 'solari'}.`);
+    if (typeof render === 'function') render();
+    return;
+  }
 });
+} // end typeof document !== 'undefined'
+
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = {
+    getOffsetDate,
+    getNextMondayDate,
+    renderDateShortcuts,
+    calcDealRottingDays,
+    dealRottingBadge,
+    leadTempBadge,
+    makeWhatsAppUrl,
+    openCompany360,
+    renderCompany360View,
+    saveInteractionFromForm,
+    saveDealStageFromForm,
+    renderExecutiveMetrics,
+    ensureDemoProjectData,
+    renderUnifiedActivityRow,
+    renderExecutiveHomeView,
+    openFollowupDraft,
+    openVoiceInputDialog,
+    parseVoiceTranscriptClient,
+    campaignsView
+  };
+}
