@@ -893,40 +893,67 @@ function ensureDemoProjectData(crmState) {
       estimatedHours: 40,
       loggedHours: 6,
       milestones: [
-        { id: 'ms-p1', title: 'Analisi flussi doganali e archiviazione', dueDate: '2026-10-20', done: true, dependsOn: '' },
-        { id: 'ms-p2', title: 'Definizione requisiti e prototipo preventivatore rapido', dueDate: '', done: false, dependsOn: 'ms-p1' },
-        { id: 'ms-p3', title: 'Collaudo operativo e formazione referenti', dueDate: '', done: false, dependsOn: 'ms-p2' }
+        { id: 'ms-p1', title: 'Prima call conoscitiva e analisi flussi doganali', dueDate: '2026-10-20', done: true, dependsOn: '' },
+        { id: 'ms-p2', title: 'Invio proposta economica formale e preventivo', dueDate: '2026-11-06', done: false, dependsOn: 'ms-p1' },
+        { id: 'ms-p3', title: 'Definizione requisiti e prototipo preventivatore rapido', dueDate: '2026-11-20', done: false, dependsOn: 'ms-p2' },
+        { id: 'ms-p4', title: 'Collaudo operativo e formazione referenti', dueDate: '2026-11-30', done: false, dependsOn: 'ms-p3' }
       ],
       clientGoal: 'Automatizzare la ricezione richieste doganali e la preventivazione rapida riducendo i tempi manuali di gestione file e archiviazione.',
       origin: 'Contatto avviato via Gmail a inizio ottobre 2026 a seguito di presentazione delle soluzioni AI e automazione documentale.',
-      currentStatusSummary: 'Call esplorativa concordata per il 20/10/2026. Esito della call da riconciliare con Andrea Zanatta.',
-      lastOutcome: 'Andrea Zanatta ha richiesto una proposta operativa e l’analisi dei flussi interni.',
-      nextStep: 'Verificare l’esito della call del 20 ottobre e concordare il follow-up',
+      currentStatusSummary: 'Prima call conoscitiva svolta con successo con Andrea Zanatta; allineamento positivo sui flussi doganali e richiesta preventivo.',
+      lastOutcome: 'Andrea Zanatta richiede preventivo dettagliato e proposta economica formale entro venerdì.',
+      nextStep: 'Inviare preventivo dettagliato e proposta economica formale',
       nextDue: '',
-      waitingFor: 'In attesa di riscontro da Andrea Zanatta su disponibilità slot per revisione requisiti.',
+      waitingFor: 'In attesa di invio preventivo (entro venerdì 06/11) e successiva approvazione di Andrea Zanatta.',
       driveUrl: 'https://drive.google.com/drive/folders/apex-parisi-automazioni',
       emailThreadUrl: 'https://mail.google.com/mail/u/0/#all/1a101fb411e24e3e',
       calendarUrl: '',
       notes: 'Richiesta integrazione con sistemi documentali doganali.'
     });
 
-    if (!crmState.activities.some(a => a.contactId === parisi.id && a.status !== 'Completata')) {
+    // Registra la prima call conoscitiva come Completata
+    if (!crmState.activities.some(a => a.contactId === parisi.id && a.title.toLowerCase().includes('conoscitiva'))) {
       crmState.activities.push({
-        id: 'act-parisi-followup-call',
+        id: 'act-parisi-call-completed',
         contactId: parisi.id,
+        companyId: parisi.id,
         dealId: (crmState.deals || []).find(d => d.contactId === parisi.id)?.id || '',
-        title: 'Verificare l’esito della call del 20 ottobre e concordare il follow-up',
-        type: 'Chiamata',
-        priority: 'Alta',
-        status: 'Da fare',
-        dueDate: '',
-        reason: 'Call del 20/10/2026 da verificare con Andrea Zanatta',
-        lastOutcome: 'Andrea Zanatta ha confermato ricezione invito Teams per il 20/10 ore 17:00',
+        title: 'Prima call conoscitiva',
+        type: 'Incontro / Demo',
+        priority: 'Media',
+        status: 'Completata',
+        dueDate: '2026-10-20',
+        completedAt: '2026-10-20',
+        reason: 'Call conoscitiva concordata via Teams',
+        lastOutcome: 'Call svolta con successo con Andrea Zanatta: allineamento positivo sui flussi doganali e interesse a preventivatore rapido',
+        outcome: 'Call svolta con successo con Andrea Zanatta: allineamento positivo sui flussi doganali e interesse a preventivatore rapido',
         referentId: parisi.referents?.[0]?.id || '',
         referentName: parisi.person || 'Andrea Zanatta',
-        notes: 'Verificare se la call esplorativa si è svolta e se procedere con la proposta formale.',
-        source: 'Notion e Gmail',
-        createdAt: '2026-10-27'
+        notes: 'Incontro conoscitivo svolto il 20/10/2026 ore 17:00 via Teams. Andrea Zanatta ha confermato interesse ad approfondire la soluzione.',
+        source: 'Teams / Gmail',
+        createdAt: '2026-10-15'
+      });
+    }
+
+    // Attività operativa aperta "Da fare": Inviare preventivo entro venerdì
+    if (!crmState.activities.some(a => a.contactId === parisi.id && ['Da fare', 'In corso'].includes(a.status))) {
+      crmState.activities.push({
+        id: 'act-parisi-quote-due',
+        contactId: parisi.id,
+        companyId: parisi.id,
+        dealId: (crmState.deals || []).find(d => d.contactId === parisi.id)?.id || '',
+        title: 'Inviare preventivo dettagliato e proposta economica formale',
+        type: 'Analisi / Offerta',
+        priority: 'Alta',
+        status: 'Da fare',
+        dueDate: '2026-11-06',
+        reason: 'Richiesta esplicita di Andrea Zanatta',
+        lastOutcome: 'Andrea Zanatta attende preventivo entro venerdì',
+        referentId: parisi.referents?.[0]?.id || '',
+        referentName: parisi.person || 'Andrea Zanatta',
+        notes: 'Preparare proposta commerciale per automazione ricezione richieste doganali e preventivatore rapido.',
+        source: 'Colloquio vocale',
+        createdAt: '2026-11-02'
       });
     }
   }
