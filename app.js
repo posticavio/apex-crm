@@ -149,12 +149,64 @@ const contact=id=>state.contacts.find(c=>c.id===id);
 const openDeals=()=>state.deals.filter(d=>!['Vinta','Persa'].includes(getSalesStage(d))&&!isArchived(d));
 const matches=(...parts)=>parts.join(' ').toLocaleLowerCase('it').includes(search.toLocaleLowerCase('it'));
 function empty(title,desc,action='',type='deal'){return `<div class="empty"><div class="empty-symbol">↗</div><h3>${title}</h3><p>${desc}</p>${action?`<button class="primary" data-new="${type}">${action}</button>`:''}</div>`;}
-function setView(v){view=v;search='';filter='';categoryFilter='';render();}
+const VIEW_ALIASES = {
+ progetti: 'projects',
+ attivita: 'activities',
+ preventivi: 'quotes',
+ campagne: 'campaigns',
+ opportunita: 'trattative',
+ pipeline: 'trattative',
+ aziende: 'contatti',
+ home: 'oggi',
+ finanze: 'analytics',
+ finance: 'analytics',
+ playbook: 'activities',
+ playbooks: 'activities'
+};
+function normalizeView(v) {
+ const norm = String(v || '').toLowerCase().trim();
+ return VIEW_ALIASES[norm] || norm || 'oggi';
+}
+function setView(v){
+ view = normalizeView(v);
+ search='';
+ filter='';
+ categoryFilter='';
+ if (typeof window !== 'undefined' && window.location && window.location.hash !== '#' + view) {
+  try { history.replaceState(null, '', '#' + view); } catch(_) {}
+ }
+ render();
+}
 function render(){
- document.querySelectorAll('[data-view]').forEach(b=>b.classList.toggle('active',b.dataset.view===view));
- const meta={projects:['Progetti','Progetti & Consegne','Milestone, dipendenze, tempi e marginalità delle commesse clienti.'],analytics:['Forecast & KPI','Obiettivi, Budget & Forecast','Fatturati storici, previsioni ponderate e pianificazione economica.'],activities:['Attività','Attività operative','Azioni, playbook e follow-up per Lead, Prospect e Clienti.'],quotes:['Preventivi','Preventivi','Proposte commerciali e versioni.'],categories:['Categorie','Categorie azienda','Regole automatiche e classificazione manuale.'],oggi:['Home','Operatività & Prossimi Passi','Attività urgenti, progetti in corso e ricontatti commerciali di Apex Digital.'],campaigns:['Campagne','Campagne Email & Ricontatti','Invii effettivi, monitoraggio risposte e chiamate suggerite.'],contatti:['Aziende','Anagrafica Aziendale Unificata','Aziende e referenti con Scheda Cockpit 360°.'],trattative:['Opportunità','Opportunità','Stati delle trattative · Nuovo contatto, Trattativa, Offerta, Vinta e Persa.'],lead:['Lead','Lead','Contatti da qualificare e prime relazioni commerciali.'],prospect:['Prospect','Prospect','Aziende con opportunità commerciali concrete.'],clienti:['Clienti','Clienti','Servizi acquisiti e canoni mensili.']}[view];
- $('#crumb').textContent=meta[0];$('#page-title').textContent=meta[1];$('#subtitle').textContent=meta[2];$('#date-label').textContent=new Intl.DateTimeFormat('it-IT',{weekday:'long',day:'numeric',month:'long',timeZone:'Europe/Rome'}).format(new Date());$('#new').textContent=view==='campaigns'?'⚙ Configura Ricontatti':view==='projects'?'+ Nuovo progetto':view==='analytics'?'⚙ Configura Obiettivi':view==='activities'||view==='oggi'?'+ Nuova attività':view==='quotes'?'+ Nuovo preventivo':view==='categories'?'+ Nuova categoria':['contatti','lead','prospect'].includes(view)?'+ Nuovo contatto':'+ Nuova trattativa';
- $('#content').innerHTML=(loadError?'<p class="notice">Impossibile leggere i dati salvati. Sono stati conservati senza sovrascriverli. Importa un backup valido per ripartire.</p>':'')+(view==='projects'&&typeof projectsView==='function'?projectsView():view==='analytics'&&typeof analyticsView==='function'?analyticsView():view==='activities'&&typeof activitiesView==='function'?activitiesView():view==='quotes'?quotesView():view==='categories'?categoriesView():view==='campaigns'&&typeof campaignsView==='function'?campaignsView():view==='oggi'?(typeof renderExecutiveHomeView==='function'?renderExecutiveHomeView():dashboard()):view==='trattative'?pipeline():contactsView(view==='clienti'));
+ view = normalizeView(view);
+ document.querySelectorAll('[data-view]').forEach(b=>b.classList.toggle('active',normalizeView(b.dataset.view)===view));
+ const metaMap={
+  projects:['Progetti','Progetti & Consegne','Milestone, dipendenze, tempi e marginalità delle commesse clienti.'],
+  analytics:['Forecast & KPI','Obiettivi, Budget & Forecast','Fatturati storici, previsioni ponderate e pianificazione economica.'],
+  activities:['Attività','Attività operative','Azioni, playbook e follow-up per Lead, Prospect e Clienti.'],
+  quotes:['Preventivi','Preventivi','Proposte commerciali e versioni.'],
+  categories:['Categorie','Categorie azienda','Regole automatiche e classificazione manuale.'],
+  oggi:['Home','Operatività & Prossimi Passi','Attività urgenti, progetti in corso e ricontatti commerciali di Apex Digital.'],
+  campaigns:['Campagne','Campagne Email & Ricontatti','Invii effettivi, monitoraggio risposte e chiamate suggerite.'],
+  contatti:['Aziende','Anagrafica Aziendale Unificata','Aziende e referenti con Scheda Cockpit 360°.'],
+  trattative:['Opportunità','Opportunità','Stati delle trattative · Nuovo contatto, Trattativa, Offerta, Vinta e Persa.'],
+  lead:['Lead','Lead','Contatti da qualificare e prime relazioni commerciali.'],
+  prospect:['Prospect','Prospect','Aziende con opportunità commerciali concrete.'],
+  clienti:['Clienti','Clienti','Servizi acquisiti e canoni mensili.']
+ };
+ const meta = metaMap[view] || ['Apex CRM', 'Apex Digital CRM', 'Gestione vendite, progetti e relazioni.'];
+ const crumbEl = $('#crumb'); if (crumbEl) crumbEl.textContent = meta[0];
+ const pageTitleEl = $('#page-title'); if (pageTitleEl) pageTitleEl.textContent = meta[1];
+ const subtitleEl = $('#subtitle'); if (subtitleEl) subtitleEl.textContent = meta[2];
+ const dateLabelEl = $('#date-label'); if (dateLabelEl) dateLabelEl.textContent = new Intl.DateTimeFormat('it-IT',{weekday:'long',day:'numeric',month:'long',timeZone:'Europe/Rome'}).format(new Date());
+ const newBtn = $('#new');
+ if (newBtn) {
+  newBtn.textContent = view==='campaigns'?'⚙ Configura Ricontatti':view==='projects'?'+ Nuovo progetto':view==='analytics'?'⚙ Configura Obiettivi':view==='activities'||view==='oggi'?'+ Nuova attività':view==='quotes'?'+ Nuovo preventivo':view==='categories'?'+ Nuova categoria':['contatti','lead','prospect'].includes(view)?'+ Nuovo contatto':'+ Nuova trattativa';
+ }
+ const contentEl = $('#content');
+ if (contentEl) {
+  contentEl.innerHTML = (loadError?'<p class="notice">Impossibile leggere i dati salvati. Sono stati conservati senza sovrascriverli. Importa un backup valido per ripartire.</p>':'')+(view==='projects'&&typeof projectsView==='function'?projectsView():view==='analytics'&&typeof analyticsView==='function'?analyticsView():view==='activities'&&typeof activitiesView==='function'?activitiesView():view==='quotes'?quotesView():view==='categories'?categoriesView():view==='campaigns'&&typeof campaignsView==='function'?campaignsView():view==='oggi'?(typeof renderExecutiveHomeView==='function'?renderExecutiveHomeView():dashboard()):view==='trattative'?pipeline():contactsView(view==='clienti'));
+ }
  if(typeof syncMobileShell==='function')syncMobileShell();
  if(typeof applyUiSettings==='function')applyUiSettings();
 }

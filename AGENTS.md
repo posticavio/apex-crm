@@ -62,6 +62,38 @@ node crm-rapid-check.cjs
 ---
 
 ## Registro di Passaggio tra Agenti (Handoff Log)
+### Sessione 2026-11-04 (Apex CRM 100% Funzionale: Risoluzione Crash Navigazione Viste, Normalizzazione Alias Rotte, Polimorfismo Touchpoint Form e Anteprima Preventivo Print) — Agente: Google Antigravity
+- **Ultimo commit precedente rilevato**: `be57f85` (`[Antigravity] feat(desktop): modernize desktop layout with Attio & Linear bento workstation, consolidated filters, and seamless page headers`) su `main`.
+- **Diagnosi del Problema segnalato dall'utente ("lapp non e funzionale al 100 % fai di tutto per renderlo /goal")**:
+  - In `app.js`, la navigazione diretta a hash/rotte in lingua italiana (`#progetti`, `#attivita`, `#preventivi`, `#campagne`, `#opportunita`) o a viste secondarie (`#finanze`, `#playbook`) faceva fallire `meta[view]`, causando un crash immediato `TypeError: Cannot read properties of undefined (reading '0')` che bloccava il render della pagina.
+  - In `quotes.js`, la funzione `quotePrintHtml(q, index)` accettava unicamente un indice numerico intero, fallendo con `TypeError: Cannot read properties of undefined (reading 'lines')` se invocata passando direttamente l'oggetto versione del preventivo.
+  - In `crm-pro.js`, `saveInteractionFromForm` assumeva tassativamente un'istanza `FormData`, generando `TypeError: formData.get is not a function` se invocata con un elemento `HTMLFormElement` standard o un plain object di input.
+- **Attività completate**:
+  - **Normalizzazione Unificata delle Rotte & Resilienza Render (`app.js`)**:
+    - Implementati `VIEW_ALIASES` e `normalizeView(v)` che mappano in modo trasparente sia i termini italiani che inglesi (`progetti` -> `projects`, `attivita` -> `activities`, `preventivi` -> `quotes`, `campagne` -> `campaigns`, `opportunita` / `pipeline` -> `trattative`, `aziende` -> `contatti`, `home` -> `oggi`, `finanze` / `finance` -> `analytics`, `playbook` -> `activities`).
+    - Aggiunto fallback difensivo in `render()` (`metaMap[view] || ['Apex CRM', ...]`) con null-check su tutti i target DOM (`crumbEl`, `pageTitleEl`, `subtitleEl`, `dateLabelEl`, `newBtn`, `contentEl`).
+  - **Polimorfismo & Robustezza Stampa Preventivi (`quotes.js`)**:
+    - Aggiornata `quotePrintHtml(q, index)` per accettare sia un indice numerico intero che un oggetto versione preventivo, risolvendo automaticamente l'indice di versione e prevenendo qualsiasi crash su `lines`.
+  - **Polimorfismo Logger Interazioni (`crm-pro.js`)**:
+    - Aggiornata `saveInteractionFromForm(formData)` con getter polimorfico che supporta nativamente `FormData`, `HTMLFormElement` (tramite `new FormData(form)`) e plain objects per massima flessibilità di integrazione.
+  - **Audit Headless Browser E2E Completo via Chrome CDP**:
+    - Verificata la corretta idratazione, navigazione su tutte le 12 viste, apertura di 8 finestre modali/drawer, completamento rapido attività, toggle milestone progetti, generazione HTML anteprima preventivi e registrazione touchpoint interattivi con **0 errori di console e 0 eccezioni non gestite**.
+- **File modificati**:
+  - `app.js`
+  - `crm-pro.js`
+  - `quotes.js`
+  - `AGENTS.md`
+- **Test eseguiti**:
+  - 10 verifiche sintattiche (`node --check`) superate con 0 errori.
+  - 13 banchi di prova funzionali completati con esito `PASS` al 100%:
+    - `crm-check.cjs`, `import-check.cjs`, `relationship-check.cjs`, `sales-check.cjs`, `resource-check.cjs`, `unscheduled-check.cjs`, `quotes-check.cjs`, `activities-check.cjs`, `enterprise-check.cjs`, `cloud-sync-check.cjs`, `mcp-server-check.cjs`, `crm-pro-check.cjs`, `crm-rapid-check.cjs`.
+  - E2E headless Chrome browser audit via CDP completato con successo (100% PASS, 0 console errors/warnings, 0 unhandled exceptions).
+- **Problemi aperti**:
+  - Nessuno.
+- **Attività successive consigliate**:
+  - Esecuzione di `git commit` e `git push` su GitHub.
+  - Deploy su Vercel (`pubblica-vercel.cmd`).
+
 ### Sessione 2026-11-04 (Restyling Desktop di Precisione Benchmark Linear & Attio: Bento Workstation 2 Colonne, Header Seamless a Filo, Filtri Consolidati a 2 Livelli, Monogrammi Aziendali e Azioni Rapide a 1 Clic) — Agente: Google Antigravity
 - **Ultimo commit precedente rilevato**: `2a65b4c` (`[Antigravity] fix(activities): sanitize and strip __crm_meta html comment tags from reason, notes and outcomes`) su `main`.
 - **Diagnosi del Problema segnalato dall'utente ("in desktop il layout non e uttimizzato sembra tutto buttato li. prendi come spunto i migliori crm e vedi come sono disposte le funzioni, forme e colori e applica. Sii piu pignolo preciso /goal")**:

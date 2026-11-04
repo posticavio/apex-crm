@@ -565,14 +565,20 @@ function openInteractionLogger(companyId = null, defaults = {}, actId = null) {
 }
 
 function saveInteractionFromForm(formData) {
-  const companyId = formData.get('companyId');
-  const personId = formData.get('personId') || '';
-  const channel = formData.get('channel') || 'Nota';
-  const dateStr = formData.get('interactionDate') || today();
-  const notes = String(formData.get('interactionNotes') || '').trim();
-  const autoFollowUp = formData.get('autoFollowUp') === 'on';
-  const nextAction = String(formData.get('nextAction') || '').trim();
-  const nextDate = formData.get('nextDate') || '';
+  const get = (k) => {
+    if (typeof FormData !== 'undefined' && formData instanceof FormData) return formData.get(k);
+    if (typeof HTMLFormElement !== 'undefined' && formData instanceof HTMLFormElement) return new FormData(formData).get(k);
+    if (formData && typeof formData.get === 'function') return formData.get(k);
+    return formData ? formData[k] : null;
+  };
+  const companyId = get('companyId');
+  const personId = get('personId') || '';
+  const channel = get('channel') || 'Nota';
+  const dateStr = get('interactionDate') || today();
+  const notes = String(get('interactionNotes') || get('summary') || '').trim();
+  const autoFollowUp = get('autoFollowUp') === 'on' || get('scheduleFollowup') === 'yes';
+  const nextAction = String(get('nextAction') || get('followupTitle') || '').trim();
+  const nextDate = get('nextDate') || get('followupDue') || '';
 
   if (!companyId || !notes) {
     if (typeof toast === 'function') toast('Compila i campi obbligatori dell’interazione.');
@@ -597,7 +603,7 @@ function saveInteractionFromForm(formData) {
   });
 
   // Se l'interazione è stata avviata da una specifica attività, contrassegnala completata con l'esito
-  const activityId = formData.get('activityId');
+  const activityId = get('activityId');
   if (activityId) {
     const act = (nextState.activities || []).find(a => a.id === activityId);
     if (act) {
