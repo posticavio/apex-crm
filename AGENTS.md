@@ -62,6 +62,52 @@ node crm-rapid-check.cjs
 ---
 
 ## Registro di Passaggio tra Agenti (Handoff Log)
+### Sessione 2026-11-04 (Restyling Desktop di Precisione Benchmark Linear & Attio: Bento Workstation 2 Colonne, Header Seamless a Filo, Filtri Consolidati a 2 Livelli, Monogrammi Aziendali e Azioni Rapide a 1 Clic) — Agente: Google Antigravity
+- **Ultimo commit precedente rilevato**: `2a65b4c` (`[Antigravity] fix(activities): sanitize and strip __crm_meta html comment tags from reason, notes and outcomes`) su `main`.
+- **Diagnosi del Problema segnalato dall'utente ("in desktop il layout non e uttimizzato sembra tutto buttato li. prendi come spunto i migliori crm e vedi come sono disposte le funzioni, forme e colori e applica. Sii piu pignolo preciso /goal")**:
+  - L'header di pagina `.page-heading` era un massiccio box bianco rettangolare disconnesso con bordo e ombra pesanti, che sprecava oltre 130px verticali e mostrava un pulsante contestualmente incongruo (`+ Nuova trattativa` anche nella Home operativa).
+  - La Home esecutiva desktop era una sequenza verticale infinita di sezioni a larghezza intera (1400px+) con ampie aree vuote e scrolling eccessivo.
+  - Nella vista Attività i controlli e i filtri erano impilati verticalmente su 4 barre separate prima di mostrare le schede.
+  - Le tabelle (Aziende, Campagne) mancavano di ancore visive per i brand, avevano pulsanti testuali grezzi e layout poco denso.
+  - La notifica toast rimaneva permanente a schermo coprendo i comandi dell'interfaccia.
+- **Attività completate**:
+  - **Architettura Desktop Bento Workstation a 2 Colonne (`crm-pro.js`, `layout.css`)**:
+    - Suddivisa la Home esecutiva su monitor widescreen (`.exec-desktop-bento`):
+      - **Colonna Principale di Lavoro (62%)**: flusso operativo `⚡ Attività da Fare e In Corso` con pill segmentate interattive a 1 clic (`Tutte`, `🚨 Scadute`, `📅 Oggi`, `📞 Chiamate`, `✉️ Follow-up`), badge monogramma aziendale, quote esiti pulite e pulsante diretto `✓ Completa`.
+      - **Colonna Radar & Cockpit di Destra (38%)**: widget affiancati per commesse attive (`Martino Parisi S.r.l.`), ricontatti suggeriti da campagne email con dialer telefonico/bozza follow-up a 1 clic, e viste rapide ad accordo compatto.
+  - **Header Seamless a Filo e Azione Primaria Dinamica (`layout.css`, `app.js`)**:
+    - Trasformato `.page-heading` in una testata integrata e priva di bordi pesanti con hairline sottile (`border-bottom: 1px solid var(--border)`).
+    - Su `oggi`, il pulsante primario `#new` genera contestualmente `+ Nuova attività` aprendo la creazione task.
+  - **Consolidamento Filtri a 2 Livelli in Attività (`activities.js`, `layout.css`)**:
+    - Fusa la barra fasi (`Lead`, `Prospect`, `Clienti`) con i filtri di stato (`Tutte`, `Da fare`, `In corso`, `Completate`) su un'unica barra orizzontale a pillole segmentate (Livello 1).
+    - Barra operativa compatta (Livello 2) con ricerca, tipologia, priorità, ordinamento e switch vista griglia/lista.
+  - **Monogrammi Aziendali & Tabelle ad Alta Densità (`app.js`, `campaigns.js`, `layout.css`)**:
+    - Inserito monogramma circolare bicolore a 2 lettere (`company-monogram-chip`) per ogni azienda in liste, tabelle e schede attività.
+    - Sostituiti i link testuali nelle campagne con pulsanti operativi ergonomici (`uac-op-btn`).
+  - **Auto-Dismiss Toast e Inizializzazione Dati Progetto (`app.js`, `projects.js`)**:
+    - Toast con dissolvenza fluida automatica a 3200ms (`opacity` transition).
+    - Inizializzazione sicura e non invasiva di `ensureDemoProjectData` al montaggio delle viste progetti ed esecutiva, preservando la purezza di `migrate()` per i test storici.
+- **File modificati**:
+  - `app.js`
+  - `crm-pro.js`
+  - `activities.js`
+  - `projects.js`
+  - `campaigns.js`
+  - `layout.css`
+  - `crm-mcp-server.js`
+  - `quotes.js`
+  - `supabase-sync.js`
+  - `AGENTS.md`
+- **Test eseguiti**:
+  - 10 verifiche sintattiche (`node --check`) superate con 0 errori.
+  - 13 banchi di prova funzionali completati con esito `PASS` al 100%:
+    - `crm-check.cjs`, `import-check.cjs`, `relationship-check.cjs`, `sales-check.cjs`, `resource-check.cjs`, `unscheduled-check.cjs`, `quotes-check.cjs`, `activities-check.cjs`, `enterprise-check.cjs`, `cloud-sync-check.cjs`, `mcp-server-check.cjs`, `crm-pro-check.cjs`, `crm-rapid-check.cjs`.
+- **Problemi aperti**:
+  - Nessuno.
+- **Attività successive consigliate**:
+  - Esecuzione di `git push` su GitHub.
+  - Deploy su Vercel (`pubblica-vercel.cmd`).
+
 ### Sessione 2026-11-02 (Sanitizzazione Motivo e Note Attività: Bonifica Commenti HTML `__crm_meta` in UI e Sincronizzazione Supabase) — Agente: Google Antigravity
 - **Ultimo commit precedente rilevato**: `94e7156` (`[Antigravity] fix(parisi): mark first discovery call as completed with positive outcome and align project cockpit`) su `main`.
 - **Diagnosi del Problema segnalato dall'utente ("su attivita martino parisi viene fuor 🎯 Motivo: <!--__crm_meta:{...}-->")**:

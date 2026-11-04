@@ -278,6 +278,7 @@ function visibleProjects(){
 }
 
 function projectsView(){
+ if(typeof ensureDemoProjectData==='function')ensureDemoProjectData(state);
  const all=state.projects||[],rows=visibleProjects();
  const active=all.filter(p=>['Pianificato','In corso','In revisione'].includes(p.status));
  const totalBudget=all.reduce((n,p)=>n+p.budgetCents,0);

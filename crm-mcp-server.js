@@ -573,8 +573,9 @@ async function executeTool(name, args) {
       const openPipelineValue = openDeals.reduce((sum, d) => sum + (Number(d.setup) || 0), 0);
       const acquiredMrr = wonDeals.reduce((sum, d) => sum + (Number(d.monthly) || 0), 0);
 
-      const overdueActivities = activities.filter(a => a.status !== 'completata' && a.dueDate && a.dueDate < todayStr);
-      const todayActivities = activities.filter(a => a.status !== 'completata' && a.dueDate === todayStr);
+      const isActCompleted = a => ['completata'].includes((a.status || '').toLowerCase());
+      const overdueActivities = activities.filter(a => !isActCompleted(a) && a.dueDate && a.dueDate < todayStr);
+      const todayActivities = activities.filter(a => !isActCompleted(a) && a.dueDate === todayStr);
 
       const clientsCount = companies.filter(c => c.stage === 'Cliente').length;
       const prospectsCount = companies.filter(c => c.stage === 'Prospect').length;
@@ -593,7 +594,7 @@ async function executeTool(name, args) {
           attivitaScadute: overdueActivities.length,
           attivitaOggi: todayActivities.length,
           preventiviTotali: quotes.length,
-          progettiAttivi: projects.filter(p => p.status === 'in_corso').length
+          progettiAttivi: projects.filter(p => ['in corso', 'pianificato', 'in revisione'].includes((p.status || '').toLowerCase())).length
         },
         cloudDatabase: 'Supabase Cloud (https://jjkqiatabmxcwvzswygh.supabase.co)'
       };
@@ -880,14 +881,15 @@ async function executeTool(name, args) {
       if (args.type && args.type !== 'all') {
         activities = activities.filter(a => a.type === args.type);
       }
+      const isActCompleted = a => ['completata'].includes((a.status || '').toLowerCase());
       if (args.filter === 'due' || args.filter === 'overdue') {
-        activities = activities.filter(a => a.status !== 'completata' && a.dueDate && a.dueDate < todayStr);
+        activities = activities.filter(a => !isActCompleted(a) && a.dueDate && a.dueDate < todayStr);
       } else if (args.filter === 'today') {
-        activities = activities.filter(a => a.status !== 'completata' && a.dueDate === todayStr);
+        activities = activities.filter(a => !isActCompleted(a) && a.dueDate === todayStr);
       } else if (args.filter === 'upcoming') {
-        activities = activities.filter(a => a.status !== 'completata' && a.dueDate && a.dueDate > todayStr);
+        activities = activities.filter(a => !isActCompleted(a) && a.dueDate && a.dueDate > todayStr);
       } else if (args.filter === 'completed') {
-        activities = activities.filter(a => a.status === 'completata');
+        activities = activities.filter(a => isActCompleted(a));
       }
 
       return {
@@ -953,7 +955,7 @@ async function executeTool(name, args) {
       const act = (state.activities || []).find(a => a.id === args.activity_id);
       if (!act) throw new Error(`Attività "${args.activity_id}" non trovata.`);
 
-      act.status = 'completata';
+      act.status = 'Completata';
       act.outcome = args.outcome;
       act.completedDate = todayStr;
 
@@ -1136,7 +1138,7 @@ async function executeTool(name, args) {
       }
 
       // 3. Ambiguity Check for Projects
-      const companyProjects = (state.projects || []).filter(p => p.contactId === matchedComp.id && p.status !== 'completato');
+      const companyProjects = (state.projects || []).filter(p => p.contactId === matchedComp.id && (p.status || '').toLowerCase() !== 'completato');
       if (companyProjects.length > 1 && !args.project_id) {
         const matchesInTranscript = companyProjects.filter(p => lower.includes(p.name.toLowerCase()));
         if (matchesInTranscript.length !== 1) {
@@ -1193,7 +1195,7 @@ async function executeTool(name, args) {
         openDeal.history.push({ date: todayStr, text: `Aggiornamento vocale: ${transcript} · Prossimo passo: ${nextActionTitle} (${resolvedDue || 'Da definire'})` });
       }
 
-      const openProject = (state.projects || []).find(p => p.contactId === matchedComp.id && p.status !== 'completato');
+      const openProject = (state.projects || []).find(p => p.contactId === matchedComp.id && (p.status || '').toLowerCase() !== 'completato');
       if (openProject) {
         openProject.lastOutcome = transcript;
         openProject.nextStep = nextActionTitle;
@@ -1268,7 +1270,7 @@ async function executeTool(name, args) {
 
       const waitingItems = [];
       for (const p of (state.projects || [])) {
-        if (p.waitingFor && p.status !== 'completato') {
+        if (p.waitingFor && (p.status || '').toLowerCase() !== 'completato') {
           const comp = (state.contacts || []).find(c => c.id === p.contactId);
           waitingItems.push({ company: comp?.company || 'N/D', project: p.name, waitingFor: p.waitingFor });
         }
@@ -1282,7 +1284,7 @@ async function executeTool(name, args) {
         }
       }
       for (const p of (state.projects || [])) {
-        if (p.status !== 'completato' && (!p.nextDue || !p.nextStep)) {
+        if ((p.status || '').toLowerCase() !== 'completato' && (!p.nextDue || !p.nextStep)) {
           const comp = (state.contacts || []).find(c => c.id === p.contactId);
           pendingNextSteps.push({ type: 'project', id: p.id, company: comp?.company || 'N/D', title: p.name, next: p.nextStep || 'Mancante' });
         }
@@ -1424,7 +1426,7 @@ async function executeTool(name, args) {
         }
       }
       for (const p of (state.projects || [])) {
-        if (p.status !== 'completato' && (!p.nextDue || !p.nextStep)) {
+        if ((p.status || '').toLowerCase() !== 'completato' && (!p.nextDue || !p.nextStep)) {
           const comp = (state.contacts || []).find(c => c.id === p.contactId);
           pending.push({
             tipo: 'progetto',

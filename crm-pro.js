@@ -482,7 +482,7 @@ function render360InfoTab(c) {
 }
 
 // --- 6. LOGGER RAPIDO INTERAZIONI & TOUCHPOINT ---
-function openInteractionLogger(companyId = null, defaults = {}) {
+function openInteractionLogger(companyId = null, defaults = {}, actId = null) {
   const dlg = document.querySelector('#interaction-dialog');
   if (!dlg) return;
 
@@ -495,6 +495,7 @@ function openInteractionLogger(companyId = null, defaults = {}) {
   const fieldsBox = document.querySelector('#interaction-fields');
   if (fieldsBox) {
     fieldsBox.innerHTML = `
+      <input type="hidden" name="activityId" value="${esc(actId || defaults?.actId || '')}">
       <div class="field-grid">
         <label class="field">Azienda *
           <select name="companyId" id="inter-company-select" required>
@@ -595,6 +596,17 @@ function saveInteractionFromForm(formData) {
     text: `${channel}${personName ? ' con ' + personName : ''}: ${notes}`
   });
 
+  // Se l'interazione è stata avviata da una specifica attività, contrassegnala completata con l'esito
+  const activityId = formData.get('activityId');
+  if (activityId) {
+    const act = (nextState.activities || []).find(a => a.id === activityId);
+    if (act) {
+      act.status = 'Completata';
+      act.outcome = notes;
+      act.completedAt = dateStr;
+    }
+  }
+
   // Se è stato richiesto il follow-up automatico, crea una nuova attività operativa in activities
   if (autoFollowUp && nextAction && nextDate) {
     nextState.activities = nextState.activities || [];
@@ -606,7 +618,7 @@ function saveInteractionFromForm(formData) {
       personId: personId,
       personName: personName,
       title: nextAction,
-      type: channel === 'Telefonata' ? 'Chiamata' : channel === 'Email' ? 'Email' : channel === 'Incontro' ? 'Riunione' : 'Task',
+      type: channel === 'Telefonata' ? 'Chiamata' : channel === 'Email' ? 'Email' : channel === 'Incontro' ? 'Incontro / Demo' : 'Follow-up',
       priority: 'Media',
       status: 'Da fare',
       dueDate: nextDate,
@@ -1076,13 +1088,15 @@ function renderUnifiedActivityRow(act) {
         : `<span class="pill">${typeof date === 'function' ? date(act.dueDate) : act.dueDate}</span>`;
 
   const priorityClass = act.priority === 'Alta' ? 'red' : act.priority === 'Media' ? 'amber' : '';
+  const companyInitials = (comp?.company || 'AZ').slice(0, 2).toUpperCase();
 
   return `
-    <article class="unified-activity-card ${isOverdue ? 'act-overdue' : ''}" data-act-id="${esc(act.id)}">
+    <article class="unified-activity-card ${isOverdue ? 'act-overdue' : isToday ? 'act-today' : ''}" data-act-id="${esc(act.id)}">
       <div class="uac-header">
         <div class="uac-company-proj">
+          <span class="company-monogram-chip">${companyInitials}</span>
           <button type="button" class="text-button uac-comp-btn" data-open-360="${esc(comp?.id || '')}">
-            🏢 <strong>${esc(comp?.company || 'Azienda')}</strong>
+            <strong>${esc(comp?.company || 'Azienda')}</strong>
           </button>
           ${proj ? `<span class="uac-proj-tag">· 🚀 ${esc(proj.name)}</span>` : deal ? `<span class="uac-deal-tag">· ▥ ${esc(deal.title)}</span>` : ''}
           ${refName ? `<span class="uac-person-tag">👤 ${esc(refName)}</span>` : ''}
@@ -1095,7 +1109,7 @@ function renderUnifiedActivityRow(act) {
       </div>
 
       <div class="uac-body">
-        <h3 class="uac-action-title">${esc(act.title)}</h3>
+        <h3 class="uac-action-title" data-edit-task="${esc(act.id)}" style="cursor:pointer;" title="Clicca per aprire e modificare attività">${esc(act.title)}</h3>
         <div class="uac-meta-reason">
           <span class="uac-reason">🎯 <strong>Motivo:</strong> ${esc(formatCrmReasonOrNotes(act.reason, act.notes, 'Avanzamento commerciale e operativo'))}</span>
           <span class="uac-separator">·</span>
@@ -1104,6 +1118,8 @@ function renderUnifiedActivityRow(act) {
       </div>
 
       <div class="uac-actions-cluster">
+        <button type="button" class="uac-op-btn op-done" data-complete-task="${esc(act.id)}" title="Segna come completata">✓ Completa</button>
+        <button type="button" class="uac-op-btn op-edit" data-edit-task="${esc(act.id)}" title="Modifica attività e scadenza">✏️ Modifica</button>
         ${phone
           ? `<a href="tel:${esc(phone.replace(/[^+\d]/g, ''))}" class="uac-op-btn op-call" title="Chiama ${esc(refName)} al ${esc(phone)}">📞 Chiama (${esc(phone)})</a>`
           : `<span class="uac-op-btn op-call disabled" title="Nessun recapito telefonico diretto presente nelle fonti">📞 Numero da verificare</span>`}
@@ -1150,208 +1166,225 @@ function renderExecutiveHomeView() {
     <div class="executive-home">
       <!-- 1. Header Ribbon Metriche Operative a 1 Clic -->
       <div class="exec-action-ribbon" role="region" aria-label="Riepilogo operativo immediato">
-        <div class="exec-ribbon-card ${overdueTasks.length ? 'urgent' : ''}">
+        <button type="button" class="exec-ribbon-card ${overdueTasks.length ? 'urgent' : ''}" data-jump-section="sec-tasks" title="Visualizza le attività da fare e urgenti">
           <span class="ribbon-label">Da fare subito</span>
           <strong>${(overdueTasks.length + todayTasks.length).toString().padStart(2, '0')}</strong>
           <small>${overdueTasks.length} scadute · ${todayTasks.length} oggi</small>
-        </div>
+        </button>
 
-        <div class="exec-ribbon-card">
+        <button type="button" class="exec-ribbon-card" data-jump-section="sec-projects" title="Visualizza i progetti e commesse in corso">
           <span class="ribbon-label">Progetti attivi</span>
           <strong>${activeProjects.length.toString().padStart(2, '0')}</strong>
           <small>Commesse in esecuzione</small>
-        </div>
+        </button>
 
-        <div class="exec-ribbon-card ${suggestedCalls.length ? 'highlight' : ''}">
+        <button type="button" class="exec-ribbon-card ${suggestedCalls.length ? 'highlight' : ''}" data-jump-section="sec-campaigns" title="Visualizza i ricontatti commerciali suggeriti">
           <span class="ribbon-label">Ricontatti suggeriti</span>
           <strong>${suggestedCalls.length.toString().padStart(2, '0')}</strong>
           <small>Campagna email B2B (4gg cadenza)</small>
-        </div>
+        </button>
 
-        <div class="exec-ribbon-card">
+        <button type="button" class="exec-ribbon-card" data-open-consultable="waiting" title="Visualizza le posizioni in attesa di risposta">
           <span class="ribbon-label">In attesa risposta</span>
           <strong>${(waitingProjects.length + waitingDeals.length).toString().padStart(2, '0')}</strong>
           <small>In attesa dal cliente</small>
-        </div>
+        </button>
 
-        <div class="exec-ribbon-card">
+        <button type="button" class="exec-ribbon-card" data-open-consultable="pending" title="Visualizza le posizioni da definire">
           <span class="ribbon-label">Da definire</span>
           <strong>${(unscheduledTasks.length + pendingDeals.length + pendingProjects.length).toString().padStart(2, '0')}</strong>
           <small>Senza scadenza inventata</small>
-        </div>
+        </button>
       </div>
 
-      <!-- 2. SEZIONE 1: Azioni Imminenti e Attività da Fare -->
-      <section class="home-operative-section" id="sec-tasks">
-        <div class="section-head">
-          <div>
-            <h2 class="section-title">⚡ Attività da Fare e In Corso</h2>
-            <p class="section-sub">Azioni operative concrete con motivo, referente ed esito precedente (ordinate per scadenza e priorità).</p>
-          </div>
-          <div class="section-actions">
-            <button type="button" class="primary" data-new="task">+ Nuova attività</button>
-          </div>
-        </div>
-
-        <div class="unified-tasks-stack">
-          ${[...overdueTasks, ...todayTasks, ...upcomingTasks, ...unscheduledTasks].length
-            ? [...overdueTasks, ...todayTasks, ...upcomingTasks, ...unscheduledTasks].map(renderUnifiedActivityRow).join('')
-            : '<div class="empty-state-card"><p>Nessuna attività in corso. Ottimo lavoro! Tutte le posizioni operative sono allineate.</p></div>'}
-        </div>
-      </section>
-
-      <!-- 3. SEZIONE 2: Progetti Attivi e in Corso -->
-      <section class="home-operative-section" id="sec-projects">
-        <div class="section-head">
-          <div>
-            <h2 class="section-title">🚀 Progetti e Commesse in Corso</h2>
-            <p class="section-sub">Stato sintetico, obiettivo di business, cosa aspettiamo e prossimo passo con scadenza.</p>
-          </div>
-          <div class="section-actions">
-            <button type="button" class="text-button" data-view="projects">Tutti i progetti ↗</button>
-            <button type="button" class="primary" data-new="project">+ Nuovo progetto</button>
-          </div>
-        </div>
-
-        <div class="projects-cockpit-stack">
-          ${activeProjects.length
-            ? activeProjects.map(p => typeof renderProjectExecutiveCockpit === 'function' ? renderProjectExecutiveCockpit(p) : `<div class="card"><strong>${esc(p.name)}</strong></div>`).join('')
-            : '<div class="empty-state-card"><p>Nessun progetto in corso. Avvia una nuova commessa da un’opportunità vinta!</p></div>'}
-        </div>
-      </section>
-
-      <!-- 4. SEZIONE 3: Ricontatti Commerciali Suggeriti da Campagne -->
-      <section class="home-operative-section" id="sec-campaigns">
-        <div class="section-head">
-          <div>
-            <h2 class="section-title">✉️ Ricontatti Commerciali e Campagne Email</h2>
-            <p class="section-sub">Aziende con email inviata e nessuna risposta rilevata entro l'intervallo configurato (4 giorni lavorativi).</p>
-          </div>
-          <div class="section-actions">
-            <button type="button" class="secondary" id="btn-open-campaign-settings">⚙ Configura intervallo</button>
-            <button type="button" class="text-button" data-view="campaigns">Vista completa campagne ↗</button>
-          </div>
-        </div>
-
-        ${camp ? `
-          <div class="campaign-summary-banner">
-            <div class="csb-left">
-              <strong>${esc(camp.name)}</strong>
-              <small>${camp.sends.length} invii effettivi · ${(camp.sends || []).filter(s => s.status === 'replied').length} risposte · ${(camp.sends || []).filter(s => s.status === 'called').length} chiamate svolte</small>
-            </div>
-            <div class="csb-right">
-              <span class="csb-check-tag">📡 Ultimo controllo posta: <strong>${esc(camp.lastEmailCheck || 'Oggi ore 08:30')}</strong> (Fonte Gmail verificata)</span>
-            </div>
-          </div>
-        ` : ''}
-
-        <div class="suggested-calls-list">
-          ${suggestedCalls.length ? suggestedCalls.map(s => `
-            <div class="suggested-call-row" data-send-id="${esc(s.sendId)}">
-              <div class="scr-info">
-                <div class="scr-title-line">
-                  <strong>🏢 ${esc(s.companyName)}</strong>
-                  <span class="scr-person">👤 ${esc(s.recipientName)} (${esc(s.recipientRole)})</span>
-                </div>
-                <p class="scr-status">${esc(s.statusText)}</p>
-                <small class="scr-notes">${esc(s.notes)}</small>
+      <!-- 2. Widescreen Desktop Bento Grid (2 Colonne bilanciate su Desktop) -->
+      <div class="exec-desktop-bento">
+        <!-- COLONNA SINISTRA: Priorità Operative & Attività da Svolgere -->
+        <div class="bento-main-col">
+          <section class="home-operative-section" id="sec-tasks">
+            <div class="section-head">
+              <div>
+                <h2 class="section-title">⚡ Attività da Fare e In Corso</h2>
+                <p class="section-sub">Azioni operative concrete con motivo, referente ed esito precedente (ordinate per scadenza e priorità).</p>
               </div>
-              <div class="scr-actions">
-                ${s.recipientPhone
-                  ? `<a href="tel:${esc(s.recipientPhone.replace(/[^+\d]/g, ''))}" class="uac-op-btn op-call">📞 Chiama (${esc(s.recipientPhone)})</a>`
-                  : `<span class="uac-op-btn op-call disabled">📞 Numero da verificare</span>`}
-                <button type="button" class="uac-op-btn op-followup" data-prepare-campaign-followup="${esc(s.sendId)}" data-campaign-id="${esc(s.campaignId)}">✉️ Prepara sollecito</button>
-                <button type="button" class="uac-op-btn op-touchpoint" data-log-campaign-call="${esc(s.sendId)}" data-campaign-id="${esc(s.campaignId)}">⚡ Registra esito chiamata</button>
-                <button type="button" class="text-button text-muted" data-campaign-optout="${esc(s.sendId)}" data-campaign-id="${esc(s.campaignId)}" title="Interrompe tutti i ricontatti verso questa azienda">Opt-out</button>
+              <div class="section-actions">
+                <button type="button" class="primary" data-new="task">+ Nuova attività</button>
               </div>
             </div>
-          `).join('') : '<div class="empty-state-card"><p>Nessuna chiamata da svolgere: tutte le aziende della campagna hanno risposto o sono già state contattate.</p></div>'}
+
+            <!-- Filtri rapidi interattivi per la coda attività -->
+            <div class="home-task-filter-pills" role="group" aria-label="Filtra attività">
+              <button type="button" class="home-filter-pill active" data-home-filter="all">Tutte <span>${[...overdueTasks, ...todayTasks, ...upcomingTasks, ...unscheduledTasks].length}</span></button>
+              <button type="button" class="home-filter-pill ${overdueTasks.length ? 'urgent' : ''}" data-home-filter="overdue">🚨 Scadute <span>${overdueTasks.length}</span></button>
+              <button type="button" class="home-filter-pill" data-home-filter="today">📅 Oggi <span>${todayTasks.length}</span></button>
+              <button type="button" class="home-filter-pill" data-home-filter="calls">📞 Chiamate <span>${openActivities.filter(a => a.type === 'Chiamata').length}</span></button>
+              <button type="button" class="home-filter-pill" data-home-filter="followups">✉️ Follow-up <span>${openActivities.filter(a => a.type === 'Follow-up' || a.type === 'Email').length}</span></button>
+            </div>
+
+            <div class="unified-tasks-stack">
+              ${[...overdueTasks, ...todayTasks, ...upcomingTasks, ...unscheduledTasks].length
+                ? [...overdueTasks, ...todayTasks, ...upcomingTasks, ...unscheduledTasks].map(renderUnifiedActivityRow).join('')
+                : '<div class="empty-state-card"><p>Nessuna attività in corso. Ottimo lavoro! Tutte le posizioni operative sono allineate.</p></div>'}
+            </div>
+          </section>
         </div>
-      </section>
 
-      <!-- 5. SEZIONE 4: Viste Consultabili Rapide (Accordion / Tab Compatti) -->
-      <section class="home-consultable-tabs" aria-label="Sezioni consultabili rapide">
-        <details class="consultable-section" open>
-          <summary class="consultable-summary">
-            <span>🕒 <strong>Cosa è cambiato</strong> (${recentFeed.length} aggiornamenti recenti)</span>
-            <small>Novità acquisite da ChatGPT, note vocali e sincronizzazione</small>
-          </summary>
-          <div class="consultable-content">
-            <div class="recent-feed-stack">
-              ${recentFeed.length ? recentFeed.map(f => `
-                <div class="feed-entry" data-open-360="${esc(f.companyId)}">
-                  <span class="feed-date">${typeof date === 'function' ? date(f.date) : f.date}</span>
-                  <strong class="feed-comp">${esc(f.companyName)}</strong>
-                  <span class="feed-text">${esc(f.text)}</span>
+        <!-- COLONNA DESTRA: Executive Radar & Cockpit -->
+        <div class="bento-side-col">
+          <!-- Widget 1: Progetti & Commesse in Corso -->
+          <section class="home-side-widget" id="sec-projects">
+            <div class="section-head">
+              <div>
+                <h2 class="section-title">🚀 Progetti e Commesse</h2>
+                <p class="section-sub">Stato sintetico, prossimo passo e scadenze concordate.</p>
+              </div>
+              <div class="section-actions">
+                <button type="button" class="text-button" data-view="projects">Tutti i progetti ↗</button>
+                <button type="button" class="text-button" data-new="project">+ Progetto</button>
+              </div>
+            </div>
+
+            <div class="projects-cockpit-stack">
+              ${activeProjects.length
+                ? activeProjects.map(p => typeof renderProjectExecutiveCockpit === 'function' ? renderProjectExecutiveCockpit(p) : `<div class="card"><strong>${esc(p.name)}</strong></div>`).join('')
+                : '<div class="empty-state-card"><p>Nessun progetto in corso. Avvia una nuova commessa da un’opportunità vinta!</p></div>'}
+            </div>
+          </section>
+
+          <!-- Widget 2: Ricontatti Commerciali Suggeriti da Campagne -->
+          <section class="home-side-widget" id="sec-campaigns">
+            <div class="section-head">
+              <div>
+                <h2 class="section-title">✉️ Ricontatti Suggeriti</h2>
+                <p class="section-sub">Email inviata senza risposta oltre 4gg lavorativi.</p>
+              </div>
+              <div class="section-actions">
+                <button type="button" class="secondary" id="btn-open-campaign-settings">⚙ Intervallo</button>
+                <button type="button" class="text-button" data-view="campaigns">Tutte ↗</button>
+              </div>
+            </div>
+
+            ${camp ? `
+              <div class="campaign-summary-banner compact">
+                <div class="csb-left">
+                  <strong>${esc(camp.name)}</strong>
+                  <small>${camp.sends.length} invii · ${(camp.sends || []).filter(s => s.status === 'replied').length} risposte · ${(camp.sends || []).filter(s => s.status === 'called').length} chiamate</small>
                 </div>
-              `).join('') : '<p class="text-muted">Nessun evento recente.</p>'}
-            </div>
-          </div>
-        </details>
+                <div class="csb-right">
+                  <span class="csb-check-tag">📡 Ultimo controllo: <strong>${esc(camp.lastEmailCheck || 'Oggi ore 08:30')}</strong></span>
+                </div>
+              </div>
+            ` : ''}
 
-        <details class="consultable-section">
-          <summary class="consultable-summary">
-            <span>⏳ <strong>Aspettiamo una risposta</strong> (${waitingProjects.length + waitingDeals.length} posizioni)</span>
-            <small>Elementi in attesa di decisione o riscontro da clienti e partner</small>
-          </summary>
-          <div class="consultable-content">
-            <div class="waiting-stack">
-              ${[...waitingProjects.map(p => ({ type: 'Progetto', compId: p.contactId, title: p.name, wait: p.waitingFor })), ...waitingDeals.map(d => ({ type: 'Opportunità', compId: d.contactId, title: d.title, wait: d.waitingFor }))].map(w => {
-                const comp = (state.contacts || []).find(c => c.id === w.compId);
-                return `
-                  <div class="waiting-entry">
-                    <span class="pill">${w.type}</span>
-                    <strong class="company-link" data-open-360="${esc(w.compId)}">${esc(comp?.company || 'Azienda')}</strong>
-                    <span class="waiting-title">(${esc(w.title)}):</span>
-                    <p class="waiting-desc text-amber">⏳ ${esc(w.wait)}</p>
+            <div class="suggested-calls-list">
+              ${suggestedCalls.length ? suggestedCalls.map(s => `
+                <div class="suggested-call-row compact" data-send-id="${esc(s.sendId)}">
+                  <div class="scr-info">
+                    <div class="scr-title-line">
+                      <strong>🏢 ${esc(s.companyName)}</strong>
+                      <span class="scr-person">👤 ${esc(s.recipientName)} (${esc(s.recipientRole)})</span>
+                    </div>
+                    <p class="scr-status">${esc(s.statusText)}</p>
+                    <small class="scr-notes">${esc(s.notes)}</small>
                   </div>
-                `;
-              }).join('')}
+                  <div class="scr-actions">
+                    ${s.recipientPhone
+                      ? `<a href="tel:${esc(s.recipientPhone.replace(/[^+\d]/g, ''))}" class="uac-op-btn op-call">📞 Chiama</a>`
+                      : `<span class="uac-op-btn op-call disabled">📞 No num</span>`}
+                    <button type="button" class="uac-op-btn op-followup" data-prepare-campaign-followup="${esc(s.sendId)}" data-campaign-id="${esc(s.campaignId)}">✉️ Sollecito</button>
+                    <button type="button" class="uac-op-btn op-touchpoint" data-log-campaign-call="${esc(s.sendId)}" data-campaign-id="${esc(s.campaignId)}">⚡ Esito</button>
+                    <button type="button" class="text-button text-muted" data-campaign-optout="${esc(s.sendId)}" data-campaign-id="${esc(s.campaignId)}" title="Interrompe tutti i ricontatti verso questa azienda">Opt-out</button>
+                  </div>
+                </div>
+              `).join('') : '<div class="empty-state-card"><p>Nessuna chiamata da svolgere: tutte le aziende hanno risposto o sono state contattate.</p></div>'}
             </div>
-          </div>
-        </details>
+          </section>
 
-        <details class="consultable-section">
-          <summary class="consultable-summary">
-            <span>❓ <strong>Da definire / Da chiarire</strong> (${unscheduledTasks.length + pendingDeals.length + pendingProjects.length} posizioni)</span>
-            <small>Posizioni aperte senza data di follow-up o con prossimo passo da organizzare</small>
-          </summary>
-          <div class="consultable-content">
-            <div class="pending-stack">
-              ${unscheduledTasks.map(a => {
-                const comp = (state.contacts || []).find(c => c.id === a.contactId);
-                return `
-                  <div class="pending-entry">
-                    <span class="pill amber">Attività</span>
-                    <strong>${esc(comp?.company || 'Azienda')}</strong>: ${esc(a.title)}
-                    <button type="button" class="text-button" data-edit-task="${esc(a.id)}">+ Pianifica scadenza</button>
-                  </div>
-                `;
-              }).join('')}
-              ${pendingDeals.map(d => {
-                const comp = (state.contacts || []).find(c => c.id === d.contactId);
-                return `
-                  <div class="pending-entry">
-                    <span class="pill">Opportunità</span>
-                    <strong>${esc(comp?.company || 'Azienda')}</strong>: ${esc(d.title)} (Prossimo passo: ${esc(d.next || 'Da definire')})
-                    <button type="button" class="text-button" data-edit-deal="${esc(d.id)}">+ Imposta data</button>
-                  </div>
-                `;
-              }).join('')}
-              ${pendingProjects.map(p => {
-                const comp = (state.contacts || []).find(c => c.id === p.contactId);
-                return `
-                  <div class="pending-entry">
-                    <span class="pill">Progetto</span>
-                    <strong>${esc(comp?.company || 'Azienda')}</strong>: ${esc(p.name)}
-                    <button type="button" class="text-button" data-edit-project="${esc(p.id)}">+ Imposta data</button>
-                  </div>
-                `;
-              }).join('')}
-            </div>
-          </div>
-        </details>
-      </section>
+          <!-- Widget 3: Viste Consultabili Rapide (Accordion / Tab Compatti) -->
+          <section class="home-side-widget home-consultable-tabs" aria-label="Sezioni consultabili rapide">
+            <details class="consultable-section" open>
+              <summary class="consultable-summary">
+                <span>🕒 <strong>Cosa è cambiato</strong> (${recentFeed.length} novità)</span>
+                <small>Novità acquisite da ChatGPT, note vocali e sincronizzazione</small>
+              </summary>
+              <div class="consultable-content">
+                <div class="recent-feed-stack">
+                  ${recentFeed.length ? recentFeed.map(f => `
+                    <div class="feed-entry" data-open-360="${esc(f.companyId)}">
+                      <span class="feed-date">${typeof date === 'function' ? date(f.date) : f.date}</span>
+                      <strong class="feed-comp">${esc(f.companyName)}</strong>
+                      <span class="feed-text">${esc(f.text)}</span>
+                    </div>
+                  `).join('') : '<p class="text-muted">Nessun evento recente.</p>'}
+                </div>
+              </div>
+            </details>
+
+            <details class="consultable-section" id="sec-waiting-details">
+              <summary class="consultable-summary">
+                <span>⏳ <strong>Aspettiamo una risposta</strong> (${waitingProjects.length + waitingDeals.length} posizioni)</span>
+                <small>Elementi in attesa di riscontro dal cliente</small>
+              </summary>
+              <div class="consultable-content">
+                <div class="waiting-stack">
+                  ${[...waitingProjects.map(p => ({ type: 'Progetto', compId: p.contactId, title: p.name, wait: p.waitingFor })), ...waitingDeals.map(d => ({ type: 'Opportunità', compId: d.contactId, title: d.title, wait: d.waitingFor }))].map(w => {
+                    const comp = (state.contacts || []).find(c => c.id === w.compId);
+                    return `
+                      <div class="waiting-entry">
+                        <span class="pill">${w.type}</span>
+                        <strong class="company-link" data-open-360="${esc(w.compId)}">${esc(comp?.company || 'Azienda')}</strong>
+                        <span class="waiting-title">(${esc(w.title)}):</span>
+                        <p class="waiting-desc text-amber">⏳ ${esc(w.wait)}</p>
+                      </div>
+                    `;
+                  }).join('')}
+                </div>
+              </div>
+            </details>
+
+            <details class="consultable-section" id="sec-pending-details">
+              <summary class="consultable-summary">
+                <span>❓ <strong>Da definire / chiarire</strong> (${unscheduledTasks.length + pendingDeals.length + pendingProjects.length} posizioni)</span>
+                <small>Posizioni aperte senza data follow-up</small>
+              </summary>
+              <div class="consultable-content">
+                <div class="pending-stack">
+                  ${unscheduledTasks.map(a => {
+                    const comp = (state.contacts || []).find(c => c.id === a.contactId);
+                    return `
+                      <div class="pending-entry">
+                        <span class="pill amber">Attività</span>
+                        <strong>${esc(comp?.company || 'Azienda')}</strong>: ${esc(a.title)}
+                        <button type="button" class="text-button" data-edit-task="${esc(a.id)}">+ Pianifica data</button>
+                      </div>
+                    `;
+                  }).join('')}
+                  ${pendingDeals.map(d => {
+                    const comp = (state.contacts || []).find(c => c.id === d.contactId);
+                    return `
+                      <div class="pending-entry">
+                        <span class="pill">Opportunità</span>
+                        <strong>${esc(comp?.company || 'Azienda')}</strong>: ${esc(d.title)} (Prossimo: ${esc(d.next || 'Da definire')})
+                        <button type="button" class="text-button" data-edit-deal="${esc(d.id)}">+ Imposta data</button>
+                      </div>
+                    `;
+                  }).join('')}
+                  ${pendingProjects.map(p => {
+                    const comp = (state.contacts || []).find(c => c.id === p.contactId);
+                    return `
+                      <div class="pending-entry">
+                        <span class="pill">Progetto</span>
+                        <strong>${esc(comp?.company || 'Azienda')}</strong>: ${esc(p.name)}
+                        <button type="button" class="text-button" data-edit-project="${esc(p.id)}">+ Imposta data</button>
+                      </div>
+                    `;
+                  }).join('')}
+                </div>
+              </div>
+            </details>
+          </section>
+        </div>
+      </div>
     </div>
   `;
 }
@@ -1581,7 +1614,10 @@ function campaignsView() {
               return `
                 <tr>
                   <td>
-                    <strong>${esc(s.companyName)}</strong><br>
+                    <div class="company-name-cell">
+                      <span class="company-monogram-chip">${esc(s.companyName.slice(0,2).toUpperCase())}</span>
+                      <strong>${esc(s.companyName)}</strong>
+                    </div>
                     <small>👤 ${esc(s.recipientName)} (${esc(s.recipientRole || 'Referente')}) · <a href="mailto:${esc(s.recipientEmail)}">${esc(s.recipientEmail)}</a></small>
                   </td>
                   <td data-label="Data Invio">${typeof date === 'function' ? date(s.sentAt) : s.sentAt}</td>
@@ -1603,10 +1639,10 @@ function campaignsView() {
                   <td class="cell-actions">
                     <div class="row-actions">
                       ${s.recipientPhone
-                        ? `<a href="tel:${esc(s.recipientPhone.replace(/[^+\d]/g, ''))}" class="text-button" title="Chiama">📞 Chiama</a>`
-                        : '<span class="text-muted" style="font-size:11px">Numero da verificare</span>'}
-                      <button type="button" class="text-button" data-prepare-campaign-followup="${esc(s.id)}" data-campaign-id="${esc(camp.id)}">✉ Sollecito</button>
-                      <button type="button" class="text-button" data-log-campaign-call="${esc(s.id)}" data-campaign-id="${esc(camp.id)}">⚡ Esito</button>
+                        ? `<a href="tel:${esc(s.recipientPhone.replace(/[^+\d]/g, ''))}" class="uac-op-btn op-call" title="Chiama">📞 Chiama</a>`
+                        : '<span class="uac-op-btn op-call disabled">📞 No num</span>'}
+                      <button type="button" class="uac-op-btn op-followup" data-prepare-campaign-followup="${esc(s.id)}" data-campaign-id="${esc(camp.id)}">✉ Sollecito</button>
+                      <button type="button" class="uac-op-btn op-touchpoint" data-log-campaign-call="${esc(s.id)}" data-campaign-id="${esc(camp.id)}">⚡ Esito</button>
                     </div>
                   </td>
                 </tr>
@@ -1684,10 +1720,31 @@ document.addEventListener('click', e => {
     return;
   }
 
+  // Salto rapido alle sezioni operative dal ribbon esecutivo
+  if (b.dataset.jumpSection) {
+    const target = document.getElementById(b.dataset.jumpSection);
+    if (target) {
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      target.classList.add('section-highlight');
+      setTimeout(() => target.classList.remove('section-highlight'), 1800);
+    }
+    return;
+  }
+  if (b.dataset.openConsultable) {
+    const secId = b.dataset.openConsultable;
+    const el = document.getElementById(secId === 'waiting' ? 'sec-waiting-details' : 'sec-pending-details');
+    if (el) {
+      el.open = true;
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+    return;
+  }
+
   // Apertura Logger Rapido Touchpoint
   if (b.dataset.quickTouchpoint) {
     const cid = b.dataset.quickTouchpoint === 'any' ? null : b.dataset.quickTouchpoint;
-    openInteractionLogger(cid);
+    const actId = b.dataset.actId || null;
+    openInteractionLogger(cid, {}, actId);
     return;
   }
 
@@ -2038,6 +2095,10 @@ document.addEventListener('submit', e => {
   }
 });
 } // end typeof document !== 'undefined'
+
+if (typeof window !== 'undefined') {
+  window.ensureDemoProjectData = ensureDemoProjectData;
+}
 
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = {

@@ -311,7 +311,12 @@
       // Unisci preventivi (quotes)
       if (Array.isArray(cloudState.quotes)) {
         for (const cq of cloudState.quotes) {
-          if (!merged.quotes.some(q => q.id === cq.id || q.number === cq.number)) {
+          const cqNum = cq.versions?.[cq.versions.length - 1]?.number;
+          const matchesNum = (q) => {
+            const qNum = q.versions?.[q.versions.length - 1]?.number;
+            return Boolean(cqNum && qNum && qNum.toLowerCase() === cqNum.toLowerCase());
+          };
+          if (!merged.quotes.some(q => q.id === cq.id || matchesNum(q))) {
             merged.quotes.push(cq);
           }
         }
@@ -461,6 +466,12 @@
     merged.quotes = (merged.quotes || []).filter(q => q && typeof q === 'object' && typeof q.id === 'string' && validContactIds.has(q.contactId));
     merged.projects = (merged.projects || []).filter(p => p && typeof p === 'object' && typeof p.id === 'string' && validContactIds.has(p.contactId));
 
+    const getFn = name => (typeof window !== 'undefined' && typeof window[name] === 'function') ? window[name] : (typeof globalThis !== 'undefined' && typeof globalThis[name] === 'function') ? globalThis[name] : null;
+    const fnCamp = getFn('ensureCampaignsInState'); if (fnCamp) fnCamp(merged);
+    const fnProj = getFn('ensureDemoProjectData'); if (fnProj) fnProj(merged);
+    const fnQuote = getFn('ensureDemoQuotesData'); if (fnQuote) fnQuote(merged);
+    const fnCat = getFn('ensureDefaultCategories'); if (fnCat) fnCat(merged);
+
     return merged;
   }
 
@@ -581,8 +592,8 @@
             id: act.id && act.id.length >= 20 ? act.id : undefined,
             company_id: act.companyId,
             titolo: act.title || 'Attività',
-            tipo: act.type === 'chiamata' ? 'chiamata' : act.type === 'meeting' ? 'meeting' : 'email',
-            stato: act.status === 'completata' ? 'completata' : 'pianificata',
+            tipo: (act.type || '').toLowerCase().includes('chiamata') ? 'chiamata' : (act.type || '').toLowerCase().includes('demo') || (act.type || '').toLowerCase().includes('meeting') ? 'meeting' : 'email',
+            stato: (act.status || '').toLowerCase() === 'completata' ? 'completata' : 'pianificata',
             data_interazione: act.dueDate ? `${act.dueDate}T09:00:00Z` : new Date().toISOString(),
             prossimo_passo: act.outcome || '',
             note: act.notes || ''

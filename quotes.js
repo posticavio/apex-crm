@@ -33,9 +33,54 @@ function visibleQuotes(){const list=state.quotes||[];return list.filter(q=>{cons
 function quotesView(){const rows=visibleQuotes();return `<div class="category-intro"><strong>Proposte con versioni conservate</strong><p>Ogni salvataggio crea una versione. IVA e dati emittente sono configurabili. Stampa / PDF apre il documento e la finestra di stampa del browser. Nessuna email viene inviata.</p></div><div class="toolbar"><input id="search" aria-label="Cerca" value="${esc(search)}" placeholder="Cerca numero, titolo o azienda…"><span class="result-count">${rows.length} preventivi</span><button id="export-csv" ${!rows.length?'disabled':''}>↓ Esporta CSV</button></div><div class="panel">${rows.length?`<div class="table-wrap"><table><thead><tr><th>Preventivo</th><th>Azienda</th><th>Stato</th><th>Importo</th><th>Versioni</th><th></th></tr></thead><tbody>${rows.map(q=>{const v=latestQuote(q);return `<tr><td><strong>${esc(v.number)}</strong><small>${esc(v.title)}</small></td><td data-label="Azienda">${esc(v.customer.name)}</td><td data-label="Stato"><span class="pill ${v.status==='Accettato'?'green':v.status==='Rifiutato'?'red':v.status==='Da approvare'?'amber':''}">${esc(v.status)}</span></td><td data-label="Importo"><div><strong class="money-atomic">${quoteMoney(v.totals.total)}</strong><small>${v.vat===null?'IVA da definire':'IVA '+v.vat+'%'}</small></div></td><td data-label="Versioni">${q.versions.length}</td><td class="cell-actions"><div class="row-actions"><button class="text-button" data-edit-quote="${esc(q.id)}">Modifica / nuova versione</button><button class="text-button" data-print-quote="${esc(q.id)}">Stampa / PDF</button><button class="text-button" data-copy-quote="${esc(q.id)}">Duplica</button></div></td></tr>`;}).join('')}</tbody></table></div>`:empty('Nessun preventivo','Crea una proposta collegata a un’azienda.','Nuovo preventivo','quote')}</div>`;}
 function quotePrintHtml(q,index=q.versions.length-1){const v=q.versions[index],t=quoteTotals(v.lines,v.vat);return `<!doctype html><html lang="it"><head><meta charset="utf-8"><title>${esc(v.number)} — versione ${index+1}</title><style>body{font:14px Arial,sans-serif;color:#26374b;margin:40px;line-height:1.6}h1{font-size:25px}pre{font:inherit;white-space:pre-wrap}table{width:100%;border-collapse:collapse;margin:25px 0}td,th{padding:10px;border-bottom:1px solid #ddd;text-align:left}.totals{text-align:right}.notice{background:#fff0dc;padding:12px}@media print{body{margin:0}@page{size:A4;margin:18mm}}</style></head><body><pre>${esc(v.issuer)}</pre><h1>Preventivo ${esc(v.number)}</h1><p>Versione ${index+1} · ${esc(v.date)} · ${esc(v.status)}</p><h2>${esc(v.title)}</h2><p><strong>${esc(v.customer.name)}</strong><br>${esc(v.customer.address)}<br>${v.customer.taxId?'Identificativo fiscale: '+esc(v.customer.taxId):''}</p>${v.validUntil?`<p>Valido fino al ${esc(v.validUntil)}</p>`:''}<table><thead><tr><th>Servizio</th><th>Qtà</th><th>Prezzo unit.</th><th>Sconto</th><th>Importo</th></tr></thead><tbody>${t.lines.map(l=>`<tr><td>${esc(l.description)}</td><td>${l.quantity}</td><td>${quoteMoney(l.unitCents)}</td><td>${l.discount}%</td><td>${quoteMoney(l.totalCents)}</td></tr>`).join('')}</tbody></table><div class="totals"><p>Imponibile: ${quoteMoney(t.net)}</p><p>IVA: ${t.tax===null?'da definire':quoteMoney(t.tax)+' ('+v.vat+'%)'}</p><h2>${t.tax===null?'Totale parziale':'Totale'}: ${quoteMoney(t.total)}</h2></div>${t.tax===null?'<p class="notice">Bozza: IVA da definire. Importi non finali.</p>':''}<pre>${esc(v.notes)}</pre></body></html>`;}
 function printQuote(id,version){const q=(state.quotes||[]).find(x=>x.id===id);if(!q)return;const i=version==null?q.versions.length-1:Number(version);if(!Number.isInteger(i)||!q.versions[i])return;const popup=window.open('','_blank');if(!popup){toast('Consenti l’apertura del documento per stampare o salvare in PDF.');return;}popup.document.write(quotePrintHtml(q,i));popup.document.close();popup.focus();popup.print();}
+if(typeof document!=='undefined'){
 document.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;if(b.dataset.editQuote)openQuote(b.dataset.editQuote);if(b.dataset.copyQuote)openQuote(b.dataset.copyQuote,true);if(b.dataset.printQuote)printQuote(b.dataset.printQuote,b.dataset.quoteVersion);if(b.dataset.new==='quote')openQuote();if(b.id==='add-quote-line'&&quoteSession)$('#quote-lines').insertAdjacentHTML('beforeend',quoteLine(quoteSession.rowSeq++));if(b.dataset.removeQuoteLine)b.closest('.quote-line')?.remove();if(b.id==='add-quote-model'&&quoteSession)for(const description of quoteModels[$('#quote-model').value]||[])$('#quote-lines').insertAdjacentHTML('beforeend',quoteLine(quoteSession.rowSeq++,{description,quantity:1,unitCents:0,discount:0}));});
 document.addEventListener('change',e=>{if(e.target.id==='quote-company')$('#quote-deal').innerHTML=quoteDealOptions(e.target.value);});
 document.addEventListener('input',e=>{if(e.target.closest('#quote-form')){try{const d=quoteFormData($('#quote-form'));$('#quote-totals').textContent='Imponibile: '+quoteMoney(d.version.totals.net)+' · '+(d.version.vat===null?'IVA da definire':'Totale: '+quoteMoney(d.version.totals.total));}catch{$('#quote-totals').textContent='Completa i campi e le righe per calcolare i totali.';}}});
 document.querySelector('#quote-form').addEventListener('submit',e=>{e.preventDefault();saveQuote(e.target);});
 document.querySelector('#quote-cancel').onclick=()=>{$('#quote-editor').close();quoteSession=null;};
 document.querySelector('#quote-editor').addEventListener('cancel',()=>{quoteSession=null;});
+}
+
+function ensureDemoQuotesData(crmState){
+ if(!crmState||!Array.isArray(crmState.contacts))return;
+ crmState.quotes=Array.isArray(crmState.quotes)?crmState.quotes:[];
+ const parisi=crmState.contacts.find(c=>(c.company||'').toLowerCase().includes('parisi'));
+ if(parisi&&!crmState.quotes.some(q=>q.contactId===parisi.id)){
+  const parisiDeal=(crmState.deals||[]).find(d=>d.contactId===parisi.id);
+  crmState.quotes.push({
+   id:'quote-parisi-automazione-2026',
+   contactId:parisi.id,
+   dealId:parisiDeal?parisiDeal.id:'',
+   versions:[{
+    number:'APX-2026-001',
+    title:'Automazione flussi doganali e preventivatore rapido',
+    date:'2026-11-02',
+    currency:'EUR',
+    status:'Bozza',
+    issuer:'Apex Digital — Automazioni & Servizi AI\nVia Roma 1, Treviso (TV)\ninfo@apexdigital.it · www.apexdigital.it',
+    customer:{
+     name:parisi.company,
+     address:[parisi.address,parisi.city,parisi.country].filter(Boolean).join(', '),
+     taxId:parisi.taxId||''
+    },
+    validUntil:'2026-11-30',
+    vat:22,
+    lines:[
+     {description:'Analisi flussi documentali doganali e mappatura specifiche tecniche',quantity:1,unitCents:80000,discount:0,totalCents:80000},
+     {description:'Sviluppo motore di estrazione dati e preventivatore rapido commesse',quantity:1,unitCents:180000,discount:0,totalCents:180000},
+     {description:'Integrazione procedurale, collaudo operativo UAT e formazione referenti',quantity:1,unitCents:90000,discount:0,totalCents:90000}
+    ],
+    totals:{gross:350000,discount:0,net:350000,tax:77000,total:427000},
+    notes:'Proposta elaborata a seguito della call del 20/10/2026 con Andrea Zanatta.\nCondizioni: 40% all’ordine, 60% al completamento del collaudo operativo.'
+   }]
+  });
+ }
+}
+
+if(typeof window!=='undefined'){
+ window.ensureDemoQuotesData=ensureDemoQuotesData;
+}
+if(typeof module!=='undefined'&&module.exports){
+ module.exports={quoteTotals,quoteFormData,validateQuotes,quoteModels,ensureDemoQuotesData};
+}

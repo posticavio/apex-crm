@@ -725,6 +725,10 @@ function recordCampaignOptOut(campaignId, sendId, reason = '') {
   return true;
 }
 
+if (typeof window !== 'undefined') {
+  window.ensureCampaignsInState = ensureCampaignsInState;
+}
+
 // Esportazione per Node / Test
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = {

@@ -445,13 +445,15 @@ function activitiesView(){
     <small>${overdueCount} scadute · ${todayCount} previste oggi</small>
    </div>
   </div>
-  <div class="stage-segment-bar" role="group" aria-label="Filtra attività per fase aziendale">
-   <button type="button" data-activity-stage="" class="${activityStageFilter===''?'selected':''}">Tutte le fasi <span>${open.length}</span></button>
-   ${stages.map(s=>`<button type="button" data-activity-stage="${s}" class="${activityStageFilter===s?'selected':''}">${s} <span>${openByStage(s).length}</span></button>`).join('')}
-  </div>
-  <div class="panel activity-status-strip">
-   <div class="activity-filters" role="group" aria-label="Filtra stato attività">
-    ${statusTabs.map(([k,label,cnt])=>`<button type="button" data-activity-status="${k}" class="${activityStatusFilter===k?'selected':''}">${label}<span>${cnt}</span></button>`).join('')}
+  <div class="activities-control-header">
+   <div class="stage-segment-bar" role="group" aria-label="Filtra attività per fase aziendale">
+    <button type="button" data-activity-stage="" class="${activityStageFilter===''?'selected':''}">Tutte le fasi <span>${open.length}</span></button>
+    ${stages.map(s=>`<button type="button" data-activity-stage="${s}" class="${activityStageFilter===s?'selected':''}">${s} <span>${openByStage(s).length}</span></button>`).join('')}
+   </div>
+   <div class="activity-status-strip">
+    <div class="activity-filters" role="group" aria-label="Filtra stato attività">
+     ${statusTabs.map(([k,label,cnt])=>`<button type="button" data-activity-status="${k}" class="${activityStatusFilter===k?'selected':''}">${label}<span>${cnt}</span></button>`).join('')}
+    </div>
    </div>
   </div>
   <div class="toolbar">
