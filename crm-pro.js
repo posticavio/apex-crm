@@ -1124,15 +1124,19 @@ function renderUnifiedActivityRow(act) {
       </div>
 
       <div class="uac-actions-cluster">
-        <button type="button" class="uac-op-btn op-done" data-complete-task="${esc(act.id)}" title="Segna come completata">✓ Completa</button>
-        <button type="button" class="uac-op-btn op-edit" data-edit-task="${esc(act.id)}" title="Modifica attività e scadenza">✏️ Modifica</button>
-        ${phone
-          ? `<a href="tel:${esc(phone.replace(/[^+\d]/g, ''))}" class="uac-op-btn op-call" title="Chiama ${esc(refName)} al ${esc(phone)}">📞 Chiama (${esc(phone)})</a>`
-          : `<span class="uac-op-btn op-call disabled" title="Nessun recapito telefonico diretto presente nelle fonti">📞 Numero da verificare</span>`}
+        <div class="uac-primary-actions">
+          <button type="button" class="uac-op-btn op-done" data-complete-task="${esc(act.id)}" title="Segna come completata">✓ Completa</button>
+          ${phone
+            ? `<a href="tel:${esc(phone.replace(/[^+\d]/g, ''))}" class="uac-op-btn op-call" title="Chiama ${esc(refName)} al ${esc(phone)}">📞 Chiama</a>`
+            : `<span class="uac-op-btn op-call disabled" title="Nessun recapito telefonico diretto presente nelle fonti">📞 Chiama</span>`}
+        </div>
         
-        <button type="button" class="uac-op-btn op-followup" data-prepare-followup="${esc(act.id)}" data-comp-id="${esc(comp?.id || '')}">✉️ Prepara sollecito</button>
-        <button type="button" class="uac-op-btn op-touchpoint" data-quick-touchpoint="${esc(comp?.id || '')}" data-act-id="${esc(act.id)}">⚡ Registra esito</button>
-        <button type="button" class="uac-op-btn op-details" data-open-360="${esc(comp?.id || '')}">Scheda 360° ↗</button>
+        <div class="uac-secondary-actions">
+          <button type="button" class="uac-op-btn op-followup" data-prepare-followup="${esc(act.id)}" data-comp-id="${esc(comp?.id || '')}" title="Prepara sollecito">✉️ Sollecito</button>
+          <button type="button" class="uac-op-btn op-touchpoint" data-quick-touchpoint="${esc(comp?.id || '')}" data-act-id="${esc(act.id)}" title="Registra esito">⚡ Esito</button>
+          <button type="button" class="uac-op-btn op-edit" data-edit-task="${esc(act.id)}" title="Modifica attività e scadenza">✏️ Modifica</button>
+          <button type="button" class="uac-op-btn op-details" data-open-360="${esc(comp?.id || '')}" title="Scheda Azienda 360°">360° ↗</button>
+        </div>
       </div>
     </article>
   `;
@@ -1170,36 +1174,41 @@ function renderExecutiveHomeView() {
 
   return `
     <div class="executive-home">
-      <!-- 1. Header Ribbon Metriche Operative a 1 Clic -->
-      <div class="exec-action-ribbon" role="region" aria-label="Riepilogo operativo immediato">
+      <!-- 1. Header Status Bar Apple/Notion Metriche a 1 Clic -->
+      <div class="exec-action-ribbon exec-status-bar" role="region" aria-label="Riepilogo operativo immediato">
         <button type="button" class="exec-ribbon-card ${overdueTasks.length ? 'urgent' : ''}" data-jump-section="sec-tasks" title="Visualizza le attività da fare e urgenti">
+          <span class="ribbon-icon">🚨</span>
           <span class="ribbon-label">Da fare subito</span>
-          <strong>${(overdueTasks.length + todayTasks.length).toString().padStart(2, '0')}</strong>
-          <small>${overdueTasks.length} scadute · ${todayTasks.length} oggi</small>
+          <span class="ribbon-count">${(overdueTasks.length + todayTasks.length).toString().padStart(2, '0')}</span>
+          <small class="ribbon-meta">${overdueTasks.length ? `${overdueTasks.length} scadute` : `${todayTasks.length} oggi`}</small>
         </button>
 
         <button type="button" class="exec-ribbon-card" data-jump-section="sec-projects" title="Visualizza i progetti e commesse in corso">
+          <span class="ribbon-icon">🚀</span>
           <span class="ribbon-label">Progetti attivi</span>
-          <strong>${activeProjects.length.toString().padStart(2, '0')}</strong>
-          <small>Commesse in esecuzione</small>
+          <span class="ribbon-count">${activeProjects.length.toString().padStart(2, '0')}</span>
+          <small class="ribbon-meta">Commesse</small>
         </button>
 
         <button type="button" class="exec-ribbon-card ${suggestedCalls.length ? 'highlight' : ''}" data-jump-section="sec-campaigns" title="Visualizza i ricontatti commerciali suggeriti">
-          <span class="ribbon-label">Ricontatti suggeriti</span>
-          <strong>${suggestedCalls.length.toString().padStart(2, '0')}</strong>
-          <small>Campagna email B2B (4gg cadenza)</small>
+          <span class="ribbon-icon">✉️</span>
+          <span class="ribbon-label">Ricontatti</span>
+          <span class="ribbon-count">${suggestedCalls.length.toString().padStart(2, '0')}</span>
+          <small class="ribbon-meta">Campagna email</small>
         </button>
 
         <button type="button" class="exec-ribbon-card" data-open-consultable="waiting" title="Visualizza le posizioni in attesa di risposta">
+          <span class="ribbon-icon">⏳</span>
           <span class="ribbon-label">In attesa risposta</span>
-          <strong>${(waitingProjects.length + waitingDeals.length).toString().padStart(2, '0')}</strong>
-          <small>In attesa dal cliente</small>
+          <span class="ribbon-count">${(waitingProjects.length + waitingDeals.length).toString().padStart(2, '0')}</span>
+          <small class="ribbon-meta">Dal cliente</small>
         </button>
 
         <button type="button" class="exec-ribbon-card" data-open-consultable="pending" title="Visualizza le posizioni da definire">
+          <span class="ribbon-icon">⚠️</span>
           <span class="ribbon-label">Da definire</span>
-          <strong>${(unscheduledTasks.length + pendingDeals.length + pendingProjects.length).toString().padStart(2, '0')}</strong>
-          <small>Senza scadenza inventata</small>
+          <span class="ribbon-count">${(unscheduledTasks.length + pendingDeals.length + pendingProjects.length).toString().padStart(2, '0')}</span>
+          <small class="ribbon-meta">Senza data</small>
         </button>
       </div>
 
@@ -1210,11 +1219,8 @@ function renderExecutiveHomeView() {
           <section class="home-operative-section" id="sec-tasks">
             <div class="section-head">
               <div>
-                <h2 class="section-title">⚡ Attività da Fare e In Corso</h2>
-                <p class="section-sub">Azioni operative concrete con motivo, referente ed esito precedente (ordinate per scadenza e priorità).</p>
-              </div>
-              <div class="section-actions">
-                <button type="button" class="primary" data-new="task">+ Nuova attività</button>
+                <h2 class="section-title">⚡ Azioni Immediate (Oggi &amp; Scadute)</h2>
+                <p class="section-sub">Azioni operative con motivo, referente ed esito precedente.</p>
               </div>
             </div>
 

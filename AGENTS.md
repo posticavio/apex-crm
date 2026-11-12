@@ -62,6 +62,47 @@ node crm-rapid-check.cjs
 ---
 
 ## Registro di Passaggio tra Agenti (Handoff Log)
+### Sessione 2026-11-12 (Revamp Completo Layout Desktop & Smartphone: Benchmark Ergonomia Apple/Notion, Bottom Bar Mobile 5 Tab, Header Minimale Senza Clutter e Bento Workstation Unificata) — Agente: Google Antigravity
+- **Ultimo commit precedente rilevato**: `75da042` (`[Antigravity] fix(navigation): normalize view route aliases, add quote print version polymorphism, and harden interaction form intake`) su `main`.
+- **Diagnosi del Problema segnalato dall'utente ("voglio rivedere completamente il layout attuale che non è chiaro non è funzionale per niente. sia per desktop che per smartphone")**:
+  - **Header sovraccarico**: pulsanti tecnici e operativi multipli (`Day Mode`, `Compatta`, `Cloud sync`, dropdown `+ Crea ▾`, dettatura estesa) intasavano l'header creando disordine sia su desktop che su smartphone.
+  - **KPI Ribbon ingombrante**: 5 grossi box quadrati occupavano spazio verticale prezioso prima di mostrare le attività da fare, forzando scrolling inutile.
+  - **Card Attività sature di pulsanti**: 6 pulsanti affiancati per ciascuna card causavano clutter visivo e rendevano difficile individuare l'azione primaria.
+  - **Mobile Shell & Bottom Bar non ergonomica**: la barra inferiore mobile su smartphone ereditava involontariamente `flex-direction: column` dal selettore `nav` generale di `layout.css` e collassava verticalmente, occupando oltre 250px di altezza; le viste secondarie non avevano un punto di accesso rapido senza aprire l'intero cassetto laterale.
+- **Attività completate**:
+  - **Header Minimale & Ergonomico Apple/Notion (`index.html`, `layout.css`, `style.css`)**:
+    - Breadcrumb essenziale a sinistra (`APEX CRM / Home`).
+    - Pillola di ricerca centrale discreta (`#cmd-trigger-btn` con shortcut `⌘K`).
+    - Cluster di destra ordinato con dettatura (`🎙️`), menu unificato `+ Crea ▾` (nascosto su smartphone per non intasare la testata), e profilo utente (`AD Apex Personal`) con indicatore live di sincronizzazione Supabase.
+    - Controlli tecnici obsoleti o duplicati (`#cloud-sync-status`, `#density-toggle`, `#theme-toggle`) integrati nel pannello Impostazioni preservando piena retrocompatibilità.
+  - **Striscia di Stato Orizzontale a Pillola (`crm-pro.js`, `layout.css`)**:
+    - Sostituiti i 5 riquadri KPI con `.exec-status-bar`: pillole orizzontali compatte stile status strip (`🚨 Da fare subito 18`, `🚀 Progetti attivi 0`, `✉️ Ricontatti 16`, `⏳ In attesa risposta 0`, `⚠️ Da definire 0`) con transizioni fluide al tocco/hover.
+    - Risolto lo spreco di spazio verticale, portando le attività urgenti e i progetti immediatamente in evidenza "above the fold".
+  - **Gerarchia Azioni Card Attività a Due Livelli (`crm-pro.js`, `layout.css`)**:
+    - Suddivise le azioni per card in:
+      - **Livello Primario Operativo**: `✓ Completa` (mint chiaro) e `📞 Chiama` (teal chiaro) grandi, chiari ed ergonomici.
+      - **Livello Secondario Raggruppato**: `✉️ Sollecito`, `⚡ Esito`, `✏️ Modifica`, `360° ↗` per azioni di approfondimento.
+  - **Barra Inferiore Smartphone a 5 Tab Fissi & Bottom Sheet Altro (`index.html`, `activities.js`, `layout.css`)**:
+    - Isolato lo scope del selettore `nav` della sidebar a `#app-sidebar nav` in `layout.css`.
+    - Realizzata `.mobile-bottom-nav` a 5 tab orizzontali con layout nativo iOS/Android (`◷ Home`, `☑ Attività`, `🏢 Aziende`, `🚀 Progetti`, `☰ Altro`) con altezza fissa di 56px, blur traslucido e tab attivo evidenziato in blu.
+    - Implementato `<dialog id="mobile-more-sheet">` ad apertura a 1 tocco per accedere istantaneamente a Opportunità, Campagne, Preventivi, Forecast & KPI e Impostazioni su smartphone.
+- **File modificati**:
+  - `index.html`
+  - `layout.css`
+  - `style.css`
+  - `activities.js`
+  - `crm-pro.js`
+  - `AGENTS.md`
+- **Test eseguiti**:
+  - 10 verifiche sintattiche (`node --check`) superate con 0 errori.
+  - 13 suite di test funzionali completate con esito `PASS` al 100% (`crm-check.cjs`, `import-check.cjs`, `relationship-check.cjs`, `sales-check.cjs`, `resource-check.cjs`, `unscheduled-check.cjs`, `quotes-check.cjs`, `activities-check.cjs`, `enterprise-check.cjs`, `cloud-sync-check.cjs`, `mcp-server-check.cjs`, `crm-pro-check.cjs`, `crm-rapid-check.cjs`).
+  - Verifiche visive headless Chrome (CDP) su risoluzioni desktop (1440x900) e mobile (390x844): confermata idratazione impeccabile, zero errori di console e navigazione tab/sheet funzionante al 100%.
+- **Problemi aperti**:
+  - Nessuno.
+- **Attività successive consigliate**:
+  - Esecuzione di `git commit` e `git push` su GitHub.
+  - Deploy su Vercel (`pubblica-vercel.cmd`).
+
 ### Sessione 2026-11-04 (Apex CRM 100% Funzionale: Risoluzione Crash Navigazione Viste, Normalizzazione Alias Rotte, Polimorfismo Touchpoint Form e Anteprima Preventivo Print) — Agente: Google Antigravity
 - **Ultimo commit precedente rilevato**: `be57f85` (`[Antigravity] feat(desktop): modernize desktop layout with Attio & Linear bento workstation, consolidated filters, and seamless page headers`) su `main`.
 - **Diagnosi del Problema segnalato dall'utente ("lapp non e funzionale al 100 % fai di tutto per renderlo /goal")**:

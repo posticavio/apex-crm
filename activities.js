@@ -737,7 +737,11 @@ function syncMobileShell(){
  }
  closeQuickCreateDropdown();
  closeMobileCreateSheet();
+ try { document.querySelector('#mobile-more-sheet')?.close(); } catch(_) {}
  if(document.querySelectorAll){
+  const isMoreView=['trattative','campaigns','quotes','analytics'].includes(view);
+  const moreBtn=document.querySelector('#mobile-nav-more');
+  if(moreBtn&&moreBtn.classList)moreBtn.classList.toggle('active',isMoreView);
   document.querySelectorAll('#mobile-bottom-nav [data-view]').forEach(b=>{
    const active=b.dataset.view===view||(b.dataset.view==='contatti'&&isAnagrafiche);
    if(b.classList)b.classList.toggle('active',active);
@@ -960,6 +964,21 @@ document.addEventListener('click',e=>{
  if(b.id==='sidebar-collapse-btn'){toggleSidebarCollapse();return;}
  if(b.id==='mobile-fab'){hapticTap(12);openMobileCreateSheet();return;}
  if(b.id==='mobile-create-close'){closeMobileCreateSheet();return;}
+ if(b.id==='mobile-nav-more'){
+  hapticTap(8);
+  const moreSheet=document.querySelector('#mobile-more-sheet');
+  if(moreSheet&&typeof moreSheet.showModal==='function')moreSheet.showModal();
+  return;
+ }
+ if(b.id==='mobile-more-close'){
+  document.querySelector('#mobile-more-sheet')?.close();
+  return;
+ }
+ if(b.id==='mobile-more-settings-btn'){
+  document.querySelector('#mobile-more-sheet')?.close();
+  openSettingsDialog();
+  return;
+ }
  if(b.id==='open-settings'||b.id==='header-settings-btn'){openSettingsDialog();return;}
  if(b.id==='cmd-trigger-btn'){openCommandPalette();return;}
  if(b.id==='command-close'){document.querySelector('#command-dialog')?.close();return;}
