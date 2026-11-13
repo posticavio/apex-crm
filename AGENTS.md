@@ -62,6 +62,27 @@ node crm-rapid-check.cjs
 ---
 
 ## Registro di Passaggio tra Agenti (Handoff Log)
+### Sessione 2026-11-13 (Recupero & Salvataggio Preventivo Inviato a Cattini Srl in CRM e Cloud Supabase) — Agente: Google Antigravity
+- **Ultimo commit precedente rilevato**: `123bd7c` (`[Antigravity] feat(ux): complete layout revamp for desktop and smartphone with Apple/Notion ergonomics, 5-tab mobile bottom nav, uncluttered headers, and status strip`) su `main`.
+- **Diagnosi del Problema segnalato dall'utente ("pero avevo inviato un preventivo a cattini e non e salvato nel crm")**:
+  - Verifica effettuata su Google Drive (`Cattini | Progetto RDO e archiviazione disegni` e `parisi-cattini.js`) e sul cloud state Supabase (`apex_crm_cloud_state.json`): la proposta indicativa inviata via email il **03/10/2026** a Paolo Cattini (~40 ore per sviluppo iniziale applicativo web RDO/registro/archiviazione disegni, **1.200 € netti / 1.500 € lordi**, integrazione SAP B1 da valutare a parte) non era salvata in `state.quotes` né in `ensureDemoQuotesData` (`quotes.js`) né nello snapshot Supabase.
+  - Inoltre, `quotesView()` non invocava `ensureDemoQuotesData(state)` al caricamento locale della vista Preventivi.
+- **Attività completate**:
+  - **Registrazione Preventivo Cattini Srl (`quotes.js`)**:
+    - Aggiunto il preventivo `quote-cattini-rdo-2026` (`APX-2026-002`, data `2026-10-03`, stato `Da approvare`, 40 ore × 30 €/ora = `1.200,00 €` netti con `vat: null` "IVA da definire" e note complete su `1.200 € netti / 1.500 € lordi` e integrazione SAP B1) in `ensureDemoQuotesData(crmState)`.
+    - Collegato automaticamente `quotesView()` a `ensureDemoQuotesData(state)` per garantire il popolamento anche in sessioni locali/offline.
+  - **Sincronizzazione Cloud Supabase**:
+    - Aggiornato lo snapshot remoto `apex_crm_cloud_state.json` su Supabase (`attachments`, id `5ba75c56-0e3d-49ab-9dbd-364756ce04f0`) con entrambi i preventivi validati (`APX-2026-001 -> Martino Parisi S.r.l.`, `APX-2026-002 -> Cattini Srl`).
+- **File modificati**:
+  - `quotes.js`
+  - `AGENTS.md`
+- **Test eseguiti**:
+  - Suite completa di controllo sintattico (`node --check` su 10 file) e 13 suite funzionali (`crm-check.cjs`, `import-check.cjs`, `relationship-check.cjs`, `sales-check.cjs`, `resource-check.cjs`, `unscheduled-check.cjs`, `quotes-check.cjs`, `activities-check.cjs`, `enterprise-check.cjs`, `cloud-sync-check.cjs`, `mcp-server-check.cjs`, `crm-pro-check.cjs`, `crm-rapid-check.cjs`).
+- **Problemi aperti**:
+  - Nessuno.
+- **Attività successive consigliate**:
+  - Eseguire `git push` su GitHub (incluso il commit locale precedente `123bd7c` + il nuovo commit).
+
 ### Sessione 2026-11-12 (Revamp Completo Layout Desktop & Smartphone: Benchmark Ergonomia Apple/Notion, Bottom Bar Mobile 5 Tab, Header Minimale Senza Clutter e Bento Workstation Unificata) — Agente: Google Antigravity
 - **Ultimo commit precedente rilevato**: `75da042` (`[Antigravity] fix(navigation): normalize view route aliases, add quote print version polymorphism, and harden interaction form intake`) su `main`.
 - **Diagnosi del Problema segnalato dall'utente ("voglio rivedere completamente il layout attuale che non è chiaro non è funzionale per niente. sia per desktop che per smartphone")**:
