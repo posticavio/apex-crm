@@ -422,6 +422,53 @@ function activitiesView(){
   ['completed','Completate',all.filter(a=>a.status==='Completata').length],
   ['all','Tutte',all.length]
  ];
+ const filtersHtml=`<div class="stage-segment-bar" role="group" aria-label="Filtra attività per fase aziendale">
+    <button type="button" data-activity-stage="" class="${activityStageFilter===''?'selected':''}">Tutte le fasi <span>${open.length}</span></button>
+    ${stages.map(s=>`<button type="button" data-activity-stage="${s}" class="${activityStageFilter===s?'selected':''}">${s} <span>${openByStage(s).length}</span></button>`).join('')}
+   </div>
+   <div class="activity-filters" role="group" aria-label="Filtra stato attività">
+    ${statusTabs.map(([k,label,cnt])=>`<button type="button" data-activity-status="${k}" class="${activityStatusFilter===k?'selected':''}">${label}<span>${cnt}</span></button>`).join('')}
+   </div>
+   <select id="activity-type-filter" aria-label="Filtra tipo attività">
+    <option value="">Tutti i tipi</option>
+    ${activityTypes.map(t=>`<option ${activityTypeFilter===t?'selected':''}>${t}</option>`).join('')}
+   </select>
+   <select id="activity-priority-filter" aria-label="Filtra priorità">
+    <option value="">Tutte le priorità</option>
+    ${activityPriorities.map(p=>`<option ${activityPriorityFilter===p?'selected':''}>${p}</option>`).join('')}
+   </select>`;
+ const sortHtml=`<label class="sort-label">Ordina per
+    <select id="activity-sort" aria-label="Ordina attività">
+     <option value="due" ${activitySort==='due'?'selected':''}>Prossima scadenza</option>
+     <option value="priority" ${activitySort==='priority'?'selected':''}>Priorità alta → bassa</option>
+     <option value="company" ${activitySort==='company'?'selected':''}>Azienda A–Z</option>
+     <option value="title" ${activitySort==='title'?'selected':''}>Titolo A–Z</option>
+    </select>
+   </label>`;
+ const viewHtml=`<div class="view-toggle" role="group" aria-label="Vista attività">
+    <button type="button" data-activity-layout="board" aria-pressed="${activityLayout==='board'}" class="${activityLayout==='board'?'selected':''}">▥ Bacheca Fasi</button>
+    <button type="button" data-activity-layout="list" aria-pressed="${activityLayout==='list'}" class="${activityLayout==='list'?'selected':''}">☷ Elenco</button>
+   </div>`;
+ const extraButtonsHtml=`<button type="button" id="open-playbook-editor" class="toolbar-icon-btn" data-open-playbooks="true" title="Configura Playbook" aria-label="Configura Playbook">⚙</button>`;
+ const parts=[];
+ if(search)parts.push(`"${search}"`);
+ if(activityStageFilter)parts.push(activityStageFilter);
+ if(activityStatusFilter&&activityStatusFilter!=='open')parts.push(activityStatusFilter);
+ if(activityTypeFilter)parts.push(activityTypeFilter);
+ if(activityPriorityFilter)parts.push(activityPriorityFilter);
+ const bar=typeof iconToolbar==='function'?iconToolbar({
+  countText:`${rows.length} attività`,
+  activeSummary:parts.join(' · '),
+  searchPlaceholder:'Cerca attività, azienda, referente…',
+  searchValue:search,
+  filtersHtml,
+  hasActiveFilters:Boolean(activityStageFilter||activityTypeFilter||activityPriorityFilter||(activityStatusFilter&&activityStatusFilter!=='open')),
+  viewHtml,
+  sortHtml,
+  hasActiveSort:activitySort!=='due',
+  extraButtonsHtml,
+  exportDisabled:!rows.length
+ }):`<div class="toolbar"><input id="search" aria-label="Cerca attività" value="${esc(search)}">${filtersHtml}${sortHtml}${viewHtml}${extraButtonsHtml}<button type="button" id="export-csv" ${!rows.length?'disabled':''}>↓ Esporta CSV</button></div>`;
  return `
   <div class="stats">
    <div class="stat">
@@ -445,45 +492,7 @@ function activitiesView(){
     <small>${overdueCount} scadute · ${todayCount} previste oggi</small>
    </div>
   </div>
-  <div class="activities-control-header">
-   <div class="stage-segment-bar" role="group" aria-label="Filtra attività per fase aziendale">
-    <button type="button" data-activity-stage="" class="${activityStageFilter===''?'selected':''}">Tutte le fasi <span>${open.length}</span></button>
-    ${stages.map(s=>`<button type="button" data-activity-stage="${s}" class="${activityStageFilter===s?'selected':''}">${s} <span>${openByStage(s).length}</span></button>`).join('')}
-   </div>
-   <div class="activity-status-strip">
-    <div class="activity-filters" role="group" aria-label="Filtra stato attività">
-     ${statusTabs.map(([k,label,cnt])=>`<button type="button" data-activity-status="${k}" class="${activityStatusFilter===k?'selected':''}">${label}<span>${cnt}</span></button>`).join('')}
-    </div>
-   </div>
-  </div>
-  <div class="toolbar">
-   <input id="search" aria-label="Cerca attività" placeholder="Cerca attività, azienda, referente, opportunità…" value="${esc(search)}">
-   <select id="activity-type-filter" aria-label="Filtra tipo attività">
-    <option value="">Tutti i tipi</option>
-    ${activityTypes.map(t=>`<option ${activityTypeFilter===t?'selected':''}>${t}</option>`).join('')}
-   </select>
-   <select id="activity-priority-filter" aria-label="Filtra priorità">
-    <option value="">Tutte le priorità</option>
-    ${activityPriorities.map(p=>`<option ${activityPriorityFilter===p?'selected':''}>${p}</option>`).join('')}
-   </select>
-   <div class="list-controls">
-    <span class="result-count">${rows.length} attività</span>
-    <label class="sort-label">Ordina per
-     <select id="activity-sort" aria-label="Ordina attività">
-      <option value="due" ${activitySort==='due'?'selected':''}>Prossima scadenza</option>
-      <option value="priority" ${activitySort==='priority'?'selected':''}>Priorità alta → bassa</option>
-      <option value="company" ${activitySort==='company'?'selected':''}>Azienda A–Z</option>
-      <option value="title" ${activitySort==='title'?'selected':''}>Titolo A–Z</option>
-     </select>
-    </label>
-    <div class="view-toggle" role="group" aria-label="Vista attività">
-     <button type="button" data-activity-layout="board" aria-pressed="${activityLayout==='board'}" class="${activityLayout==='board'?'selected':''}">▥ Bacheca Fasi</button>
-     <button type="button" data-activity-layout="list" aria-pressed="${activityLayout==='list'}" class="${activityLayout==='list'?'selected':''}">☷ Elenco</button>
-    </div>
-    <button type="button" id="open-playbook-editor" data-open-playbooks="true">⚙ Configura Playbook</button>
-    <button type="button" id="export-csv" ${!rows.length?'disabled':''}>↓ Esporta CSV</button>
-   </div>
-  </div>
+  ${bar}
   ${activityLayout==='board'?activitiesBoard(rows):activitiesTable(rows)}`;
 }
 

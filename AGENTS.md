@@ -62,6 +62,34 @@ node crm-rapid-check.cjs
 ---
 
 ## Registro di Passaggio tra Agenti (Handoff Log)
+### Sessione 2026-11-13b (Toolbar Compatta ad Icone a Destra con Popup per Cerca/Fasi/Vista/Ordina — Tabelle Subito in Alto) — Agente: Google Antigravity
+- **Ultimo commit precedente rilevato**: `ce0e588` (`[Antigravity] fix(desktop): lock background scroll when dialogs are open and enable internal dialog scrolling`) su `main`.
+- **Richiesta utente**: *"cerca fasi vista ordina devono essere delle icone a destra che si aprono al pop up occupato troppo spazio spostando la tabella in basso, la tabella deve essere piu in alto possibile"*.
+- **Attività completate**:
+  - **Componente Unificato `iconToolbar` (`app.js`, `layout.css`)**:
+    - Sostituite le barre filtri estese, i box `.category-intro` e le strisce di chip multi-riga con una singola barra compatta (`.toolbar-compact`) che mostra solo il conteggio risultati (e chip `× Ripristina` quando attivo) a sinistra e le icone compatte a destra: **Cerca (`🔍`)**, **Fasi/Filtri (`⫘`)**, **Vista (`▥`)**, **Ordina (`⇅`)**, **Playbook (`⚙`)**, **Esporta CSV (`↓`)**.
+    - Ogni icona apre un popup flottante (`.toolbar-popover`) su desktop e un pannello ancorato su mobile, con chiusura automatica su clic esterno o `Esc` e indicatore blu quando un filtro/ricerca/ordinamento è attivo.
+  - **Viste aggiornate**:
+    - `app.js` (`contactsView`, `pipeline`, `pipelineTable`, `categoriesView`)
+    - `activities.js` (`activitiesView`)
+    - `projects.js` (`projectsView`)
+    - `quotes.js` (`quotesView`)
+  - **Compattazione Header (`layout.css`)**:
+    - Ridotto il padding/margine inferiore di `.page-heading` (`10px`) così tabelle e bacheche partono immediatamente nella parte alta dello schermo.
+- **File modificati**:
+  - `app.js`
+  - `activities.js`
+  - `projects.js`
+  - `quotes.js`
+  - `layout.css`
+  - `AGENTS.md`
+- **Test eseguiti**:
+  - Suite completa di controllo sintattico (`node --check` su 10 file) e 13 suite funzionali (`crm-check.cjs`, `import-check.cjs`, `relationship-check.cjs`, `sales-check.cjs`, `resource-check.cjs`, `unscheduled-check.cjs`, `quotes-check.cjs`, `activities-check.cjs`, `enterprise-check.cjs`, `cloud-sync-check.cjs`, `mcp-server-check.cjs`, `crm-pro-check.cjs`, `crm-rapid-check.cjs`).
+- **Problemi aperti**:
+  - Nessuno.
+- **Attività successive consigliate**:
+  - Nessuna (modifiche già pubblicate su `origin/main`).
+
 ### Sessione 2026-11-13 (Fix Scroll Desktop Modali/Overlay: Blocco Scroll Sfondo & Scorrimento Interno Dialog) — Agente: Google Antigravity
 - **Ultimo commit precedente rilevato**: `b610ffa` (`[Antigravity] feat(quotes): recover and save Cattini Srl sent quote (2026-10-03) in CRM and Supabase cloud state`) su `main`.
 - **Diagnosi del Problema segnalato dall'utente ("quando apro una schermata tipo sopra lìapp in desktio. lo scroll viene fatto sulla schermata sotto e non su quella davanti")**:

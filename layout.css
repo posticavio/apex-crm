@@ -6297,3 +6297,194 @@ h1, h2, h3, .section-title, .brand {
     align-items: flex-start;
   }
 }
+
+/* ==========================================================================
+   Compact Right-Aligned Icon Toolbar & Floating Popovers
+   ========================================================================== */
+.toolbar.toolbar-compact {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  padding: 2px 0 6px;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: nowrap;
+}
+
+.toolbar-compact-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.toolbar-compact-left .result-count {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink-secondary);
+  white-space: nowrap;
+}
+
+.toolbar-clear-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 9px;
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: 999px;
+  background: var(--blue-bg, #eff6ff);
+  color: var(--blue, #2563eb);
+  border: 1px solid rgba(37, 99, 235, 0.22);
+  cursor: pointer;
+  white-space: nowrap;
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.toolbar-compact-right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.toolbar-pop-wrap {
+  position: relative;
+  display: inline-flex;
+}
+
+.toolbar-icon-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border-radius: var(--radius-sm, 8px);
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--ink-secondary);
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.toolbar-icon-btn:hover:not(:disabled) {
+  background: var(--surface-subtle);
+  color: var(--ink);
+  border-color: var(--line-strong);
+}
+
+.toolbar-icon-btn.is-open,
+.toolbar-icon-btn.has-active {
+  background: var(--blue-bg, #eff6ff);
+  color: var(--blue, #2563eb);
+  border-color: rgba(37, 99, 235, 0.35);
+}
+
+.toolbar-icon-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.toolbar-active-dot {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--blue, #2563eb);
+}
+
+.toolbar-popover {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 80;
+  min-width: 260px;
+  max-width: min(360px, 90vw);
+  background: var(--surface);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-md, 12px);
+  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.14), 0 2px 6px rgba(15, 23, 42, 0.06);
+  padding: 10px 12px;
+}
+
+.toolbar-popover[hidden] {
+  display: none !important;
+}
+
+.toolbar-popover-head {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ink-tertiary, var(--ink-secondary));
+  margin-bottom: 8px;
+}
+
+.toolbar-popover-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.toolbar-popover-body input,
+.toolbar-popover-body select {
+  width: 100%;
+  max-width: none;
+  font-size: 13px;
+}
+
+.toolbar-popover-body .company-phase-chips-bar,
+.toolbar-popover-body .stage-segment-bar,
+.toolbar-popover-body .activity-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+}
+
+.toolbar-popover-body .view-toggle {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  width: 100%;
+}
+
+.toolbar-popover-body .view-toggle button {
+  justify-content: center;
+  min-height: 34px;
+}
+
+@media (max-width: 767px) {
+  .toolbar.toolbar-compact {
+    padding: 0 0 6px;
+    margin-bottom: 4px;
+  }
+
+  .toolbar-icon-btn {
+    width: 36px;
+    height: 36px;
+  }
+
+  .toolbar-popover {
+    position: fixed;
+    top: auto;
+    bottom: 72px;
+    left: 12px;
+    right: 12px;
+    max-width: none;
+    z-index: 120;
+    padding: 14px;
+  }
+}
+

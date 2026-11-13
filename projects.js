@@ -285,7 +285,7 @@ function projectsView(){
  const totalMargin=all.reduce((n,p)=>n+projectMarginCents(p),0);
  const totalHours=all.reduce((n,p)=>n+p.loggedHours,0);
  const estHours=all.reduce((n,p)=>n+p.estimatedHours,0);
- return `
+ const statsHtml=`
   <div class="stats">
    <div class="stat">
     <span class="stat-label">Progetti attivi</span>
@@ -307,31 +307,39 @@ function projectsView(){
     <strong>${totalHours} / ${estHours} h</strong>
     <small>Controllo avanzamento operativo</small>
    </div>
-  </div>
-  <div class="toolbar">
-   <input id="search" aria-label="Cerca progetto" placeholder="Cerca progetto, cliente o milestone…" value="${esc(search)}">
-   <select id="project-status-filter" aria-label="Filtra stato progetto">
+  </div>`;
+ const filtersHtml=`<select id="project-status-filter" aria-label="Filtra stato progetto">
     <option value="">Tutti gli stati</option>
     ${projectStatuses.map(s=>`<option ${projectStatusFilter===s?'selected':''}>${s}</option>`).join('')}
-   </select>
-   <div class="list-controls">
-    <span class="result-count">${rows.length} progetti</span>
-    <label class="sort-label">Ordina per
-     <select id="project-sort" aria-label="Ordina progetti">
-      <option value="due" ${projectSort==='due'?'selected':''}>Consegna prevista</option>
-      <option value="budget" ${projectSort==='budget'?'selected':''}>Budget maggiore</option>
-      <option value="progress" ${projectSort==='progress'?'selected':''}>Avanzamento %</option>
-      <option value="name" ${projectSort==='name'?'selected':''}>Nome A–Z</option>
-     </select>
-    </label>
-    <div class="view-toggle" role="group" aria-label="Vista progetti">
-     <button type="button" data-project-layout="board" aria-pressed="${projectLayout==='board'}" class="${projectLayout==='board'?'selected':''}">▥ Bacheca</button>
-     <button type="button" data-project-layout="gantt" aria-pressed="${projectLayout==='gantt'}" class="${projectLayout==='gantt'?'selected':''}">▤ Cronoprogramma &amp; Costi</button>
-    </div>
-    <button type="button" id="export-csv" ${!rows.length?'disabled':''}>↓ Esporta CSV</button>
-   </div>
-  </div>
-  ${projectLayout==='board'?projectsBoard(rows):projectsGanttTable(rows)}`;
+   </select>`;
+ const sortHtml=`<label class="sort-label">Ordina per
+    <select id="project-sort" aria-label="Ordina progetti">
+     <option value="due" ${projectSort==='due'?'selected':''}>Consegna prevista</option>
+     <option value="budget" ${projectSort==='budget'?'selected':''}>Budget maggiore</option>
+     <option value="progress" ${projectSort==='progress'?'selected':''}>Avanzamento %</option>
+     <option value="name" ${projectSort==='name'?'selected':''}>Nome A–Z</option>
+    </select>
+   </label>`;
+ const viewHtml=`<div class="view-toggle" role="group" aria-label="Vista progetti">
+    <button type="button" data-project-layout="board" aria-pressed="${projectLayout==='board'}" class="${projectLayout==='board'?'selected':''}">▥ Bacheca</button>
+    <button type="button" data-project-layout="gantt" aria-pressed="${projectLayout==='gantt'}" class="${projectLayout==='gantt'?'selected':''}">▤ Cronoprogramma &amp; Costi</button>
+   </div>`;
+ const parts=[];
+ if(search)parts.push(`"${search}"`);
+ if(projectStatusFilter)parts.push(projectStatusFilter);
+ const bar=typeof iconToolbar==='function'?iconToolbar({
+  countText:`${rows.length} progetti`,
+  activeSummary:parts.join(' · '),
+  searchPlaceholder:'Cerca progetto, cliente o milestone…',
+  searchValue:search,
+  filtersHtml,
+  hasActiveFilters:Boolean(projectStatusFilter),
+  viewHtml,
+  sortHtml,
+  hasActiveSort:projectSort!=='due',
+  exportDisabled:!rows.length
+ }):`<div class="toolbar"><input id="search" aria-label="Cerca progetto" value="${esc(search)}">${filtersHtml}${sortHtml}${viewHtml}<button type="button" id="export-csv" ${!rows.length?'disabled':''}>↓ Esporta CSV</button></div>`;
+ return `${statsHtml}${bar}${projectLayout==='board'?projectsBoard(rows):projectsGanttTable(rows)}`;
 }
 
 function projectsBoard(rows){
