@@ -859,3 +859,7 @@ node crm-rapid-check.cjs
 - Verifiche prima del push: origin/main e HEAD allineati a 5e236a4; 10 controlli sintattici e 11 suite offline PASS; git diff --check PASS. Le due suite con accesso ai dati Supabase reali restano escluse.
 - Commit previsto: correzione comune del blocco scroll dialog, con app.js, layout.css e questo registro.
 - Vercel: API non raggiungibile dalla policy corrente (CONNECT 403); nessun binding Vercel o login CLI locale disponibile. Verificare il deploy automatico GitHub, se configurato; il push da solo non prova il deploy.
+
+
+## Specifiche UX APEX CRM (13 novembre 2026)
+Per ogni intervento sull'interfaccia, leggere e applicare [docs/APEX-UX-SPEC.md](docs/APEX-UX-SPEC.md). Ottimizzare l'app esistente, senza riscriverla o perdere funzionalità.
