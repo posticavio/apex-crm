@@ -1,0 +1,952 @@
+/* ==========================================================================
+   design-v2.css — Apex CRM Unified Design System (Attio / Linear / Notion / Pipedrive)
+   Loaded after layout.css and before design-v2-views.css
+   ========================================================================== */
+
+:root {
+  /* Surfaces (warm-neutral Notion/Attio light) */
+  --bg: #F8F7F4;
+  --bg-sunken: #F1F0EB;
+  --surface: #FFFFFF;
+  --surface-hover: #FAF9F6;
+  --sidebar: #F4F3EF;
+
+  /* Hairline borders & ink */
+  --line: #E7E5DF;
+  --line-strong: #D6D3CB;
+  --border: #E7E5DF;
+  --text: #1F1D1A;
+  --text-2: #5F5B53;
+  --text-3: #8F8A80;
+  --muted: #6F6A60;
+  --text-inv: #FFFFFF;
+
+  /* Accent & semantic tokens */
+  --accent: #3B5BDB;
+  --accent-soft: #E8EDFD;
+  --accent-hover: #2F4AB8;
+  --blue: #3B5BDB;
+  --ok: #2F9E6B;
+  --ok-soft: #E3F4EB;
+  --warn: #C77D0A;
+  --warn-soft: #FBF0DB;
+  --danger: #D6453D;
+  --danger-soft: #FBE7E5;
+  --info: #2B7FB8;
+  --info-soft: #E1F0F9;
+
+  /* Typography & Radii */
+  --font: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --r-xs: 4px;
+  --r-sm: 6px;
+  --r-md: 8px;
+  --r-lg: 12px;
+  --r-pill: 999px;
+
+  /* Elevation (only popovers & drawers) */
+  --sh-pop: 0 8px 24px rgba(31, 29, 26, 0.10), 0 1px 2px rgba(31, 29, 26, 0.06);
+  --sh-drawer: -12px 0 32px rgba(31, 29, 26, 0.10);
+  --focus: 0 0 0 3px rgba(59, 91, 219, 0.22);
+
+  /* Layout metrics */
+  --sidebar-w: 228px;
+  --topbar-h: 48px;
+  --row-h: 40px;
+}
+
+/* Base typography & tabular numbers */
+body[data-theme="light"],
+body {
+  font-family: var(--font);
+  font-size: 13.5px;
+  line-height: 1.45;
+  color: var(--text);
+  background: var(--bg);
+  font-variant-numeric: tabular-nums;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Crisp SVG icon helper */
+.ico {
+  display: inline-block;
+  vertical-align: -0.15em;
+  flex-shrink: 0;
+}
+
+/* ---------- Sidebar (Linear / Notion rail) ---------- */
+#app-sidebar {
+  background: var(--sidebar) !important;
+  border-right: 1px solid var(--line) !important;
+  box-shadow: none !important;
+}
+
+#app-sidebar .sidebar-top {
+  padding: 10px 12px 6px;
+}
+
+#app-sidebar .brand {
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+#app-sidebar .brand .mark {
+  width: 24px;
+  height: 24px;
+  border-radius: var(--r-sm);
+  background: var(--text);
+  color: var(--text-inv);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+#app-sidebar .workspace-profile {
+  margin: 4px 10px 8px;
+  padding: 6px 8px;
+  border-radius: var(--r-md);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  box-shadow: none;
+}
+
+#app-sidebar .profile-avatar {
+  width: 26px;
+  height: 26px;
+  font-size: 11px;
+  border-radius: var(--r-sm);
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+#app-sidebar .nav-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--text-3);
+  padding: 10px 12px 4px;
+}
+
+#app-sidebar nav button {
+  height: 32px;
+  min-height: 32px;
+  padding: 0 10px;
+  margin: 1px 8px;
+  border-radius: var(--r-sm);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-2);
+  border: 1px solid transparent;
+  background: transparent;
+  transition: background 0.12s, color 0.12s;
+}
+
+#app-sidebar nav button:hover {
+  background: var(--bg-sunken);
+  color: var(--text);
+}
+
+#app-sidebar nav button.active {
+  background: var(--surface);
+  color: var(--text);
+  font-weight: 600;
+  border-color: var(--line);
+  box-shadow: 0 1px 2px rgba(31, 29, 26, 0.04);
+}
+
+#app-sidebar nav button.active .nav-icon {
+  color: var(--accent);
+}
+
+#app-sidebar .nav-badge {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-3);
+  background: transparent;
+  padding: 0 4px;
+}
+
+/* ---------- Topbar (48px minimal) ---------- */
+.topbar {
+  height: var(--topbar-h);
+  min-height: var(--topbar-h);
+  padding: 0 20px;
+  background: rgba(248, 247, 244, 0.88);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--line);
+}
+
+.cmd-trigger-btn {
+  height: 30px;
+  border-radius: var(--r-md);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  color: var(--text-3);
+  font-size: 12.5px;
+  box-shadow: none;
+}
+
+.cmd-trigger-btn:hover {
+  border-color: var(--line-strong);
+  color: var(--text-2);
+}
+
+.topbar-new-btn,
+button.primary {
+  background: var(--accent);
+  color: var(--text-inv);
+  border: 1px solid transparent;
+  border-radius: var(--r-sm);
+  font-weight: 500;
+  box-shadow: none;
+}
+
+.topbar-new-btn:hover,
+button.primary:hover {
+  background: var(--accent-hover);
+}
+
+/* ---------- Seamless Page Heading (Table-first, ultra-compact) ---------- */
+.page-heading {
+  padding: 10px 0 8px !important;
+  margin: 0 0 6px !important;
+  background: transparent !important;
+  border: 0 !important;
+  border-bottom: 1px solid var(--line) !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.page-heading h1 {
+  font-size: 20px !important;
+  font-weight: 600 !important;
+  letter-spacing: -0.02em;
+  color: var(--text);
+  margin: 0 !important;
+  line-height: 1.25;
+}
+
+.page-heading #subtitle {
+  font-size: 12.5px;
+  color: var(--text-3);
+  margin: 2px 0 0;
+}
+
+.page-heading .heading-meta,
+.page-heading #date-label {
+  font-size: 12px;
+  color: var(--text-3);
+}
+
+/* ---------- Unified Pills ---------- */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 22px;
+  padding: 0 8px;
+  border-radius: var(--r-pill);
+  font-size: 12px;
+  font-weight: 500;
+  background: var(--bg-sunken);
+  color: var(--text-2);
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+
+.pill.green {
+  background: var(--ok-soft);
+  color: var(--ok);
+}
+
+.pill.amber {
+  background: var(--warn-soft);
+  color: var(--warn);
+}
+
+.pill.red {
+  background: var(--danger-soft);
+  color: var(--danger);
+}
+
+.pill.blue {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+/* ---------- Attio-style Phase Tabs (Aziende) ---------- */
+.company-phase-chips-bar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0;
+  margin: 0 0 8px;
+  border-bottom: 1px solid var(--line);
+  background: transparent;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.company-phase-chips-bar .date-chip {
+  position: relative;
+  height: 32px;
+  padding: 0 12px;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+  background: transparent;
+  color: var(--text-2);
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: color 0.12s;
+}
+
+.company-phase-chips-bar .date-chip:hover {
+  color: var(--text);
+}
+
+.company-phase-chips-bar .date-chip.active {
+  color: var(--accent);
+  font-weight: 600;
+  border-bottom-color: var(--accent);
+  background: transparent;
+}
+
+/* Monogram avatar */
+.company-monogram-chip {
+  display: inline-grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: var(--r-sm);
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: 11px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.company-name-cell {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.company-row-clickable {
+  cursor: pointer;
+}
+
+.company-contact-inline {
+  display: inline-flex !important;
+  align-items: center;
+  gap: 6px;
+  margin-left: 8px;
+  font-size: 12px;
+  color: var(--text-3);
+}
+
+.company-contact-inline a {
+  color: var(--text-2);
+  text-decoration: none;
+}
+
+.company-contact-inline a:hover {
+  color: var(--accent);
+  text-decoration: underline;
+}
+
+/* ---------- Executive Home (Linear + Attio Workstation) ---------- */
+.exec-status-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 12px;
+  padding: 0;
+  background: transparent;
+  border: 0;
+}
+
+.exec-status-pill {
+  height: 28px;
+  padding: 0 10px;
+  border-radius: var(--r-pill);
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--text-2);
+  font-size: 12.5px;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  box-shadow: none;
+}
+
+.exec-status-pill:hover {
+  border-color: var(--line-strong);
+  background: var(--surface-hover);
+  color: var(--text);
+}
+
+.exec-status-pill.is-urgent {
+  border-color: rgba(214, 69, 61, 0.28);
+  background: var(--danger-soft);
+  color: var(--danger);
+}
+
+.exec-status-pill strong {
+  font-weight: 600;
+  color: inherit;
+}
+
+.executive-home-grid,
+.home-bento-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.55fr) minmax(300px, 1fr);
+  gap: 16px;
+  align-items: start;
+}
+
+.home-section-card,
+.exec-panel {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  box-shadow: none;
+  padding: 12px 14px;
+}
+
+.unified-activity-card {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--surface);
+  margin-bottom: 6px;
+  box-shadow: none;
+  transition: border-color 0.12s, background 0.12s;
+}
+
+.unified-activity-card:hover {
+  border-color: var(--line-strong);
+  background: var(--surface-hover);
+}
+
+.uac-main {
+  min-width: 0;
+  flex: 1;
+}
+
+.uac-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+
+.uac-action-title {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0 0 3px;
+}
+
+.uac-meta-reason {
+  font-size: 12px;
+  color: var(--text-2);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.uac-actions-cluster {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.uac-primary-actions,
+.uac-secondary-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.uac-icon-btn {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  display: inline-grid;
+  place-items: center;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--text-2);
+  font-size: 12px;
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s, border-color 0.12s;
+}
+
+.uac-icon-btn:hover:not(:disabled) {
+  background: var(--bg-sunken);
+  color: var(--text);
+  border-color: var(--line-strong);
+}
+
+.uac-icon-btn.op-done:hover {
+  background: var(--ok-soft);
+  color: var(--ok);
+  border-color: transparent;
+}
+
+.uac-icon-btn.op-call:hover:not(:disabled) {
+  background: var(--accent-soft);
+  color: var(--accent);
+  border-color: transparent;
+}
+
+@media (hover: hover) {
+  .unified-activity-card .uac-secondary-actions {
+    opacity: 0.45;
+    transition: opacity 0.12s;
+  }
+  .unified-activity-card:hover .uac-secondary-actions,
+  .unified-activity-card:focus-within .uac-secondary-actions {
+    opacity: 1;
+  }
+}
+
+/* ---------- Kanban Pipeline (Pipedrive-style) ---------- */
+.board {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  padding-bottom: 12px;
+  align-items: flex-start;
+}
+
+.board .column {
+  flex: 0 0 284px;
+  min-width: 284px;
+  background: var(--bg-sunken);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  padding: 10px;
+  box-shadow: none;
+}
+
+.board .column-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 2px 4px 8px;
+  margin-bottom: 6px;
+  border-bottom: 1px solid var(--line);
+}
+
+.board .column-heading h3 {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.board .column-heading h3 span {
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--text-3);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  padding: 0 6px;
+  border-radius: var(--r-pill);
+}
+
+.board .column-value {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-2);
+  text-align: right;
+}
+
+.board .column-value small {
+  display: none;
+}
+
+.deal-container {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  padding: 10px 11px;
+  margin-bottom: 8px;
+  box-shadow: none;
+  transition: border-color 0.12s;
+}
+
+.deal-container:hover {
+  border-color: var(--line-strong);
+}
+
+.deal-container .deal {
+  background: transparent;
+  border: 0;
+  padding: 0;
+  text-align: left;
+  width: 100%;
+  box-shadow: none;
+}
+
+.deal-container .deal strong {
+  display: block;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text);
+  margin: 6px 0 2px;
+}
+
+.deal-container .deal p {
+  font-size: 12.5px;
+  color: var(--text-2);
+  margin: 0 0 4px;
+}
+
+.deal-container .deal .amount {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  margin: 4px 0 2px;
+}
+
+/* ---------- Company 360° Slide-Over Drawer (HubSpot/Attio) ---------- */
+#company-360-dialog {
+  box-shadow: var(--sh-drawer);
+  border-left: 1px solid var(--line);
+  background: var(--surface);
+}
+
+.c360-header {
+  background: var(--bg);
+  border-bottom: 1px solid var(--line);
+}
+
+.c360-tabs {
+  background: var(--surface);
+  border-bottom: 1px solid var(--line);
+  gap: 4px;
+  padding: 0 16px;
+}
+
+.c360-tab {
+  height: 36px;
+  padding: 0 10px;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  color: var(--text-2);
+  font-size: 12.5px;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.c360-tab.active {
+  color: var(--accent);
+  font-weight: 600;
+  border-bottom-color: var(--accent);
+}
+
+/* ---------- Mobile Ergonomics (< 768px) ---------- */
+@media (max-width: 767px) {
+  .executive-home-grid,
+  .home-bento-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .topbar {
+    padding: 0 12px;
+  }
+
+  .page-heading {
+    padding: 8px 0 6px !important;
+  }
+
+  .uac-icon-btn {
+    width: 36px;
+    height: 36px;
+  }
+
+  .unified-activity-card {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .uac-actions-cluster {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .board[data-mobile-tabbed="true"] .column {
+    flex: 1 1 100%;
+    min-width: 100%;
+  }
+
+  .mobile-bottom-nav {
+    background: rgba(255, 255, 255, 0.94);
+    backdrop-filter: blur(12px);
+    border-top: 1px solid var(--line);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  .exec-status-bar {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    scrollbar-width: none;
+    padding-bottom: 4px;
+    gap: 6px;
+  }
+
+  .exec-status-pill {
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
+  }
+
+  .page-heading #subtitle {
+    display: none;
+  }
+
+  .v2-table tbody td {
+    text-align: left !important;
+  }
+
+  .v2-table tbody td[data-label]:not(:first-child):not(.cell-actions) {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  .v2-table .row-actions {
+    flex-wrap: wrap !important;
+  }
+}
+
+/* Desktop dense row actions: never wrap vertically or clip right edge */
+.v2-companies-table td:first-child {
+  max-width: 250px !important;
+}
+
+.v2-companies-table td:nth-child(4) {
+  max-width: 230px !important;
+}
+
+.v2-table td.cell-actions {
+  white-space: nowrap !important;
+  width: 1% !important;
+}
+
+.v2-table .row-actions {
+  display: inline-flex !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
+  align-items: center;
+  gap: 4px;
+}
+
+.v2-table .row-actions button {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+/* ---------- Pipedrive #5: Urgent Follow-ups Strip + 3-Line Deal Cards ---------- */
+.pipe-urgent-strip {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 8px;
+  margin: 0 0 10px;
+}
+
+.pipe-urgent-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 11px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  text-align: left;
+  cursor: pointer;
+  min-width: 0;
+  transition: border-color 0.12s, background 0.12s;
+}
+
+.pipe-urgent-card:hover {
+  border-color: var(--line-strong);
+  background: var(--surface-hover);
+}
+
+.pipe-urgent-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: inline-grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+
+.pipe-urgent-icon.is-danger { background: var(--danger-soft); color: var(--danger); }
+.pipe-urgent-icon.is-warn { background: var(--warn-soft); color: var(--warn); }
+.pipe-urgent-icon.is-ok { background: var(--ok-soft); color: var(--ok); }
+
+.pipe-urgent-info {
+  min-width: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.pipe-urgent-info strong {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pipe-urgent-info small {
+  font-size: 11.5px;
+  color: var(--text-3);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pipe-act-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  display: inline-block;
+}
+
+.pipe-act-dot.is-ok { background: var(--ok); }
+.pipe-act-dot.is-warn { background: var(--warn); }
+.pipe-act-dot.is-danger { background: var(--danger); }
+.pipe-act-dot.is-muted { background: var(--text-3); }
+
+.deal-container .deal-row-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.deal-container .deal-row-top strong {
+  margin: 0 !important;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.deal-container .deal-row-company {
+  font-size: 12px !important;
+  color: var(--text-2) !important;
+  margin: 2px 0 6px !important;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.deal-container .deal-row-meta {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.deal-container .deal-row-meta .amount {
+  margin: 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
+  border: 0 !important;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.deal-container .deal-row-meta .amount small {
+  font-weight: 400;
+  color: var(--text-3);
+}
+
+.deal-container .deal-due {
+  font-size: 11.5px;
+  color: var(--text-3);
+  white-space: nowrap;
+}
+
+.deal-container .deal-due.is-overdue {
+  color: var(--danger);
+  font-weight: 600;
+}
+
+.deal-hover-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px solid var(--line);
+}
+
+@media (hover: hover) {
+  .deal-container .deal-hover-actions {
+    display: none;
+  }
+  .deal-container:hover .deal-hover-actions,
+  .deal-container:focus-within .deal-hover-actions {
+    display: flex;
+  }
+}
+
+@media (max-width: 767px) {
+  .exec-status-pill {
+    width: auto !important;
+  }
+  .company-contact-inline {
+    flex-wrap: wrap;
+    margin-left: 0 !important;
+  }
+  .pipe-urgent-strip {
+    display: flex;
+    overflow-x: auto;
+    scrollbar-width: none;
+    padding-bottom: 2px;
+  }
+  .pipe-urgent-card {
+    flex: 0 0 240px;
+  }
+}

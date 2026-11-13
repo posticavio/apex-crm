@@ -286,7 +286,7 @@ function projectsView(){
  const totalHours=all.reduce((n,p)=>n+p.loggedHours,0);
  const estHours=all.reduce((n,p)=>n+p.estimatedHours,0);
  const statsHtml=`
-  <div class="stats">
+  <div class="stats v2-stats-strip">
    <div class="stat">
     <span class="stat-label">Progetti attivi</span>
     <strong>${active.length.toString().padStart(2,'0')}</strong>
@@ -344,7 +344,7 @@ function projectsView(){
 
 function projectsBoard(rows){
  const cols=projectStatusFilter?[projectStatusFilter]:projectStatuses;
- return `<div class="board">
+ return `<div class="board v2-projects-board">
   ${cols.map((s,idx)=>{
    const items=rows.filter(p=>p.status===s);
    return `<section class="column stage-${idx%5}">
@@ -383,7 +383,7 @@ function projectsBoard(rows){
 }
 
 function projectsGanttTable(rows){
- return `<div class="panel">${rows.length?`<div class="table-wrap"><table>
+ return `<div class="panel v2-table v2-projects-table">${rows.length?`<div class="table-wrap"><table>
   <thead><tr><th>Progetto / Cliente</th><th>Stato &amp; Avanzamento</th><th>Cronoprogramma &amp; Milestone</th><th>Budget / Costi / Margine</th><th>Ore</th><th></th></tr></thead>
   <tbody>${rows.map(p=>{
    const c=contact(p.contactId),prog=projectProgress(p),margin=projectMarginCents(p);

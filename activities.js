@@ -490,14 +490,13 @@ function activitiesView(){
   searchValue:search,
   filtersHtml,
   hasActiveFilters:Boolean(activityStageFilter||activityTypeFilter||activityPriorityFilter||(activityStatusFilter&&activityStatusFilter!=='open')),
-  viewHtml,
   sortHtml,
   hasActiveSort:activitySort!=='due',
   extraButtonsHtml,
   exportDisabled:!rows.length
  }):`<div class="toolbar"><input id="search" aria-label="Cerca attività" value="${esc(search)}">${filtersHtml}${sortHtml}${viewHtml}${extraButtonsHtml}<button type="button" id="export-csv" ${!rows.length?'disabled':''}>↓ Esporta CSV</button></div>`;
  return `
-  <div class="stats">
+  <div class="stats v2-stats-strip">
    <div class="stat">
     <span class="stat-label">Attività Lead aperte</span>
     <strong>${openByStage('Lead').length.toString().padStart(2,'0')}</strong>
@@ -519,7 +518,10 @@ function activitiesView(){
     <small>${overdueCount} scadute · ${todayCount} previste oggi</small>
    </div>
   </div>
-  <div class="activities-control-header">
+  <div class="activities-control-header v2-activities-head">
+   <div class="view-toggle v2-layout-switch" role="group" aria-label="Vista attività">
+    ${[['list','Elenco'],['week','Settimana'],['month','Mese'],['board','Bacheca']].map(([k,l])=>`<button type="button" data-activity-layout="${k}" aria-pressed="${activityLayout===k}" class="${activityLayout===k?'selected':''}">${l}</button>`).join('')}
+   </div>
    <div class="stage-segment-bar" role="group" aria-label="Filtra attività per fase aziendale">
     <button type="button" data-activity-stage="" class="${activityStageFilter===''?'selected':''}">Tutte le fasi <span>${open.length}</span></button>
     ${stages.map(s=>`<button type="button" data-activity-stage="${s}" class="${activityStageFilter===s?'selected':''}">${s} <span>${openByStage(s).length}</span></button>`).join('')}
@@ -530,36 +532,7 @@ function activitiesView(){
     </div>
    </div>
   </div>
-  <div class="toolbar">
-   <input id="search" aria-label="Cerca attività" placeholder="Cerca attività, azienda, referente, opportunità…" value="${esc(search)}">
-   <select id="activity-type-filter" aria-label="Filtra tipo attività">
-    <option value="">Tutti i tipi</option>
-    ${activityTypes.map(t=>`<option ${activityTypeFilter===t?'selected':''}>${t}</option>`).join('')}
-   </select>
-   <select id="activity-priority-filter" aria-label="Filtra priorità">
-    <option value="">Tutte le priorità</option>
-    ${activityPriorities.map(p=>`<option ${activityPriorityFilter===p?'selected':''}>${p}</option>`).join('')}
-   </select>
-   <div class="list-controls">
-    <span class="result-count">${rows.length} attività</span>
-    <label class="sort-label">Ordina per
-     <select id="activity-sort" aria-label="Ordina attività">
-      <option value="due" ${activitySort==='due'?'selected':''}>Prossima scadenza</option>
-      <option value="priority" ${activitySort==='priority'?'selected':''}>Priorità alta → bassa</option>
-      <option value="company" ${activitySort==='company'?'selected':''}>Azienda A–Z</option>
-      <option value="title" ${activitySort==='title'?'selected':''}>Titolo A–Z</option>
-     </select>
-    </label>
-    <div class="view-toggle" role="group" aria-label="Vista attività">
-     <button type="button" data-activity-layout="board" aria-pressed="${activityLayout==='board'}" class="${activityLayout==='board'?'selected':''}">▥ Bacheca Fasi</button>
-     <button type="button" data-activity-layout="list" aria-pressed="${activityLayout==='list'}" class="${activityLayout==='list'?'selected':''}">☷ Elenco</button>
-     <button type="button" data-activity-layout="month" aria-pressed="${activityLayout==='month'}" class="${activityLayout==='month'?'selected':''}">📅 Mese</button>
-     <button type="button" data-activity-layout="week" aria-pressed="${activityLayout==='week'}" class="${activityLayout==='week'?'selected':''}">📆 Settimana</button>
-    </div>
-    <button type="button" id="open-playbook-editor" data-open-playbooks="true">⚙ Configura Playbook</button>
-    <button type="button" id="export-csv" ${!rows.length?'disabled':''}>↓ Esporta CSV</button>
-   </div>
-  </div>
+  ${bar}
   ${activityLayout==='board'?activitiesBoard(rows):activityLayout==='month'?activitiesMonthCalendar(rows):activityLayout==='week'?activitiesWeekCalendar(rows):activitiesTemporalList(rows)}`;
 }
 
@@ -575,7 +548,7 @@ function activitiesTemporalList(rows){
   {id:'unscheduled',label:'📋 Da definire',items:rows.filter(a=>!a.dueDate)}
  ].filter(g=>g.items.length);
  if(!groups.length)return activitiesTable(rows);
- return `<div class="temporal-groups">${groups.map(g=>`
+ return `<div class="temporal-groups v2-groups">${groups.map(g=>`
   <section class="temporal-group">
    <div class="temporal-group-header">
     <h3>${g.label}</h3>
@@ -704,7 +677,7 @@ function activitiesBoard(rows){
 }
 
 function activitiesTable(rows){
- return `<div class="panel">${rows.length?`<div class="table-wrap"><table>
+ return `<div class="panel v2-table v2-activity-table">${rows.length?`<div class="table-wrap"><table>
   <thead><tr><th>Attività / Tipo</th><th>Azienda & Fase</th><th>Referente & Collegamenti</th><th>Priorità</th><th>Scadenza</th><th>Stato</th><th></th></tr></thead>
   <tbody>${rows.map(a=>{
    const c=contact(a.contactId),stage=taskLifecycleStage(a),person=taskPersonLabel(a);

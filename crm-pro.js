@@ -1,3 +1,5 @@
+/* Apex design-v2: icone SVG inline (stroke, ereditano currentColor) */
+function apexIcon(name,size){const P={phone:'<path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/>',mail:'<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/>',check:'<path d="M5 12.5l4.5 4.5L19 7.5"/>',edit:'<path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/>',bolt:'<path d="M13 3L5 14h6l-1 7 8-11h-6z"/>',open:'<path d="M14 4h6v6"/><path d="M20 4l-9 9"/><path d="M18 14v5H5V6h5"/>',building:'<rect x="5" y="3" width="14" height="18" rx="1.5"/><path d="M9 7h2M13 7h2M9 11h2M13 11h2M9 15h2M13 15h2"/>',rocket:'<path d="M4 20l4-1 9-9a5 5 0 0 0-4-6l-9 9z"/><circle cx="14" cy="10" r="1.5"/>',user:'<circle cx="12" cy="8" r="3.5"/><path d="M5 20a7 7 0 0 1 14 0"/>',alert:'<path d="M12 4l9 16H3z"/><path d="M12 10v4M12 17v.5"/>',calendar:'<rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M8 3v4M16 3v4"/>',deal:'<rect x="3" y="4" width="5" height="16" rx="1"/><rect x="10" y="4" width="5" height="10" rx="1"/><rect x="17" y="4" width="4" height="13" rx="1"/>',chat:'<path d="M4 5h16v11H9l-5 4z"/>',target:'<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/>',clock:'<circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/>',users:'<circle cx="9" cy="8" r="3"/><path d="M3 20a6 6 0 0 1 12 0M16 5a3 3 0 0 1 0 6M18 14a6 6 0 0 1 3 6"/>',more:'<circle cx="5" cy="12" r="1.2"/><circle cx="12" cy="12" r="1.2"/><circle cx="19" cy="12" r="1.2"/>'};const s=size||16;return '<svg class="ico" viewBox="0 0 24 24" width="'+s+'" height="'+s+'" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+(P[name]||'')+'</svg>';}
 'use strict';
 /**
  * crm-pro.js — Modulo Executive CRM Professionale per Apex Digital
@@ -202,7 +204,7 @@ function renderCompany360View(c) {
       ${phone ? `<a href="tel:${esc(phone.replace(/[^+\d]/g, ''))}" class="c360-action-btn primary-action" data-auto-log-call="${esc(c.id)}">📞 Chiama</a>` : ''}
       ${email ? `<a href="mailto:${esc(email)}?subject=Apex%20Digital%20—%20Aggiornamento" class="c360-action-btn">✉️ Invia Email</a>` : ''}
       ${waUrl ? `<a href="${esc(waUrl)}" target="_blank" rel="noopener noreferrer" class="c360-action-btn whatsapp-action">💬 WhatsApp</a>` : ''}
-      <button type="button" class="c360-action-btn highlight-action" data-quick-touchpoint="${esc(c.id)}">⚡ Registra Interazione</button>
+      <button type="button" class="c360-action-btn highlight-action" data-quick-touchpoint="${esc(c.id)}">${apexIcon('bolt',14)} Registra Interazione</button>
       <button type="button" class="c360-action-btn" data-new-contact-task="${esc(c.id)}">+ Nuova Attività</button>
       <button type="button" class="c360-action-btn" data-contact-deal="${esc(c.id)}">+ Nuova Opportunità</button>
       <button type="button" class="c360-action-btn" data-new-contact-quote="${esc(c.id)}">+ Preventivo</button>
@@ -235,11 +237,11 @@ function renderCompany360View(c) {
 
     <!-- Navigazione a Tab -->
     <div class="c360-tabs" role="tablist">
-      <button type="button" class="c360-tab ${current360Tab === 'timeline' ? 'active' : ''}" data-c360-tab="timeline">🕒 Timeline & Feed (${(c.history || []).length})</button>
-      <button type="button" class="c360-tab ${current360Tab === 'people' ? 'active' : ''}" data-c360-tab="people">👥 Referenti (${companyPeople(c).length})</button>
+      <button type="button" class="c360-tab ${current360Tab === 'timeline' ? 'active' : ''}" data-c360-tab="timeline">${apexIcon('clock',14)} Timeline & Feed (${(c.history || []).length})</button>
+      <button type="button" class="c360-tab ${current360Tab === 'people' ? 'active' : ''}" data-c360-tab="people">${apexIcon('users',14)} Referenti (${companyPeople(c).length})</button>
       <button type="button" class="c360-tab ${current360Tab === 'deals' ? 'active' : ''}" data-c360-tab="deals">▥ Opportunità (${deals.length})</button>
       <button type="button" class="c360-tab ${current360Tab === 'quotes' ? 'active' : ''}" data-c360-tab="quotes">▤ Preventivi (${quotes.length})</button>
-      <button type="button" class="c360-tab ${current360Tab === 'projects' ? 'active' : ''}" data-c360-tab="projects">🚀 Progetti (${projects.length})</button>
+      <button type="button" class="c360-tab ${current360Tab === 'projects' ? 'active' : ''}" data-c360-tab="projects">${apexIcon('rocket',14)} Progetti (${projects.length})</button>
       <button type="button" class="c360-tab ${current360Tab === 'info' ? 'active' : ''}" data-c360-tab="info">🏢 Anagrafica & Note</button>
     </div>
 
@@ -1090,11 +1092,11 @@ function renderUnifiedActivityRow(act) {
   const isUnscheduled = !act.dueDate;
 
   const dateBadge = isUnscheduled
-    ? `<span class="pill amber">⚡ Prossimo passo da definire</span>`
+    ? `<span class="pill amber">${apexIcon('bolt',12)} Prossimo passo da definire</span>`
     : isOverdue
-      ? `<span class="pill red">🚨 Scaduta (${typeof date === 'function' ? date(act.dueDate) : act.dueDate})</span>`
+      ? `<span class="pill red">${apexIcon('alert',12)} Scaduta (${typeof date === 'function' ? date(act.dueDate) : act.dueDate})</span>`
       : isToday
-        ? `<span class="pill blue">📅 Oggi</span>`
+        ? `<span class="pill blue">${apexIcon('calendar',12)} Oggi</span>`
         : `<span class="pill">${typeof date === 'function' ? date(act.dueDate) : act.dueDate}</span>`;
 
   const priorityClass = act.priority === 'Alta' ? 'red' : act.priority === 'Media' ? 'amber' : '';
@@ -1108,8 +1110,8 @@ function renderUnifiedActivityRow(act) {
           <button type="button" class="text-button uac-comp-btn" data-open-360="${esc(comp?.id || '')}">
             <strong>${esc(comp?.company || 'Azienda')}</strong>
           </button>
-          ${proj ? `<span class="uac-proj-tag">· 🚀 ${esc(proj.name)}</span>` : deal ? `<span class="uac-deal-tag">· ▥ ${esc(deal.title)}</span>` : ''}
-          ${refName ? `<span class="uac-person-tag">👤 ${esc(refName)}</span>` : ''}
+          ${proj ? `<span class="uac-proj-tag">· ${apexIcon('rocket',12)} ${esc(proj.name)}</span>` : deal ? `<span class="uac-deal-tag">· ${apexIcon('deal',12)} ${esc(deal.title)}</span>` : ''}
+          ${refName ? `<span class="uac-person-tag">${apexIcon('user',12)} ${esc(refName)}</span>` : ''}
         </div>
         <div class="uac-badges">
           ${dateBadge}
@@ -1121,25 +1123,25 @@ function renderUnifiedActivityRow(act) {
       <div class="uac-body">
         <h3 class="uac-action-title" data-edit-task="${esc(act.id)}" style="cursor:pointer;" title="Clicca per aprire e modificare attività">${esc(act.title)}</h3>
         <div class="uac-meta-reason">
-          <span class="uac-reason">🎯 <strong>Motivo:</strong> ${esc(formatCrmReasonOrNotes(act.reason, act.notes, 'Avanzamento commerciale e operativo'))}</span>
+          <span class="uac-reason">${apexIcon('target',12)} <strong>Motivo:</strong> ${esc(formatCrmReasonOrNotes(act.reason, act.notes, 'Avanzamento commerciale e operativo'))}</span>
           <span class="uac-separator">·</span>
-          <span class="uac-last-outcome">💬 <strong>Ultimo esito:</strong> ${esc(formatCrmOutcome(act.lastOutcome, act.outcome, 'In attesa di primo riscontro'))}</span>
+          <span class="uac-last-outcome">${apexIcon('chat',12)} <strong>Ultimo esito:</strong> ${esc(formatCrmOutcome(act.lastOutcome, act.outcome, 'In attesa di primo riscontro'))}</span>
         </div>
       </div>
 
       <div class="uac-actions-cluster">
         <div class="uac-primary-actions">
-          <button type="button" class="uac-op-btn uac-icon-btn op-done" data-complete-task="${esc(act.id)}" title="Segna come completata" aria-label="Segna come completata"><span aria-hidden="true">✓</span></button>
+          <button type="button" class="uac-op-btn uac-icon-btn op-done" data-complete-task="${esc(act.id)}" title="Segna come completata" aria-label="Segna come completata">${apexIcon('check')}</button>
           ${phone
-            ? `<a href="tel:${esc(phone.replace(/[^+\d]/g, ''))}" class="uac-op-btn uac-icon-btn op-call" data-auto-log-call="${esc(comp?.id || '')}" data-act-id="${esc(act.id)}" title="Chiama ${esc(refName)} al ${esc(phone)}" aria-label="Chiama ${esc(refName || comp?.company || 'azienda')}"><span aria-hidden="true">📞</span></a>`
-            : `<button type="button" class="uac-op-btn uac-icon-btn op-call disabled" disabled title="Nessun recapito telefonico diretto" aria-label="Nessun telefono disponibile"><span aria-hidden="true">📞</span></button>`}
+            ? `<a href="tel:${esc(phone.replace(/[^+\d]/g, ''))}" class="uac-op-btn uac-icon-btn op-call" data-auto-log-call="${esc(comp?.id || '')}" data-act-id="${esc(act.id)}" title="Chiama ${esc(refName)} al ${esc(phone)}" aria-label="Chiama ${esc(refName || comp?.company || 'azienda')}">${apexIcon('phone')}</a>`
+            : `<button type="button" class="uac-op-btn uac-icon-btn op-call disabled" disabled title="Nessun recapito telefonico diretto" aria-label="Nessun telefono disponibile">${apexIcon('phone')}</button>`}
         </div>
 
         <div class="uac-secondary-actions">
-          <button type="button" class="uac-op-btn uac-icon-btn op-followup" data-prepare-followup="${esc(act.id)}" data-comp-id="${esc(comp?.id || '')}" title="Prepara sollecito email" aria-label="Prepara sollecito email"><span aria-hidden="true">✉️</span></button>
-          <button type="button" class="uac-op-btn uac-icon-btn op-touchpoint" data-quick-touchpoint="${esc(comp?.id || '')}" data-act-id="${esc(act.id)}" title="Registra esito interazione" aria-label="Registra esito interazione"><span aria-hidden="true">⚡</span></button>
-          <button type="button" class="uac-op-btn uac-icon-btn op-edit" data-edit-task="${esc(act.id)}" title="Modifica attività e scadenza" aria-label="Modifica attività e scadenza"><span aria-hidden="true">✏️</span></button>
-          <button type="button" class="uac-op-btn uac-icon-btn op-details" data-open-360="${esc(comp?.id || '')}" title="Apri Scheda Azienda 360°" aria-label="Apri Scheda Azienda 360°"><span aria-hidden="true">360°</span></button>
+          <button type="button" class="uac-op-btn uac-icon-btn op-followup" data-prepare-followup="${esc(act.id)}" data-comp-id="${esc(comp?.id || '')}" title="Prepara sollecito email" aria-label="Prepara sollecito email">${apexIcon('mail')}</button>
+          <button type="button" class="uac-op-btn uac-icon-btn op-touchpoint" data-quick-touchpoint="${esc(comp?.id || '')}" data-act-id="${esc(act.id)}" title="Registra esito interazione" aria-label="Registra esito interazione">${apexIcon('bolt')}</button>
+          <button type="button" class="uac-op-btn uac-icon-btn op-edit" data-edit-task="${esc(act.id)}" title="Modifica attività e scadenza" aria-label="Modifica attività e scadenza">${apexIcon('edit')}</button>
+          <button type="button" class="uac-op-btn uac-icon-btn op-details" data-open-360="${esc(comp?.id || '')}" title="Apri Scheda Azienda 360°" aria-label="Apri Scheda Azienda 360°">${apexIcon('open')}</button>
         </div>
       </div>
     </article>
@@ -1223,7 +1225,7 @@ function renderExecutiveHomeView() {
           <section class="home-operative-section" id="sec-tasks">
             <div class="section-head">
               <div>
-                <h2 class="section-title">⚡ Azioni Immediate (Oggi &amp; Scadute)</h2>
+                <h2 class="section-title">Azioni Immediate (Oggi &amp; Scadute)</h2>
                 <p class="section-sub">Azioni operative con motivo, referente ed esito precedente.</p>
               </div>
             </div>
@@ -1231,10 +1233,10 @@ function renderExecutiveHomeView() {
             <!-- Filtri rapidi interattivi per la coda attività -->
             <div class="home-task-filter-pills" role="group" aria-label="Filtra attività">
               <button type="button" class="home-filter-pill active" data-home-filter="all">Tutte <span>${[...overdueTasks, ...todayTasks, ...upcomingTasks, ...unscheduledTasks].length}</span></button>
-              <button type="button" class="home-filter-pill ${overdueTasks.length ? 'urgent' : ''}" data-home-filter="overdue">🚨 Scadute <span>${overdueTasks.length}</span></button>
-              <button type="button" class="home-filter-pill" data-home-filter="today">📅 Oggi <span>${todayTasks.length}</span></button>
-              <button type="button" class="home-filter-pill" data-home-filter="calls">📞 Chiamate <span>${openActivities.filter(a => a.type === 'Chiamata').length}</span></button>
-              <button type="button" class="home-filter-pill" data-home-filter="followups">✉️ Follow-up <span>${openActivities.filter(a => a.type === 'Follow-up' || a.type === 'Email').length}</span></button>
+              <button type="button" class="home-filter-pill ${overdueTasks.length ? 'urgent' : ''}" data-home-filter="overdue">${apexIcon('alert',13)} Scadute <span>${overdueTasks.length}</span></button>
+              <button type="button" class="home-filter-pill" data-home-filter="today">${apexIcon('calendar',13)} Oggi <span>${todayTasks.length}</span></button>
+              <button type="button" class="home-filter-pill" data-home-filter="calls">${apexIcon('phone',13)} Chiamate <span>${openActivities.filter(a => a.type === 'Chiamata').length}</span></button>
+              <button type="button" class="home-filter-pill" data-home-filter="followups">${apexIcon('mail',13)} Follow-up <span>${openActivities.filter(a => a.type === 'Follow-up' || a.type === 'Email').length}</span></button>
             </div>
 
             <div class="unified-tasks-stack">

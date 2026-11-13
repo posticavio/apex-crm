@@ -62,6 +62,28 @@ node crm-rapid-check.cjs
 ---
 
 ## Registro di Passaggio tra Agenti (Handoff Log)
+### Sessione 2026-11-13c (Design System Unificato `design-v2.css` + `design-v2-views.css`, Icone SVG Nitide, Pipeline Pipedrive #5 con Striscia Follow-up Urgent & Card 3 Righe, Tabelle Dense 40px e Fix Mobile) — Agente: Google Antigravity
+- **Ultimo commit precedente rilevato**: `5e236a4` (`Merge remote-tracking branch 'origin/main'`) su `main`.
+- **Attività completate**:
+  - **Design System Unificato (`design-v2.css`, `design-v2-views.css`, `index.html`)**:
+    - Definiti i design token warm-neutral (`--bg:#F8F7F4`, `--bg-sunken:#F1F0EB`, `--surface:#FFFFFF`, `--sidebar:#F4F3EF`, `--line:#E7E5DF`, `--accent:#3B5BDB`, `tabular-nums`, bordi hairline 1px, ombre solo su popover/drawer).
+    - Sidebar rail lineare con voci `32px`, topbar `48px` compatta, `.page-heading` ridotto a barra lineare 1-riga table-first.
+    - Icone SVG inline `apexIcon(...)` (`crm-pro.js`) per sostituire le emoji nelle viste principali, card Home, tab 360° e azioni riga.
+  - **Pipeline Opportunità Stile Pipedrive #5 (`app.js`, `design-v2.css`)**:
+    - Aggiunta la striscia superiore `.pipe-urgent-strip` con le 4 azioni/opportunità più urgenti (icona tonda colorata, azienda, prossimo passo, pallino stato).
+    - Card Kanban compatte a 3 righe (titolo + pallino stato attività verde/ambra/rosso, azienda·referente, valore + scadenza) con azioni fase visibili su hover/focus su desktop.
+  - **Tabelle Dense & Mobile Ergonomics (`app.js`, `activities.js`, `projects.js`, `quotes.js`, `design-v2.css`, `design-v2-views.css`)**:
+    - `toolbar()` in `app.js` migrata a `iconToolbar` compatta per Aziende e Opportunità.
+    - Tabelle `.v2-table` a righe `40px` con `.row-actions` su riga singola su desktop, fase tabs stile Attio su Aziende, segmented switch inline (`Elenco/Settimana/Mese/Bacheca`) su Attività.
+    - Fix mobile (`< 768px`): status strip scrollabile orizzontalmente (`width: auto`), card tabella allineate a sinistra con wrap pulito.
+- **File modificati / aggiunti**:
+  - `design-v2.css` (nuovo), `design-v2-views.css` (nuovo), `index.html`, `app.js`, `activities.js`, `projects.js`, `quotes.js`, `crm-pro.js`, `AGENTS.md`.
+- **Test eseguiti**:
+  - 10 verifiche sintattiche (`node --check`) + 13 suite `*-check.cjs`: **100% PASS**.
+  - Audit visivo Chrome headless CDP Desktop (`1440×900`) & Mobile (`390×844`): **0 errori console**, **0 overflow orizzontale**.
+- **Problemi aperti**:
+  - Deploy su Vercel limitato dal cap giornaliero del piano free (`api-deployments-free-per-day`: 100/giorno); riprovare dopo il reset delle 24h.
+
 ### Sessione 2026-11-13 (Restyling Completo Notion/Apple Light Mode, Vista Mese/Settimana con Titoli Eventi, Modale Evento con Calendario/Persona/Progetto, Scheda 360° Slide-Over, Zero Duplicati Home, Web Design Guidelines & Deploy Vercel) — Agente: Google Antigravity
 - **Ultimo commit precedente rilevato**: `123bd7c` (`[Antigravity] feat(ux): complete layout revamp for desktop and smartphone with Apple/Notion ergonomics, 5-tab mobile bottom nav, uncluttered headers, and status strip`) su `main`.
 - **Attività completate**:
