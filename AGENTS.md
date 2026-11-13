@@ -62,6 +62,29 @@ node crm-rapid-check.cjs
 ---
 
 ## Registro di Passaggio tra Agenti (Handoff Log)
+### Sessione 2026-11-13 (Fix Scroll Desktop Modali/Overlay: Blocco Scroll Sfondo & Scorrimento Interno Dialog) — Agente: Google Antigravity
+- **Ultimo commit precedente rilevato**: `b610ffa` (`[Antigravity] feat(quotes): recover and save Cattini Srl sent quote (2026-10-03) in CRM and Supabase cloud state`) su `main`.
+- **Diagnosi del Problema segnalato dall'utente ("quando apro una schermata tipo sopra lìapp in desktio. lo scroll viene fatto sulla schermata sotto e non su quella davanti")**:
+  - In `layout.css`, i dialoghi desktop (`#editor`, `#task-editor`, `#project-editor`, `#quote-editor`, `#finance-editor`, `#playbook-editor`) avevano `overflow-y: hidden;` e mancava `overscroll-behavior: contain` sui `<dialog>` e sui loro contenitori scrollabili (`.c360-tab-body`, `.command-results`).
+  - Inoltre non era presente alcun blocco dello scroll sullo sfondo (`html`/`body`) quando un `<dialog[open]>` era aperto, causando lo scorrimento della pagina sottostante al passaggio della rotella del mouse o per scroll chaining.
+- **Attività completate**:
+  - **Blocco Scroll Sfondo (`layout.css`)**:
+    - Aggiunti `html { scrollbar-gutter: stable; }` e `html:has(dialog[open]), body:has(dialog[open]) { overflow: hidden !important; overscroll-behavior: none; }`.
+  - **Scorrimento Interno & Contenimento Overscroll (`layout.css`)**:
+    - Abilitati `overflow-y: auto; overflow-x: hidden; overscroll-behavior: contain;` su `dialog` e sui modal desktop (`#editor`, `#task-editor`, `#project-editor`, `#quote-editor`, `#finance-editor`, `#playbook-editor`), sostituendo `overflow-y: hidden` e impostando `max-height: 92dvh`.
+    - Aggiunto `dialog:not([open]) { display: none !important; }` e `overscroll-behavior: none;` su `dialog::backdrop`.
+    - Rafforzati `min-height: 0; overscroll-behavior: contain;` e `flex-shrink: 0;` su `#company-360-dialog`, `.c360-header`, `.c360-tabs`, `.c360-tab-body`, `#command-dialog`, `.command-body` e `.command-results`.
+- **File modificati**:
+  - `layout.css`
+  - `AGENTS.md`
+- **Test eseguiti**:
+  - Verifica visiva/funzionale con Google Chrome headless (CDP) su desktop (`1280x620`): confermati `htmlOverflow: hidden`, `bodyOverflow: hidden`, `dlgOverflowY: auto`, `dlgOverscroll: contain`, `pageScrollY` invariato sotto il modal e `dlgScrollTop` / `.c360-tab-body.scrollTop` scorrevoli.
+  - Suite completa di controllo sintattico (`node --check` su 10 file) e 13 suite funzionali eseguite con successo (100% PASS).
+- **Problemi aperti**:
+  - Nessuno.
+- **Attività successive consigliate**:
+  - Deploy aggiornato su Vercel (`pubblica-vercel.cmd`).
+
 ### Sessione 2026-11-13 (Recupero & Salvataggio Preventivo Inviato a Cattini Srl in CRM e Cloud Supabase) — Agente: Google Antigravity
 - **Ultimo commit precedente rilevato**: `123bd7c` (`[Antigravity] feat(ux): complete layout revamp for desktop and smartphone with Apple/Notion ergonomics, 5-tab mobile bottom nav, uncluttered headers, and status strip`) su `main`.
 - **Diagnosi del Problema segnalato dall'utente ("pero avevo inviato un preventivo a cattini e non e salvato nel crm")**:
