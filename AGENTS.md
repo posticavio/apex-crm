@@ -89,6 +89,77 @@ node crm-rapid-check.cjs
   - Audit visivo headless Chromium CDP (Desktop `1440×900` e Mobile `390×844`): **0 errori console/eccezioni**, 0 overflow orizzontali.
 - **Problemi aperti**:
   - Nessuno.
+### Sessione 2026-11-13b (Toolbar Compatta ad Icone a Destra con Popup per Cerca/Fasi/Vista/Ordina — Tabelle Subito in Alto) — Agente: Google Antigravity
+- **Ultimo commit precedente rilevato**: `ce0e588` (`[Antigravity] fix(desktop): lock background scroll when dialogs are open and enable internal dialog scrolling`) su `main`.
+- **Richiesta utente**: *"cerca fasi vista ordina devono essere delle icone a destra che si aprono al pop up occupato troppo spazio spostando la tabella in basso, la tabella deve essere piu in alto possibile"*.
+- **Attività completate**:
+  - **Componente Unificato `iconToolbar` (`app.js`, `layout.css`)**:
+    - Sostituite le barre filtri estese, i box `.category-intro` e le strisce di chip multi-riga con una singola barra compatta (`.toolbar-compact`) che mostra solo il conteggio risultati (e chip `× Ripristina` quando attivo) a sinistra e le icone compatte a destra: **Cerca (`🔍`)**, **Fasi/Filtri (`⫘`)**, **Vista (`▥`)**, **Ordina (`⇅`)**, **Playbook (`⚙`)**, **Esporta CSV (`↓`)**.
+    - Ogni icona apre un popup flottante (`.toolbar-popover`) su desktop e un pannello ancorato su mobile, con chiusura automatica su clic esterno o `Esc` e indicatore blu quando un filtro/ricerca/ordinamento è attivo.
+  - **Viste aggiornate**:
+    - `app.js` (`contactsView`, `pipeline`, `pipelineTable`, `categoriesView`)
+    - `activities.js` (`activitiesView`)
+    - `projects.js` (`projectsView`)
+    - `quotes.js` (`quotesView`)
+  - **Compattazione Header (`layout.css`)**:
+    - Ridotto il padding/margine inferiore di `.page-heading` (`10px`) così tabelle e bacheche partono immediatamente nella parte alta dello schermo.
+- **File modificati**:
+  - `app.js`
+  - `activities.js`
+  - `projects.js`
+  - `quotes.js`
+  - `layout.css`
+  - `AGENTS.md`
+- **Test eseguiti**:
+  - Suite completa di controllo sintattico (`node --check` su 10 file) e 13 suite funzionali (`crm-check.cjs`, `import-check.cjs`, `relationship-check.cjs`, `sales-check.cjs`, `resource-check.cjs`, `unscheduled-check.cjs`, `quotes-check.cjs`, `activities-check.cjs`, `enterprise-check.cjs`, `cloud-sync-check.cjs`, `mcp-server-check.cjs`, `crm-pro-check.cjs`, `crm-rapid-check.cjs`).
+- **Problemi aperti**:
+  - Nessuno.
+- **Attività successive consigliate**:
+  - Nessuna (modifiche già pubblicate su `origin/main`).
+
+### Sessione 2026-11-13 (Fix Scroll Desktop Modali/Overlay: Blocco Scroll Sfondo & Scorrimento Interno Dialog) — Agente: Google Antigravity
+- **Ultimo commit precedente rilevato**: `b610ffa` (`[Antigravity] feat(quotes): recover and save Cattini Srl sent quote (2026-10-03) in CRM and Supabase cloud state`) su `main`.
+- **Diagnosi del Problema segnalato dall'utente ("quando apro una schermata tipo sopra lìapp in desktio. lo scroll viene fatto sulla schermata sotto e non su quella davanti")**:
+  - In `layout.css`, i dialoghi desktop (`#editor`, `#task-editor`, `#project-editor`, `#quote-editor`, `#finance-editor`, `#playbook-editor`) avevano `overflow-y: hidden;` e mancava `overscroll-behavior: contain` sui `<dialog>` e sui loro contenitori scrollabili (`.c360-tab-body`, `.command-results`).
+  - Inoltre non era presente alcun blocco dello scroll sullo sfondo (`html`/`body`) quando un `<dialog[open]>` era aperto, causando lo scorrimento della pagina sottostante al passaggio della rotella del mouse o per scroll chaining.
+- **Attività completate**:
+  - **Blocco Scroll Sfondo (`layout.css`)**:
+    - Aggiunti `html { scrollbar-gutter: stable; }` e `html:has(dialog[open]), body:has(dialog[open]) { overflow: hidden !important; overscroll-behavior: none; }`.
+  - **Scorrimento Interno & Contenimento Overscroll (`layout.css`)**:
+    - Abilitati `overflow-y: auto; overflow-x: hidden; overscroll-behavior: contain;` su `dialog` e sui modal desktop (`#editor`, `#task-editor`, `#project-editor`, `#quote-editor`, `#finance-editor`, `#playbook-editor`), sostituendo `overflow-y: hidden` e impostando `max-height: 92dvh`.
+    - Aggiunto `dialog:not([open]) { display: none !important; }` e `overscroll-behavior: none;` su `dialog::backdrop`.
+    - Rafforzati `min-height: 0; overscroll-behavior: contain;` e `flex-shrink: 0;` su `#company-360-dialog`, `.c360-header`, `.c360-tabs`, `.c360-tab-body`, `#command-dialog`, `.command-body` e `.command-results`.
+- **File modificati**:
+  - `layout.css`
+  - `AGENTS.md`
+- **Test eseguiti**:
+  - Verifica visiva/funzionale con Google Chrome headless (CDP) su desktop (`1280x620`): confermati `htmlOverflow: hidden`, `bodyOverflow: hidden`, `dlgOverflowY: auto`, `dlgOverscroll: contain`, `pageScrollY` invariato sotto il modal e `dlgScrollTop` / `.c360-tab-body.scrollTop` scorrevoli.
+  - Suite completa di controllo sintattico (`node --check` su 10 file) e 13 suite funzionali eseguite con successo (100% PASS).
+- **Problemi aperti**:
+  - Nessuno.
+- **Attività successive consigliate**:
+  - Deploy aggiornato su Vercel (`pubblica-vercel.cmd`).
+
+### Sessione 2026-11-13 (Recupero & Salvataggio Preventivo Inviato a Cattini Srl in CRM e Cloud Supabase) — Agente: Google Antigravity
+- **Ultimo commit precedente rilevato**: `123bd7c` (`[Antigravity] feat(ux): complete layout revamp for desktop and smartphone with Apple/Notion ergonomics, 5-tab mobile bottom nav, uncluttered headers, and status strip`) su `main`.
+- **Diagnosi del Problema segnalato dall'utente ("pero avevo inviato un preventivo a cattini e non e salvato nel crm")**:
+  - Verifica effettuata su Google Drive (`Cattini | Progetto RDO e archiviazione disegni` e `parisi-cattini.js`) e sul cloud state Supabase (`apex_crm_cloud_state.json`): la proposta indicativa inviata via email il **03/10/2026** a Paolo Cattini (~40 ore per sviluppo iniziale applicativo web RDO/registro/archiviazione disegni, **1.200 € netti / 1.500 € lordi**, integrazione SAP B1 da valutare a parte) non era salvata in `state.quotes` né in `ensureDemoQuotesData` (`quotes.js`) né nello snapshot Supabase.
+  - Inoltre, `quotesView()` non invocava `ensureDemoQuotesData(state)` al caricamento locale della vista Preventivi.
+- **Attività completate**:
+  - **Registrazione Preventivo Cattini Srl (`quotes.js`)**:
+    - Aggiunto il preventivo `quote-cattini-rdo-2026` (`APX-2026-002`, data `2026-10-03`, stato `Da approvare`, 40 ore × 30 €/ora = `1.200,00 €` netti con `vat: null` "IVA da definire" e note complete su `1.200 € netti / 1.500 € lordi` e integrazione SAP B1) in `ensureDemoQuotesData(crmState)`.
+    - Collegato automaticamente `quotesView()` a `ensureDemoQuotesData(state)` per garantire il popolamento anche in sessioni locali/offline.
+  - **Sincronizzazione Cloud Supabase**:
+    - Aggiornato lo snapshot remoto `apex_crm_cloud_state.json` su Supabase (`attachments`, id `5ba75c56-0e3d-49ab-9dbd-364756ce04f0`) con entrambi i preventivi validati (`APX-2026-001 -> Martino Parisi S.r.l.`, `APX-2026-002 -> Cattini Srl`).
+- **File modificati**:
+  - `quotes.js`
+  - `AGENTS.md`
+- **Test eseguiti**:
+  - Suite completa di controllo sintattico (`node --check` su 10 file) e 13 suite funzionali (`crm-check.cjs`, `import-check.cjs`, `relationship-check.cjs`, `sales-check.cjs`, `resource-check.cjs`, `unscheduled-check.cjs`, `quotes-check.cjs`, `activities-check.cjs`, `enterprise-check.cjs`, `cloud-sync-check.cjs`, `mcp-server-check.cjs`, `crm-pro-check.cjs`, `crm-rapid-check.cjs`).
+- **Problemi aperti**:
+  - Nessuno.
+- **Attività successive consigliate**:
+  - Eseguire `git push` su GitHub (incluso il commit locale precedente `123bd7c` + il nuovo commit).
 
 ### Sessione 2026-11-12 (Revamp Completo Layout Desktop & Smartphone: Benchmark Ergonomia Apple/Notion, Bottom Bar Mobile 5 Tab, Header Minimale Senza Clutter e Bento Workstation Unificata) — Agente: Google Antigravity
 - **Ultimo commit precedente rilevato**: `75da042` (`[Antigravity] fix(navigation): normalize view route aliases, add quote print version polymorphism, and harden interaction form intake`) su `main`.
