@@ -62,6 +62,34 @@ node crm-rapid-check.cjs
 ---
 
 ## Registro di Passaggio tra Agenti (Handoff Log)
+### Sessione 2026-11-13 (Restyling Completo Notion/Apple Light Mode, Vista Mese/Settimana con Titoli Eventi, Modale Evento con Calendario/Persona/Progetto, Scheda 360° Slide-Over, Zero Duplicati Home, Web Design Guidelines & Deploy Vercel) — Agente: Google Antigravity
+- **Ultimo commit precedente rilevato**: `123bd7c` (`[Antigravity] feat(ux): complete layout revamp for desktop and smartphone with Apple/Notion ergonomics, 5-tab mobile bottom nav, uncluttered headers, and status strip`) su `main`.
+- **Attività completate**:
+  - **100% Light Mode Notion/Apple Warm-Neutral (`style.css`, `layout.css`, `index.html`)**:
+    - Palette unificata `#F8F7F4` (canvas), `#F4F3EF` (sidebar rail), card arrotondate 1px hairline, rimozione selettori Dark/AMOLED dall'UI e neutralizzazione degli override scuri.
+    - Spostati gli strumenti tecnici (`Playbook`, `Esporta JSON`, `Importa CSV`, `Ripristina JSON`) dalla sidebar al modale Impostazioni.
+    - Accessibilità & Web Interface Guidelines: `preconnect` Google Fonts, `aria-label` su pulsanti solo-icona, `aria-live="polite"` su `#toast`, `touch-action: manipulation`, `overscroll-behavior: contain` sui dialog, `prefers-reduced-motion: reduce`, `text-wrap: balance` sui titoli, ellissi tipografiche `…`.
+  - **Home Operativa & Automazioni (`crm-pro.js`, `app.js`)**:
+    - Rimossi i duplicati tra colonna sinistra (solo attività dirette, esclusi `act-followup-*`) e colonna destra (`Ricontatti Suggeriti`).
+    - Tutti i 6 pulsanti card (`✓`, `📞`, `✉️`, `⚡`, `✏️`, `360°`) compatti `28px` solo-icona con tooltip e `aria-label`.
+    - Auto-apertura di `"Registra Esito"` (`openInteractionLogger`) al clic su `📞 Chiama` e dopo invio/apertura client email da `✉️ Sollecito`.
+  - **Aziende 5 Colonne & Scheda 360° Slide-Over Drawer (`app.js`, `crm-pro.js`, `layout.css`)**:
+    - Tabella Aziende a 5 colonne essenziali (`Azienda + Referente`, `Fase`, `Valore Pipeline`, `Prossimo Passo`, `Azioni`) con riga cliccabile che apre il cassetto laterale destro 360° (`#company-360-dialog`) dotato di selettore fase rapido a 1 clic (`Lead | Prospect | Cliente`).
+  - **Calendario Mese/Settimana con Titoli Leggibili & Modale Evento Completo (`activities.js`, `layout.css`)**:
+    - Vista `Mese` (`activitiesMonthCalendar`) e `Settimana` (`activitiesWeekCalendar`) con badge `.cal-event-chip` leggibili (titolo, orario, colore per stato/priorità, click per aprire `#task-editor`), più raggruppamento temporale in `Elenco` (`Scadute | Oggi | Domani | Questa settimana | Prossimamente | Da definire`).
+    - Modale `#task-editor` riallineato (`.field-grid` / `.field-pair`) con nuovi campi **Calendario** (`calendar`, `calendarUrl`), **Persona / Referente** (`referentId` + `personName`) e **Progetto** (`projectId`).
+    - Ricerca `⌘K` potenziata su note, email, referenti, telefoni, motivo, esito e problema/soluzione.
+  - **Mobile Opportunità & Ergonomia Smartphone (`app.js`, `layout.css`)**:
+    - Tab fasi su mobile (`.pipeline-mobile-tabs`) per mostrare una colonna alla volta senza scroll orizzontale; rimosso `#mobile-menu-btn` su `< 768px`, mantenuto FAB rotondo `52×52px`.
+- **File modificati**:
+  - `index.html`, `style.css`, `layout.css`, `app.js`, `crm-pro.js`, `activities.js`, `AGENTS.md`.
+- **Test eseguiti**:
+  - 10 verifiche sintattiche (`node --check`) superate con 0 errori.
+  - 13 suite di test (`crm-check.cjs`, `import-check.cjs`, `relationship-check.cjs`, `sales-check.cjs`, `resource-check.cjs`, `unscheduled-check.cjs`, `quotes-check.cjs`, `activities-check.cjs`, `enterprise-check.cjs`, `cloud-sync-check.cjs`, `mcp-server-check.cjs`, `crm-pro-check.cjs`, `crm-rapid-check.cjs`): **100% PASS**.
+  - Audit visivo headless Chromium CDP (Desktop `1440×900` e Mobile `390×844`): **0 errori console/eccezioni**, 0 overflow orizzontali.
+- **Problemi aperti**:
+  - Nessuno.
+
 ### Sessione 2026-11-12 (Revamp Completo Layout Desktop & Smartphone: Benchmark Ergonomia Apple/Notion, Bottom Bar Mobile 5 Tab, Header Minimale Senza Clutter e Bento Workstation Unificata) — Agente: Google Antigravity
 - **Ultimo commit precedente rilevato**: `75da042` (`[Antigravity] fix(navigation): normalize view route aliases, add quote print version polymorphism, and harden interaction form intake`) su `main`.
 - **Diagnosi del Problema segnalato dall'utente ("voglio rivedere completamente il layout attuale che non è chiaro non è funzionale per niente. sia per desktop che per smartphone")**:

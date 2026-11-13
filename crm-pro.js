@@ -179,7 +179,11 @@ function renderCompany360View(c) {
         <div class="c360-title-block">
           <div class="c360-title-row">
             <h2>${esc(c.company)}</h2>
-            <span class="pill ${stage === 'Cliente' ? 'green' : stage === 'Prospect' ? 'amber' : ''}">${esc(stage)}</span>
+            <div class="c360-stage-pills" role="group" aria-label="Cambia fase azienda">
+              ${['Lead', 'Prospect', 'Cliente'].map(s => `
+                <button type="button" class="c360-stage-pill ${stage === s ? 'active' : ''}" data-c360-set-stage="${s}" data-company-id="${esc(c.id)}" aria-pressed="${stage === s}">${s}</button>
+              `).join('')}
+            </div>
             ${leadTempBadge(c)}
           </div>
           <div class="c360-meta-row">
@@ -195,7 +199,7 @@ function renderCompany360View(c) {
 
     <!-- Barra Azioni Rapide Esecutive -->
     <div class="c360-actions-bar">
-      ${phone ? `<a href="tel:${esc(phone.replace(/[^+\d]/g, ''))}" class="c360-action-btn primary-action">📞 Chiama</a>` : ''}
+      ${phone ? `<a href="tel:${esc(phone.replace(/[^+\d]/g, ''))}" class="c360-action-btn primary-action" data-auto-log-call="${esc(c.id)}">📞 Chiama</a>` : ''}
       ${email ? `<a href="mailto:${esc(email)}?subject=Apex%20Digital%20—%20Aggiornamento" class="c360-action-btn">✉️ Invia Email</a>` : ''}
       ${waUrl ? `<a href="${esc(waUrl)}" target="_blank" rel="noopener noreferrer" class="c360-action-btn whatsapp-action">💬 WhatsApp</a>` : ''}
       <button type="button" class="c360-action-btn highlight-action" data-quick-touchpoint="${esc(c.id)}">⚡ Registra Interazione</button>
@@ -276,7 +280,7 @@ function render360TimelineTab(c) {
           <option value="Email">✉️ Email</option>
           <option value="Incontro">🤝 Incontro / Video call</option>
         </select>
-        <input type="text" id="c360-quick-text" placeholder="Es. Chiamato Marco: molto interessato al bot AI, inviare offerta lunedì..." aria-label="Sintesi interazione">
+        <input type="text" id="c360-quick-text" placeholder="Es. Chiamato Marco: molto interessato al bot AI, inviare offerta lunedì…" aria-label="Sintesi interazione">
         <button type="button" class="primary" id="c360-quick-submit" data-company-id="${esc(c.id)}">Registra nel feed</button>
       </div>
     </div>
@@ -1125,17 +1129,17 @@ function renderUnifiedActivityRow(act) {
 
       <div class="uac-actions-cluster">
         <div class="uac-primary-actions">
-          <button type="button" class="uac-op-btn op-done" data-complete-task="${esc(act.id)}" title="Segna come completata">✓ Completa</button>
+          <button type="button" class="uac-op-btn uac-icon-btn op-done" data-complete-task="${esc(act.id)}" title="Segna come completata" aria-label="Segna come completata"><span aria-hidden="true">✓</span></button>
           ${phone
-            ? `<a href="tel:${esc(phone.replace(/[^+\d]/g, ''))}" class="uac-op-btn op-call" title="Chiama ${esc(refName)} al ${esc(phone)}">📞 Chiama</a>`
-            : `<span class="uac-op-btn op-call disabled" title="Nessun recapito telefonico diretto presente nelle fonti">📞 Chiama</span>`}
+            ? `<a href="tel:${esc(phone.replace(/[^+\d]/g, ''))}" class="uac-op-btn uac-icon-btn op-call" data-auto-log-call="${esc(comp?.id || '')}" data-act-id="${esc(act.id)}" title="Chiama ${esc(refName)} al ${esc(phone)}" aria-label="Chiama ${esc(refName || comp?.company || 'azienda')}"><span aria-hidden="true">📞</span></a>`
+            : `<button type="button" class="uac-op-btn uac-icon-btn op-call disabled" disabled title="Nessun recapito telefonico diretto" aria-label="Nessun telefono disponibile"><span aria-hidden="true">📞</span></button>`}
         </div>
-        
+
         <div class="uac-secondary-actions">
-          <button type="button" class="uac-op-btn op-followup" data-prepare-followup="${esc(act.id)}" data-comp-id="${esc(comp?.id || '')}" title="Prepara sollecito">✉️ Sollecito</button>
-          <button type="button" class="uac-op-btn op-touchpoint" data-quick-touchpoint="${esc(comp?.id || '')}" data-act-id="${esc(act.id)}" title="Registra esito">⚡ Esito</button>
-          <button type="button" class="uac-op-btn op-edit" data-edit-task="${esc(act.id)}" title="Modifica attività e scadenza">✏️ Modifica</button>
-          <button type="button" class="uac-op-btn op-details" data-open-360="${esc(comp?.id || '')}" title="Scheda Azienda 360°">360° ↗</button>
+          <button type="button" class="uac-op-btn uac-icon-btn op-followup" data-prepare-followup="${esc(act.id)}" data-comp-id="${esc(comp?.id || '')}" title="Prepara sollecito email" aria-label="Prepara sollecito email"><span aria-hidden="true">✉️</span></button>
+          <button type="button" class="uac-op-btn uac-icon-btn op-touchpoint" data-quick-touchpoint="${esc(comp?.id || '')}" data-act-id="${esc(act.id)}" title="Registra esito interazione" aria-label="Registra esito interazione"><span aria-hidden="true">⚡</span></button>
+          <button type="button" class="uac-op-btn uac-icon-btn op-edit" data-edit-task="${esc(act.id)}" title="Modifica attività e scadenza" aria-label="Modifica attività e scadenza"><span aria-hidden="true">✏️</span></button>
+          <button type="button" class="uac-op-btn uac-icon-btn op-details" data-open-360="${esc(comp?.id || '')}" title="Apri Scheda Azienda 360°" aria-label="Apri Scheda Azienda 360°"><span aria-hidden="true">360°</span></button>
         </div>
       </div>
     </article>
@@ -1147,7 +1151,7 @@ function renderExecutiveHomeView() {
   ensureDemoProjectData(state);
 
   const todayStr = typeof today === 'function' ? today() : new Date().toISOString().slice(0, 10);
-  const openActivities = (state.activities || []).filter(a => ['Da fare', 'In corso'].includes(a.status));
+  const openActivities = (state.activities || []).filter(a => ['Da fare', 'In corso'].includes(a.status) && !(a.id && a.id.startsWith('act-followup-')));
   const overdueTasks = openActivities.filter(a => a.dueDate && a.dueDate < todayStr);
   const todayTasks = openActivities.filter(a => a.dueDate && a.dueDate === todayStr);
   const upcomingTasks = openActivities.filter(a => a.dueDate && a.dueDate > todayStr);
@@ -1670,8 +1674,58 @@ function campaignsView() {
 // --- 9. EVENT LISTENERS E HOOKS GLOBALI ---
 if (typeof document !== 'undefined') {
 document.addEventListener('click', e => {
-  const b = e.target.closest('button, [data-open-360]');
+  const b = e.target.closest('button, [data-open-360], [data-auto-log-call]');
   if (!b) return;
+
+  // Auto-apertura Registra Esito quando si clicca Chiama (tel:)
+  if (b.dataset.autoLogCall) {
+    const cid = b.dataset.autoLogCall;
+    const actId = b.dataset.actId || null;
+    setTimeout(() => {
+      openInteractionLogger(cid, { channel: 'Telefonata' }, actId);
+    }, 150);
+    return;
+  }
+
+  // Cambio fase rapido a 1 clic nella Scheda 360°
+  if (b.dataset.c360SetStage) {
+    const newStage = b.dataset.c360SetStage;
+    const compId = b.dataset.companyId || current360CompanyId;
+    const nextState = structuredClone(state);
+    const comp = (nextState.contacts || []).find(c => c.id === compId);
+    if (comp) {
+      comp.stageOverride = newStage;
+      comp.stage = newStage;
+      const compDeals = (nextState.deals || []).filter(d => d.contactId === compId && !isArchived(d));
+      if (newStage === 'Cliente') {
+        const targetDeal = compDeals.find(d => d.stage !== 'Cliente') || compDeals[0];
+        if (targetDeal) {
+          targetDeal.stage = 'Cliente';
+          targetDeal.salesStage = 'Vinta';
+        }
+      } else if (newStage === 'Prospect') {
+        compDeals.forEach(d => {
+          if (d.stage !== 'Cliente') {
+            d.stage = 'Prospect';
+            if (!d.salesStage || d.salesStage === 'Nuovo contatto') d.salesStage = 'Trattativa';
+          }
+        });
+      }
+      comp.history = comp.history || [];
+      comp.history.push({
+        date: today(),
+        kind: 'stage-change',
+        text: `Fase azienda aggiornata a: ${newStage}`
+      });
+      if (persist(nextState)) {
+        const refreshed = (state.contacts || []).find(c => c.id === compId);
+        if (refreshed) renderCompany360View(refreshed);
+        if (typeof render === 'function') render();
+        if (typeof toast === 'function') toast(`Fase aggiornata a ${newStage}`);
+      }
+    }
+    return;
+  }
 
   // Filtro rapido fase azienda (Lead, Prospect, Cliente)
   if (b.dataset.companyFilter !== undefined) {
@@ -1866,6 +1920,11 @@ document.addEventListener('click', e => {
     const su = document.querySelector('#followup-subject')?.value || '';
     const body = document.querySelector('#followup-body')?.value || '';
     window.location.href = `mailto:${encodeURIComponent(to)}?subject=${encodeURIComponent(su)}&body=${encodeURIComponent(body)}`;
+    const ctx = currentFollowupContext;
+    document.querySelector('#followup-draft-dialog')?.close();
+    if (ctx?.companyId) {
+      setTimeout(() => openInteractionLogger(ctx.companyId, { channel: 'Email', notes: `Sollecito email: ${su}` }, ctx.activityId || null), 180);
+    }
     return;
   }
 
@@ -1874,6 +1933,11 @@ document.addEventListener('click', e => {
     const su = document.querySelector('#followup-subject')?.value || '';
     const body = document.querySelector('#followup-body')?.value || '';
     window.open(`https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(to)}&su=${encodeURIComponent(su)}&body=${encodeURIComponent(body)}`, '_blank', 'noopener,noreferrer');
+    const ctx = currentFollowupContext;
+    document.querySelector('#followup-draft-dialog')?.close();
+    if (ctx?.companyId) {
+      setTimeout(() => openInteractionLogger(ctx.companyId, { channel: 'Email', notes: `Sollecito Gmail: ${su}` }, ctx.activityId || null), 180);
+    }
     return;
   }
 

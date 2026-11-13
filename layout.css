@@ -9,50 +9,50 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap');
 
 :root {
-  /* --- ATTIO LIGHT / PAPER-SLATE TOKENS (Default) --- */
-  --bg: #f6f7f9;
-  --surface: #ffffff;
-  --surface-subtle: #f8f9fb;
-  --surface-hover: #f1f3f6;
-  --surface-elevated: #ffffff;
+  /* --- NOTION / APPLE WORKSPACE WARM LIGHT TOKENS (100% Light Mode) --- */
+  --bg: #F8F7F4;
+  --surface: #FFFFFF;
+  --surface-subtle: #F7F6F2;
+  --surface-hover: #F1EFE9;
+  --surface-elevated: #FFFFFF;
 
   /* Ink & Typography Hierarchy */
-  --ink: #101214;
-  --ink-secondary: #384152;
-  --muted: #667085;
-  --muted-subtle: #98a2b3;
+  --ink: #191918;
+  --ink-secondary: #37352F;
+  --muted: #6B6A65;
+  --muted-subtle: #9B9A97;
 
-  /* Hairlines & Micro-Borders (Attio / Twenty 1px precision) */
-  --line: #e4e7ec;
-  --line-strong: #d0d5dd;
-  --line-subtle: #eef0f4;
+  /* Hairlines & Micro-Borders */
+  --line: rgba(15, 23, 42, 0.08);
+  --line-strong: rgba(15, 23, 42, 0.14);
+  --line-subtle: rgba(15, 23, 42, 0.05);
 
-  /* Brand & Semantic Accents (Linear Indigo + Attio Royal Blue) */
-  --blue: #2563eb;
-  --blue-hover: #1d4ed8;
-  --blue-soft: #eff4ff;
-  --blue-border: #bfdbfe;
-  --indigo: #4f46e5;
+  /* Brand & Semantic Accents (Apple Blue + Notion Soft Pastels) */
+  --blue: #2563EB;
+  --blue-hover: #1D4ED8;
+  --blue-soft: #EFF6FF;
+  --blue-border: #BFDBFE;
+  --indigo: #4F46E5;
   --emerald: #059669;
-  --emerald-soft: #ecfdf3;
-  --emerald-border: #a6f4c5;
-  --amber: #d97706;
-  --amber-soft: #fffaeb;
-  --amber-border: #fedf89;
-  --rose: #e11d48;
-  --rose-soft: #fff1f3;
-  --rose-border: #fecdd6;
-  --violet: #7c3aed;
-  --violet-soft: #f5f3ff;
-  --violet-border: #ddd6fe;
-  --dark: #0b0d11;
+  --emerald-soft: #ECFDF5;
+  --emerald-border: #A7F3D0;
+  --amber: #D97706;
+  --amber-soft: #FFFBEB;
+  --amber-border: #FDE68A;
+  --rose: #E11D48;
+  --rose-soft: #FFF1F2;
+  --rose-border: #FECDD3;
+  --violet: #7C3AED;
+  --violet-soft: #F5F3FF;
+  --violet-border: #DDD6FE;
+  --dark: #F4F3EF;
 
-  /* Sidebar Tokens (Linear Obsidian Rail) */
-  --sidebar-bg: #0b0d11;
-  --sidebar-surface: #12151c;
-  --sidebar-border: rgba(255, 255, 255, 0.08);
-  --sidebar-ink: #f2f4f7;
-  --sidebar-muted: #868e9c;
+  /* Sidebar Tokens (Notion Warm-Neutral Light Rail) */
+  --sidebar-bg: #F4F3EF;
+  --sidebar-surface: #ECEAE3;
+  --sidebar-border: rgba(15, 23, 42, 0.08);
+  --sidebar-ink: #191918;
+  --sidebar-muted: #6B6A65;
 
   /* Shape & Geometry (Attio 8px/10px signature radii) */
   --radius-xs: 6px;
@@ -172,14 +172,14 @@ aside {
   font-size: 12px;
   color: var(--sidebar-muted);
   border-radius: var(--radius-xs);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  background: rgba(255, 255, 255, 0.55);
 }
 
 .sidebar-collapse-btn:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.1);
-  border-color: rgba(255, 255, 255, 0.18);
-  color: #ffffff;
+  background: #ffffff;
+  border-color: rgba(15, 23, 42, 0.14);
+  color: var(--ink);
 }
 
 .brand {
@@ -189,14 +189,14 @@ aside {
   padding: 2px 4px;
   gap: 8px;
   letter-spacing: -0.03em;
-  color: #ffffff;
+  color: var(--ink);
   display: flex;
   align-items: center;
   min-width: 0;
 }
 
 .mark {
-  background: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%);
+  background: linear-gradient(135deg, #2563EB 0%, #4F46E5 100%);
   color: #ffffff;
   border-radius: 7px;
   width: 26px;
@@ -206,31 +206,31 @@ aside {
   font-weight: 800;
   display: grid;
   place-items: center;
-  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.25);
 }
 
 .brand-sub {
   font-family: var(--font-mono);
   font-size: 7.5px;
   font-weight: 600;
-  color: #93c5fd;
+  color: var(--blue);
   letter-spacing: 1.4px;
   margin-top: 1px;
   display: block;
 }
 
-/* Twenty-style Workspace Switcher Card */
+/* Notion-style Workspace Card */
 .workspace-profile {
   text-align: left;
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 6px 8px;
-  background: var(--sidebar-surface);
+  padding: 7px 9px;
+  background: rgba(255, 255, 255, 0.65);
   border: 1px solid var(--sidebar-border);
   border-radius: var(--radius-sm);
-  margin: 0 0 6px;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  margin: 0 0 8px;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);
   flex-shrink: 0;
 }
 
@@ -240,11 +240,11 @@ aside {
   width: 26px;
   height: 26px;
   flex-shrink: 0;
-  border: 1px solid rgba(96, 165, 250, 0.35);
+  border: 1px solid var(--blue-border);
   border-radius: 6px;
   margin: 0;
-  background: rgba(37, 99, 235, 0.22);
-  color: #93c5fd;
+  background: var(--blue-soft);
+  color: var(--blue);
   font-family: var(--font-mono);
   font-size: 10px;
   font-weight: 700;
@@ -253,9 +253,9 @@ aside {
 .workspace-profile strong {
   display: block;
   font-size: 11px;
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: 0.01em;
-  color: #f8fafc;
+  color: var(--ink);
 }
 
 .workspace-profile small {
@@ -268,7 +268,7 @@ aside {
 #app-sidebar nav {
   display: flex;
   flex-direction: column;
-  gap: 1.5px;
+  gap: 2px;
   flex: 1 1 auto;
   min-height: 0;
   overflow-y: auto;
@@ -282,27 +282,27 @@ aside {
 }
 
 .nav-label {
-  font-size: 9px;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  color: #64748b;
-  padding: 6px 8px 1px;
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  color: var(--muted-subtle);
+  padding: 8px 8px 2px;
   margin: 0;
   text-transform: uppercase;
 }
 
 #app-sidebar nav button {
   border-radius: var(--radius-xs);
-  font-size: 12px;
-  padding: 4.5px 8px;
+  font-size: 12.5px;
+  padding: 6px 9px;
   gap: 8px;
-  color: #9ba3b2;
+  color: #4A4945;
   font-weight: 500;
   border: 1px solid transparent;
   background: transparent;
   box-shadow: none;
   width: 100%;
-  min-height: 28px;
+  min-height: 31px;
   justify-content: flex-start;
   position: relative;
   flex-shrink: 0;
@@ -319,7 +319,7 @@ aside {
 }
 
 .nav-text {
-  font-size: 12px;
+  font-size: 12.5px;
   letter-spacing: -0.01em;
   white-space: nowrap;
   overflow: hidden;
@@ -331,11 +331,11 @@ aside {
   font-family: var(--font-mono);
   font-size: 9.5px;
   font-weight: 600;
-  padding: 0 5px;
+  padding: 0 6px;
   border-radius: var(--radius-pill);
-  background: rgba(255, 255, 255, 0.08);
-  color: #cbd5e1;
-  line-height: 1.35;
+  background: rgba(15, 23, 42, 0.07);
+  color: var(--muted);
+  line-height: 1.4;
   flex-shrink: 0;
 }
 
@@ -344,31 +344,31 @@ aside {
   display: none;
 }
 
-nav button.active .nav-badge {
-  background: rgba(59, 130, 246, 0.28);
-  color: #93c5fd;
-  border: 1px solid rgba(96, 165, 250, 0.35);
+#app-sidebar nav button.active .nav-badge {
+  background: var(--blue-soft);
+  color: var(--blue);
+  border: 1px solid var(--blue-border);
 }
 
-nav button:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.05);
+#app-sidebar nav button:hover:not(:disabled) {
+  background: rgba(15, 23, 42, 0.05);
   border-color: transparent;
-  color: #f1f5f9;
+  color: var(--ink);
 }
 
-nav button.active {
-  background: rgba(255, 255, 255, 0.09);
-  border-color: rgba(255, 255, 255, 0.08);
-  box-shadow: inset 2.5px 0 0 #3b82f6, inset 0 1px 0 rgba(255, 255, 255, 0.06);
-  color: #ffffff;
+#app-sidebar nav button.active {
+  background: #ffffff;
+  border-color: rgba(15, 23, 42, 0.08);
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
+  color: var(--ink);
   font-weight: 600;
 }
 
 .sidebar-bottom {
   margin-top: auto;
-  padding: 6px 2px 2px;
+  padding: 8px 2px 4px;
   border-top: 1px solid var(--sidebar-border);
-  color: #cbd5e1;
+  color: var(--sidebar-muted);
   font-size: 10.5px;
   font-weight: 600;
   flex-shrink: 0;
@@ -377,9 +377,9 @@ nav button.active {
 .sidebar-status-line {
   display: flex;
   align-items: center;
-  gap: 4px;
-  margin-bottom: 4px;
-  font-size: 10px;
+  gap: 5px;
+  margin-bottom: 6px;
+  font-size: 10.5px;
   color: var(--sidebar-muted);
 }
 
@@ -387,28 +387,28 @@ nav button.active {
   width: 100%;
   justify-content: flex-start;
   text-align: left;
-  font-size: 11.5px;
+  font-size: 12px;
   font-weight: 500;
-  color: #cbd5e1;
-  padding: 5px 8px;
+  color: var(--ink-secondary);
+  padding: 6px 9px;
   border-radius: var(--radius-xs);
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.07);
-  box-shadow: none;
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid var(--sidebar-border);
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);
   gap: 8px;
-  min-height: 28px;
+  min-height: 30px;
 }
 
 .sidebar-bottom button:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.09);
-  border-color: rgba(255, 255, 255, 0.14);
-  color: #ffffff;
+  background: #ffffff;
+  border-color: var(--line-strong);
+  color: var(--ink);
 }
 
 .sidebar-settings-btn {
-  border-color: rgba(59, 130, 246, 0.35) !important;
-  background: rgba(37, 99, 235, 0.18) !important;
-  color: #93c5fd !important;
+  border-color: var(--sidebar-border) !important;
+  background: rgba(255, 255, 255, 0.85) !important;
+  color: var(--ink) !important;
   font-weight: 600 !important;
 }
 
@@ -6272,3 +6272,770 @@ h1, h2, h3, .section-title, .brand {
     align-items: flex-start;
   }
 }
+
+
+/* ==========================================================================
+   NOTION / APPLE WORKSPACE DESIGN SYSTEM (100% Light Mode & New Components)
+   ========================================================================== */
+
+/* 1. Accessibility, Touch & Motion Guidelines */
+button, a, [role="button"] {
+  touch-action: manipulation;
+}
+
+dialog,
+.mobile-action-sheet,
+.company-360-dialog {
+  overscroll-behavior: contain;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Enforce 100% Light Mode even if legacy state has data-theme */
+body[data-theme="dark"],
+body[data-theme="amoled"] {
+  --bg: #F8F7F4;
+  --surface: #FFFFFF;
+  --surface-subtle: #F7F6F2;
+  --surface-hover: #F1EFE9;
+  --surface-elevated: #FFFFFF;
+  --ink: #191918;
+  --ink-secondary: #37352F;
+  --muted: #6B6A65;
+  --muted-subtle: #9B9A97;
+  --line: rgba(15, 23, 42, 0.08);
+  --line-strong: rgba(15, 23, 42, 0.14);
+  --line-subtle: rgba(15, 23, 42, 0.05);
+  background: var(--bg) !important;
+  color: var(--ink) !important;
+}
+
+body[data-theme="dark"] .mobile-bottom-nav,
+body[data-theme="amoled"] .mobile-bottom-nav {
+  background: rgba(255, 255, 255, 0.96) !important;
+  border-top-color: var(--line) !important;
+}
+
+/* 2. Settings Tools Grid (moved from Sidebar footer) */
+.settings-tools-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.settings-tools-grid button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  padding: 8px 10px;
+  font-size: 12px;
+  font-weight: 500;
+  border-radius: var(--radius-xs);
+  background: var(--surface-subtle);
+  border: 1px solid var(--line);
+  color: var(--ink-secondary);
+}
+
+.settings-tools-grid button:hover:not(:disabled) {
+  background: var(--surface-hover);
+  border-color: var(--line-strong);
+  color: var(--ink);
+}
+
+/* 3. Fluid 5-Pill Status Strip (Zero Right-Edge Clipping) */
+.exec-status-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 18px;
+  overflow: visible;
+}
+
+.exec-status-bar .exec-ribbon-card {
+  flex: 1 1 165px;
+  min-width: 150px;
+  max-width: 100%;
+  padding: 8px 12px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--line);
+  background: var(--surface);
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);
+}
+
+/* 4. Compact 28px Icon-Only Activity Card Actions */
+.uac-actions-cluster {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: nowrap;
+  flex-shrink: 0;
+}
+
+.uac-op-btn.uac-icon-btn {
+  width: 28px;
+  height: 28px;
+  min-width: 28px;
+  min-height: 28px;
+  padding: 0;
+  border-radius: var(--radius-xs);
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--ink-secondary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  line-height: 1;
+  box-shadow: none;
+  transition: background-color 0.14s ease, border-color 0.14s ease, color 0.14s ease, transform 0.1s ease;
+}
+
+.uac-op-btn.uac-icon-btn:hover:not(:disabled) {
+  background: var(--surface-hover);
+  border-color: var(--line-strong);
+  color: var(--ink);
+}
+
+.uac-op-btn.uac-icon-btn.uac-op-done {
+  background: var(--emerald-soft);
+  border-color: var(--emerald-border);
+  color: var(--emerald);
+  font-weight: 700;
+}
+
+.uac-op-btn.uac-icon-btn.uac-op-done:hover:not(:disabled) {
+  background: #D1FAE5;
+}
+
+.uac-op-btn.uac-icon-btn.uac-op-call {
+  background: var(--blue-soft);
+  border-color: var(--blue-border);
+  color: var(--blue);
+}
+
+.uac-op-btn.uac-icon-btn.uac-op-call:hover:not(:disabled) {
+  background: #DBEAFE;
+}
+
+.uac-op-btn.uac-icon-btn.uac-op-360 {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  width: auto;
+  padding: 0 7px;
+}
+
+/* 5. Aziende Clickable Rows */
+.company-row-clickable {
+  cursor: pointer;
+  transition: background-color 0.12s ease;
+}
+
+.company-row-clickable:hover {
+  background: var(--surface-subtle);
+}
+
+/* 6. Company 360° Slide-Over Drawer (Desktop & Fullscreen Mobile) */
+#company-360-dialog.company-360-dialog {
+  margin: 0 0 0 auto;
+  width: min(760px, 92vw);
+  max-width: 92vw;
+  height: 100dvh;
+  max-height: 100dvh;
+  border-radius: 14px 0 0 14px;
+  border: 1px solid var(--line);
+  border-right: 0;
+  box-shadow: -14px 0 40px rgba(15, 23, 42, 0.12);
+  padding: 0;
+  overflow: hidden;
+  background: var(--surface);
+}
+
+#company-360-dialog[open] {
+  display: flex;
+  flex-direction: column;
+}
+
+#company-360-content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.c360-header {
+  flex-shrink: 0;
+  background: var(--surface);
+  border-bottom: 1px solid var(--line);
+  padding: 18px 22px 14px;
+}
+
+.c360-tabs {
+  flex-shrink: 0;
+  background: var(--surface-subtle);
+  border-bottom: 1px solid var(--line);
+  padding: 8px 22px;
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+}
+
+.c360-tab-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 18px 22px;
+}
+
+.c360-stage-pills {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--surface-subtle);
+  padding: 3px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--line);
+}
+
+.c360-stage-pill {
+  padding: 3px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: var(--radius-pill);
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  box-shadow: none;
+  min-height: 24px;
+}
+
+.c360-stage-pill.active {
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
+}
+
+.c360-summary-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 10px;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  background: var(--surface-subtle);
+  border: 1px solid var(--line);
+  font-size: 12px;
+}
+
+/* 7. Temporal Grouping in Attività */
+.temporal-group {
+  margin-bottom: 20px;
+}
+
+.temporal-group-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 2px 8px;
+  margin-bottom: 10px;
+  border-bottom: 1px solid var(--line);
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.temporal-group-header .tg-count {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+  background: var(--surface-subtle);
+  border: 1px solid var(--line);
+  color: var(--muted);
+}
+
+.temporal-group-header.is-overdue {
+  color: var(--rose);
+  border-bottom-color: var(--rose-border);
+}
+
+.temporal-group-header.is-overdue .tg-count {
+  background: var(--rose-soft);
+  color: var(--rose);
+  border-color: var(--rose-border);
+}
+
+/* 8. Calendar Month & Week Views (Readable Event Titles!) */
+.cal-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 12px;
+  padding: 10px 14px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+}
+
+.cal-toolbar-title {
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--ink);
+  text-transform: capitalize;
+}
+
+.cal-nav-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.cal-month-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  border-top: 1px solid var(--line);
+  border-left: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: var(--surface);
+}
+
+.cal-day-header {
+  padding: 8px 6px;
+  text-align: center;
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  background: var(--surface-subtle);
+  border-right: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+
+.cal-day-cell {
+  min-height: 98px;
+  padding: 6px;
+  border-right: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  background: var(--surface);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.cal-day-cell.is-outside {
+  background: var(--surface-subtle);
+  opacity: 0.58;
+}
+
+.cal-day-cell.is-today {
+  background: #F4F8FF;
+}
+
+.cal-day-num {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+}
+
+.cal-day-cell.is-today .cal-day-num {
+  background: var(--blue);
+  color: #ffffff;
+}
+
+.cal-event-chip {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+  text-align: left;
+  padding: 3px 6px;
+  border-radius: 5px;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.25;
+  border: 1px solid var(--blue-border);
+  background: var(--blue-soft);
+  color: #1E40AF;
+  box-shadow: none;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  min-height: 22px;
+}
+
+.cal-event-chip .cal-event-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+  min-width: 0;
+}
+
+.cal-event-chip.is-overdue {
+  background: var(--rose-soft);
+  border-color: var(--rose-border);
+  color: #9F1239;
+}
+
+.cal-event-chip.is-done {
+  background: var(--emerald-soft);
+  border-color: var(--emerald-border);
+  color: #065F46;
+  text-decoration: line-through;
+  opacity: 0.78;
+}
+
+.cal-event-chip:hover {
+  filter: brightness(0.96);
+}
+
+.cal-week-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.cal-week-col {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  padding: 10px 8px;
+  min-height: 220px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.cal-week-col.is-today {
+  border-color: var(--blue-border);
+  background: #F8FAFF;
+}
+
+.cal-week-col-head {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--ink);
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  justify-content: space-between;
+}
+
+/* 9. Aligned Event Modal (#task-editor) */
+#task-editor .field-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px 16px;
+  align-items: start;
+}
+
+#task-editor .field-pair {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px 16px;
+}
+
+#task-editor .field.full,
+#task-editor .date-shortcuts-bar,
+#task-editor .next-task-chain,
+#task-editor .form-section {
+  grid-column: 1 / -1;
+}
+
+#task-editor .date-shortcuts-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-top: -4px;
+}
+
+/* 10. Pipeline Mobile Phase Tabs */
+.pipeline-mobile-tabs {
+  display: none;
+}
+
+/* 11. Mobile Responsive Overrides (< 768px) */
+@media (max-width: 767px) {
+  #mobile-menu-btn {
+    display: none !important;
+  }
+
+  .page-heading #new {
+    display: none !important;
+  }
+
+  .page,
+  body[data-density="compact"] .page {
+    padding: 12px 12px calc(108px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+
+  .exec-status-bar {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 8px !important;
+    overflow: visible !important;
+    padding: 0 !important;
+  }
+
+  .exec-status-bar .exec-ribbon-card {
+    min-width: 0 !important;
+    flex: none !important;
+    width: 100%;
+    padding: 8px 10px !important;
+  }
+
+  /* Compact 28px icon buttons on mobile too */
+  .uac-actions-cluster {
+    width: 100%;
+    flex-direction: row !important;
+    justify-content: flex-end !important;
+    flex-wrap: wrap !important;
+    gap: 6px !important;
+  }
+
+  /* Round 52x52 Mobile FAB */
+  .mobile-fab {
+    width: 52px !important;
+    height: 52px !important;
+    min-height: 52px !important;
+    padding: 0 !important;
+    border-radius: 50% !important;
+    right: 16px !important;
+    bottom: calc(68px + env(safe-area-inset-bottom, 0px)) !important;
+    box-shadow: 0 8px 22px rgba(37, 99, 235, 0.35) !important;
+  }
+
+  .mobile-fab .fab-label {
+    display: none !important;
+  }
+
+  .mobile-fab .fab-plus {
+    font-size: 24px !important;
+    line-height: 1 !important;
+  }
+
+  /* Fullscreen 360° Drawer on Mobile */
+  #company-360-dialog.company-360-dialog {
+    margin: 0 !important;
+    width: 100vw !important;
+    max-width: 100vw !important;
+    height: 100dvh !important;
+    max-height: 100dvh !important;
+    border-radius: 0 !important;
+    border: 0 !important;
+  }
+
+  /* Pipeline Phase Tabs on Mobile */
+  .pipeline-mobile-tabs {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    padding: 2px 0 10px;
+    margin-bottom: 6px;
+    scrollbar-width: none;
+  }
+
+  .pipeline-mobile-tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .pipeline-mobile-tab {
+    flex: 0 0 auto;
+    padding: 6px 12px;
+    border-radius: var(--radius-pill);
+    font-size: 12px;
+    font-weight: 600;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    color: var(--muted);
+    box-shadow: none;
+  }
+
+  .pipeline-mobile-tab.active {
+    background: var(--blue-soft);
+    border-color: var(--blue-border);
+    color: var(--blue);
+  }
+
+  .board[data-mobile-tabbed="true"] {
+    display: block !important;
+    overflow-x: visible !important;
+  }
+
+  .board[data-mobile-tabbed="true"] .column {
+    display: none;
+    width: 100%;
+    min-width: 0;
+  }
+
+  .board[data-mobile-tabbed="true"] .column.is-active-mobile-col {
+    display: block;
+  }
+
+  /* Calendar Month/Week on Mobile */
+  .cal-month-grid {
+    font-size: 11px;
+  }
+
+  .cal-day-cell {
+    min-height: 68px;
+    padding: 4px 2px;
+  }
+
+  .cal-event-chip {
+    font-size: 9.5px;
+    padding: 2px 3px;
+  }
+
+  .cal-week-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  #task-editor .field-grid,
+  #task-editor .field-pair {
+    grid-template-columns: 1fr !important;
+  }
+
+  .exec-status-bar .ribbon-meta {
+    display: none;
+  }
+
+  .exec-status-bar .exec-ribbon-card {
+    justify-content: space-between;
+  }
+}
+
+/* Calendar Header, Weekdays Grid & Event Chip Layout */
+.cal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 16px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+
+.cal-title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.cal-nav {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.cal-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  background: var(--surface-2);
+  border-bottom: 1px solid var(--border);
+}
+
+.cal-weekdays span {
+  padding: 8px 10px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  text-align: center;
+}
+
+.cal-day-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.cal-day-add {
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1;
+  opacity: 0;
+  transition: opacity 0.15s ease, background 0.15s ease;
+}
+
+.cal-day-cell:hover .cal-day-add,
+.cal-week-col-head .cal-day-add {
+  opacity: 1;
+}
+
+.cal-day-add:hover {
+  background: var(--surface-2);
+  color: var(--blue);
+  border-color: var(--border);
+}
+
+.cal-day-events {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.cal-more-badge {
+  font-size: 11px;
+  color: var(--muted);
+  font-weight: 600;
+  padding: 2px 4px;
+}
+
+.cal-week-col-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 8px;
+  margin-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.8125rem;
+}
+
+.cal-week-col-body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.cal-week-empty {
+  font-size: 0.75rem;
+  color: var(--muted);
+  padding: 8px 0;
+}
+

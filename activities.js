@@ -1,8 +1,15 @@
 'use strict';
-let taskSession=null,activityStageFilter='',activityStatusFilter='open',activityTypeFilter='',activityPriorityFilter='',activityLayout='board',activitySort='due';
+let taskSession=null,activityStageFilter='',activityStatusFilter='open',activityTypeFilter='',activityPriorityFilter='',activityLayout='board',activitySort='due',calendarCursor='',weekCursor='';
 const activityTypes=['Chiamata','Email','Incontro / Demo','Follow-up','Analisi / Offerta','Onboarding / Consegna','Customer Care / Check-in','Altro'];
 const activityPriorities=['Alta','Media','Bassa'];
 const activityStatuses=['Da fare','In corso','Completata','Annullata'];
+const activityCalendars=['Principale (Apex Digital)','Commerciale & Demo','Consegne & Progetti','Personale'];
+function taskProjectOptions(contactId,selectedId=''){
+ const all=state.projects||[];
+ const companyProjects=all.filter(p=>p.contactId===contactId);
+ const otherProjects=all.filter(p=>p.contactId!==contactId);
+ return `<option value="">Nessun progetto collegato</option>${companyProjects.map(p=>`<option value="${esc(p.id)}" ${selectedId===p.id?'selected':''}>🚀 ${esc(p.name)}</option>`).join('')}${otherProjects.length?`<optgroup label="Altri progetti">${otherProjects.map(p=>`<option value="${esc(p.id)}" ${selectedId===p.id?'selected':''}>${esc(p.name)}</option>`).join('')}</optgroup>`:''}`;
+}
 const activityPlaybooks={
  Lead:[
   {title:'Profilazione azienda e analisi preliminare',type:'Analisi / Offerta',priority:'Media',offsetDays:0,notes:'Verificare settore, processi operativi e referente decisionale.'},
@@ -87,8 +94,12 @@ function openTaskEditor(id=null,overrides={}){
   contactId:defaultContactId,
   dealId:overrides.dealId||'',
   quoteId:overrides.quoteId||'',
+  projectId:overrides.projectId||'',
   referentId:overrides.referentId||'',
   referentName:overrides.referentName||'',
+  personName:overrides.personName||'',
+  calendar:overrides.calendar||'Principale (Apex Digital)',
+  calendarUrl:overrides.calendarUrl||'',
   title:overrides.title||'',
   type:overrides.type||(contactStage(defaultContactId)==='Cliente'?'Customer Care / Check-in':contactStage(defaultContactId)==='Prospect'?'Incontro / Demo':'Chiamata'),
   priority:overrides.priority||'Media',
@@ -100,7 +111,7 @@ function openTaskEditor(id=null,overrides={}){
  };
  const stage=contactStage(item.contactId);
  taskSession={id:existing?.id||null,updatedSnap:existing?JSON.stringify(existing):null};
- $('#task-title').textContent=existing?(overrides.status==='Completata'?'Completa attività':'Modifica attività'):`Nuova attività · ${stage}`;
+ $('#task-title').textContent=existing?(overrides.status==='Completata'?'Completa attività':'Modifica attività / evento'):`Nuova attività / evento · ${stage}`;
  $('#task-error').hidden=true;
  $('#task-delete').classList.toggle('hidden',!existing);
  const templates=(typeof getPlaybooks==='function'?getPlaybooks():activityPlaybooks)[stage]||activityPlaybooks.Lead;
@@ -120,14 +131,20 @@ function openTaskEditor(id=null,overrides={}){
    </div>
   </div>
   <div class="field-grid">
-   <h3 class="form-section">Destinatario e collegamento</h3>
+   <h3 class="form-section">Destinatario, persona e progetto</h3>
    <label class="field">Azienda (Lead / Prospect / Cliente) *
     <select name="contactId" id="task-company" required>
      ${state.contacts.map(c=>`<option value="${esc(c.id)}" ${item.contactId===c.id?'selected':''}>${esc(c.company)} (${contactStage(c.id)})</option>`).join('')}
     </select>
    </label>
-   <label class="field">Referente coinvolto
+   <label class="field">Persona / Referente
     <select name="referentId" id="task-referent">${personOptions(item.contactId,item.referentId||'',item.referentName||'')}</select>
+   </label>
+   <label class="field">Nome persona (se non in elenco)
+    <input name="personName" type="text" value="${esc(item.personName||'')}" placeholder="Es. Ing. Marco Rossi">
+   </label>
+   <label class="field">Progetto collegato
+    <select name="projectId" id="task-project">${taskProjectOptions(item.contactId,item.projectId||'')}</select>
    </label>
    <label class="field">Opportunità collegata
     <select name="dealId" id="task-deal">${quoteDealOptions(item.contactId,item.dealId||'')}</select>
@@ -135,10 +152,13 @@ function openTaskEditor(id=null,overrides={}){
    <label class="field">Preventivo collegato
     <select name="quoteId" id="task-quote">${taskQuoteOptions(item.contactId,item.quoteId||'')}</select>
    </label>
-   <h3 class="form-section">Dettagli operativi dell’attività</h3>
-   ${field('title','Titolo attività *',item.title,'text',true)}
+   <h3 class="form-section">Dettagli operativi &amp; Calendario</h3>
+   ${field('title','Titolo attività / evento *',item.title,'text',true)}
    <label class="field">Tipo di attività
     <select name="type" id="task-type">${activityTypes.map(t=>`<option ${item.type===t?'selected':''}>${t}</option>`).join('')}</select>
+   </label>
+   <label class="field">Calendario
+    <select name="calendar" id="task-calendar">${activityCalendars.map(cal=>`<option value="${esc(cal)}" ${(item.calendar||'Principale (Apex Digital)')===cal?'selected':''}>📅 ${esc(cal)}</option>`).join('')}</select>
    </label>
    <label class="field">Priorità
     <select name="priority" id="task-priority">${activityPriorities.map(p=>`<option ${item.priority===p?'selected':''}>${p}</option>`).join('')}</select>
@@ -150,7 +170,9 @@ function openTaskEditor(id=null,overrides={}){
     ${field('dueDate','Data scadenza',item.dueDate,'date')}
     ${field('dueTime','Ora (opzionale)',item.dueTime,'time')}
    </div>
-   ${typeof renderDateShortcuts==='function'?renderDateShortcuts('input[name="dueDate"]'):''}${area('notes','Note e scaletta operativa',item.notes)}
+   ${typeof renderDateShortcuts==='function'?renderDateShortcuts('input[name="dueDate"]'):''}
+   ${field('calendarUrl','Link evento / Video call (opzionale)',item.calendarUrl,'url',true)}
+   ${area('notes','Note e scaletta operativa',item.notes)}
    <h3 class="form-section">Esito e concatenazione prossimo passo</h3>
    ${area('outcome','Esito / Risultato (registrato nello storico aziendale)',item.outcome)}
    <details class="next-task-chain" ${overrides.status==='Completata'?'open':''}>
@@ -188,9 +210,10 @@ function saveTask(formOrValues){
   if(data.dueTime&&!validTime(data.dueTime))throw Error('Indica un orario valido nel formato HH:MM.');
   if(data.dealId&&!state.deals.some(d=>d.id===data.dealId&&d.contactId===c.id))throw Error('L’opportunità selezionata non appartiene a questa azienda.');
   if(data.quoteId&&!(state.quotes||[]).some(q=>q.id===data.quoteId&&q.contactId===c.id))throw Error('Il preventivo selezionato non appartiene a questa azienda.');
+  if(data.projectId&&!(state.projects||[]).some(p=>p.id===data.projectId))throw Error('Il progetto selezionato non esiste.');
   const person=companyPeople(c).find(p=>p.id===data.referentId);
   if(data.referentId&&!person&&!(old?.contactId===c.id&&old?.referentId===data.referentId))throw Error('Il referente selezionato non appartiene a questa azienda.');
-  const referentName=person?.name||(data.referentId?old?.referentName||'Referente storico':'');
+  const referentName=person?.name||data.personName||(data.referentId?old?.referentName||'Referente storico':'');
   const nextTitle=data.nextTaskTitle||'',nextDue=data.nextTaskDue||'',nextType=data.nextTaskType||'Follow-up',nextPriority=data.nextTaskPriority||'Media';
   if(nextDue&&!validDate(nextDue))throw Error('Data della prossima attività concatenata non valida.');
   if(nextDue&&!nextTitle)throw Error('Indica il titolo della prossima attività concatenata.');
@@ -204,8 +227,12 @@ function saveTask(formOrValues){
    contactId:c.id,
    dealId:data.dealId||'',
    quoteId:data.quoteId||'',
+   projectId:data.projectId||'',
    referentId:data.referentId||'',
    referentName,
+   personName:data.personName||'',
+   calendar:data.calendar||'Principale (Apex Digital)',
+   calendarUrl:data.calendarUrl||'',
    title:data.title,
    type:data.type,
    priority:data.priority,
@@ -479,12 +506,133 @@ function activitiesView(){
     <div class="view-toggle" role="group" aria-label="Vista attività">
      <button type="button" data-activity-layout="board" aria-pressed="${activityLayout==='board'}" class="${activityLayout==='board'?'selected':''}">▥ Bacheca Fasi</button>
      <button type="button" data-activity-layout="list" aria-pressed="${activityLayout==='list'}" class="${activityLayout==='list'?'selected':''}">☷ Elenco</button>
+     <button type="button" data-activity-layout="month" aria-pressed="${activityLayout==='month'}" class="${activityLayout==='month'?'selected':''}">📅 Mese</button>
+     <button type="button" data-activity-layout="week" aria-pressed="${activityLayout==='week'}" class="${activityLayout==='week'?'selected':''}">📆 Settimana</button>
     </div>
     <button type="button" id="open-playbook-editor" data-open-playbooks="true">⚙ Configura Playbook</button>
     <button type="button" id="export-csv" ${!rows.length?'disabled':''}>↓ Esporta CSV</button>
    </div>
   </div>
-  ${activityLayout==='board'?activitiesBoard(rows):activitiesTable(rows)}`;
+  ${activityLayout==='board'?activitiesBoard(rows):activityLayout==='month'?activitiesMonthCalendar(rows):activityLayout==='week'?activitiesWeekCalendar(rows):activitiesTemporalList(rows)}`;
+}
+
+function activitiesTemporalList(rows){
+ if(!rows.length)return activitiesTable(rows);
+ const day=today(),tom=addDays(day,1),endWeek=addDays(day,7);
+ const groups=[
+  {id:'overdue',label:'🚨 Scadute',items:rows.filter(a=>isOpenTask(a)&&a.dueDate&&a.dueDate<day)},
+  {id:'today',label:'📅 Oggi',items:rows.filter(a=>a.dueDate===day)},
+  {id:'tomorrow',label:'🌅 Domani',items:rows.filter(a=>a.dueDate===tom)},
+  {id:'week',label:'📆 Questa settimana',items:rows.filter(a=>a.dueDate&&a.dueDate>tom&&a.dueDate<=endWeek)},
+  {id:'later',label:'⏳ Prossimamente',items:rows.filter(a=>a.dueDate&&a.dueDate>endWeek)},
+  {id:'unscheduled',label:'📋 Da definire',items:rows.filter(a=>!a.dueDate)}
+ ].filter(g=>g.items.length);
+ if(!groups.length)return activitiesTable(rows);
+ return `<div class="temporal-groups">${groups.map(g=>`
+  <section class="temporal-group">
+   <div class="temporal-group-header">
+    <h3>${g.label}</h3>
+    <span class="pill">${g.items.length}</span>
+   </div>
+   ${activitiesTable(g.items)}
+  </section>`).join('')}</div>`;
+}
+
+function activitiesMonthCalendar(rows){
+ const todayStr=today();
+ const baseYM=(calendarCursor&&/^\d{4}-\d{2}$/.test(calendarCursor))?calendarCursor:todayStr.slice(0,7);
+ const [yr,mo]=baseYM.split('-').map(Number);
+ const firstOfMonth=new Date(Date.UTC(yr,mo-1,1,12,0,0));
+ const monthName=new Intl.DateTimeFormat('it-IT',{month:'long',year:'numeric',timeZone:'UTC'}).format(firstOfMonth);
+ const startDow=(firstOfMonth.getUTCDay()+6)%7; // 0=Mon..6=Sun
+ const daysInMonth=new Date(Date.UTC(yr,mo,0,12,0,0)).getUTCDate();
+ const totalCells=Math.ceil((startDow+daysInMonth)/7)*7;
+ const cells=[];
+ for(let i=0;i<totalCells;i++){
+  const d=new Date(Date.UTC(yr,mo-1,1-startDow+i,12,0,0));
+  const iso=d.toISOString().slice(0,10);
+  const inMonth=d.getUTCMonth()===(mo-1);
+  const dayEvents=rows.filter(a=>a.dueDate===iso).sort((a,b)=>(a.dueTime||'99:99').localeCompare(b.dueTime||'99:99'));
+  cells.push({iso,dayNum:d.getUTCDate(),inMonth,dayEvents});
+ }
+ return `<div class="cal-month-wrap">
+  <div class="cal-header">
+   <h3 class="cal-title">${esc(monthName.charAt(0).toUpperCase()+monthName.slice(1))}</h3>
+   <div class="cal-nav">
+    <button type="button" class="secondary" data-cal-nav="prev-month" aria-label="Mese precedente">‹ Prec</button>
+    <button type="button" class="secondary" data-cal-nav="today-month">Oggi</button>
+    <button type="button" class="secondary" data-cal-nav="next-month" aria-label="Mese successivo">Succ ›</button>
+   </div>
+  </div>
+  <div class="cal-weekdays"><span>Lun</span><span>Mar</span><span>Mer</span><span>Gio</span><span>Ven</span><span>Sab</span><span>Dom</span></div>
+  <div class="cal-month-grid">
+   ${cells.map(cell=>`
+    <div class="cal-day-cell ${cell.inMonth?'':'is-outside'} ${cell.iso===todayStr?'is-today':''}" data-cal-date="${cell.iso}">
+     <div class="cal-day-top">
+      <span class="cal-day-num">${cell.dayNum}</span>
+      <button type="button" class="cal-day-add" data-cal-add="${cell.iso}" title="Nuova attività il ${cell.iso}" aria-label="Nuova attività il ${cell.iso}">+</button>
+     </div>
+     <div class="cal-day-events">
+      ${cell.dayEvents.slice(0,3).map(a=>{
+       const comp=contact(a.contactId);
+       const isDone=a.status==='Completata';
+       const isOver=isOpenTask(a)&&a.dueDate<todayStr;
+       const chipCls=isDone?'cal-chip-done':isOver?'cal-chip-overdue':a.priority==='Alta'?'cal-chip-high':'';
+       const label=`${a.dueTime?a.dueTime+' ':''}${a.title}${comp?' · '+comp.company:''}`;
+       return `<button type="button" class="cal-event-chip ${chipCls}" data-edit-task="${esc(a.id)}" title="${esc(label)}">${a.dueTime?`<span class="cal-chip-time">${esc(a.dueTime)}</span>`:''}<span class="cal-chip-title">${esc(a.title)}</span></button>`;
+      }).join('')}
+      ${cell.dayEvents.length>3?`<span class="cal-more-badge">+${cell.dayEvents.length-3} altri</span>`:''}
+     </div>
+    </div>`).join('')}
+  </div>
+ </div>`;
+}
+
+function activitiesWeekCalendar(rows){
+ const todayStr=today();
+ const anchorStr=(weekCursor&&validDate(weekCursor))?weekCursor:todayStr;
+ const anchor=new Date(anchorStr+'T12:00:00Z');
+ const dow=(anchor.getUTCDay()+6)%7;
+ const monday=new Date(anchor.getTime()-dow*86400000);
+ const weekDays=Array.from({length:7},(_,i)=>{
+  const d=new Date(monday.getTime()+i*86400000);
+  const iso=d.toISOString().slice(0,10);
+  const label=new Intl.DateTimeFormat('it-IT',{weekday:'short',day:'numeric',month:'short',timeZone:'UTC'}).format(d);
+  const dayEvents=rows.filter(a=>a.dueDate===iso).sort((a,b)=>(a.dueTime||'99:99').localeCompare(b.dueTime||'99:99'));
+  return {iso,label,dayEvents};
+ });
+ return `<div class="cal-month-wrap">
+  <div class="cal-header">
+   <h3 class="cal-title">Settimana ${esc(weekDays[0].label)} – ${esc(weekDays[6].label)}</h3>
+   <div class="cal-nav">
+    <button type="button" class="secondary" data-cal-nav="prev-week" aria-label="Settimana precedente">‹ Prec</button>
+    <button type="button" class="secondary" data-cal-nav="today-week">Questa settimana</button>
+    <button type="button" class="secondary" data-cal-nav="next-week" aria-label="Settimana successiva">Succ ›</button>
+   </div>
+  </div>
+  <div class="cal-week-grid">
+   ${weekDays.map(wd=>`
+    <div class="cal-week-col ${wd.iso===todayStr?'is-today':''}">
+     <div class="cal-week-col-head">
+      <strong>${esc(wd.label)}</strong>
+      <button type="button" class="cal-day-add" data-cal-add="${wd.iso}" title="Nuova attività il ${wd.iso}" aria-label="Nuova attività il ${wd.iso}">+</button>
+     </div>
+     <div class="cal-week-col-body">
+      ${wd.dayEvents.length?wd.dayEvents.map(a=>{
+       const comp=contact(a.contactId);
+       const proj=a.projectId?(state.projects||[]).find(p=>p.id===a.projectId):null;
+       const isDone=a.status==='Completata';
+       const isOver=isOpenTask(a)&&a.dueDate<todayStr;
+       const chipCls=isDone?'cal-chip-done':isOver?'cal-chip-overdue':a.priority==='Alta'?'cal-chip-high':'';
+       return `<button type="button" class="cal-event-chip cal-week-chip ${chipCls}" data-edit-task="${esc(a.id)}">
+        <span class="cal-chip-title">${a.dueTime?esc(a.dueTime)+' · ':''}${esc(a.title)}</span>
+        <small>${esc(comp?.company||'Azienda')}${proj?' · 🚀 '+esc(proj.name):''}</small>
+       </button>`;
+      }).join(''):'<span class="cal-week-empty">Nessun evento</span>'}
+     </div>
+    </div>`).join('')}
+  </div>
+ </div>`;
 }
 
 function activitiesBoard(rows){
@@ -614,6 +762,25 @@ document.addEventListener('click',e=>{
  if(b.dataset.activityStage!==undefined){activityStageFilter=b.dataset.activityStage;render();return;}
  if(b.dataset.activityStatus){activityStatusFilter=b.dataset.activityStatus;render();return;}
  if(b.dataset.activityLayout){activityLayout=b.dataset.activityLayout;render();return;}
+ if(b.dataset.calAdd){openTaskEditor(null,{dueDate:b.dataset.calAdd});return;}
+ if(b.dataset.calNav){
+  const nav=b.dataset.calNav;
+  const todayStr=today();
+  if(nav==='today-month'){calendarCursor=todayStr.slice(0,7);render();return;}
+  if(nav==='prev-month'||nav==='next-month'){
+   const baseYM=(calendarCursor&&/^\d{4}-\d{2}$/.test(calendarCursor))?calendarCursor:todayStr.slice(0,7);
+   const [yr,mo]=baseYM.split('-').map(Number);
+   const d=new Date(Date.UTC(yr,mo-1+(nav==='next-month'?1:-1),1,12,0,0));
+   calendarCursor=d.toISOString().slice(0,7);
+   render();return;
+  }
+  if(nav==='today-week'){weekCursor=todayStr;render();return;}
+  if(nav==='prev-week'||nav==='next-week'){
+   const base=(weekCursor&&validDate(weekCursor))?weekCursor:todayStr;
+   weekCursor=addDays(base,nav==='next-week'?7:-7);
+   render();return;
+  }
+ }
  if(b.dataset.jumpStage){activityStageFilter=b.dataset.jumpStage;setView('activities');activityStageFilter=b.dataset.jumpStage;render();return;}
  if(b.id==='apply-task-template'&&taskSession){
   const idx=Number($('#task-template-select')?.value);
@@ -637,6 +804,7 @@ document.addEventListener('change',e=>{
  if(e.target.id==='task-company'){
   const cid=e.target.value;
   if($('#task-referent'))$('#task-referent').innerHTML=personOptions(cid);
+  if($('#task-project'))$('#task-project').innerHTML=taskProjectOptions(cid);
   if($('#task-deal'))$('#task-deal').innerHTML=quoteDealOptions(cid);
   if($('#task-quote'))$('#task-quote').innerHTML=taskQuoteOptions(cid);
  }
@@ -843,7 +1011,6 @@ function buildCommandItems(q=''){
   {group:'Azioni rapide',icon:'☑',label:'Nuova attività operativa',meta:'Pianifica chiamata, demo o follow-up',cmd:'new-task'},
   {group:'Azioni rapide',icon:'▤',label:'Nuovo preventivo',meta:'Crea proposta commerciale con versioni',cmd:'new-quote'},
   {group:'Azioni rapide',icon:'🚀',label:'Nuovo progetto / commessa',meta:'Avvia commessa con milestone',cmd:'new-project'},
-  {group:'Azioni rapide',icon:'⚡',label:'Cambia tema (Chiaro / Scuro / AMOLED)',meta:'Alterna profilo cromatico',cmd:'cycle-theme'},
   {group:'Azioni rapide',icon:'↕',label:'Cambia densità (Confortevole / Compatta)',meta:'Ottimizza densità tabelle',cmd:'toggle-density'},
   {group:'Azioni rapide',icon:'⇤',label:'Comprimi / Espandi barra laterale (Ctrl+B)',meta:'Passa da Sidebar estesa a Navigation Rail compatta',cmd:'toggle-sidebar'},
   {group:'Azioni rapide',icon:'↓',label:'Esporta backup JSON completo',meta:'Salva copia locale',cmd:'export-json'},
@@ -854,18 +1021,26 @@ function buildCommandItems(q=''){
   {group:'Navigazione',icon:'▥',label:'Vai a Opportunità (Pipeline)',meta:'Bacheca 5 fasi ed elenco',cmd:'view:trattative'},
   {group:'Navigazione',icon:'▤',label:'Vai a Preventivi',meta:'Proposte commerciali e stampa PDF',cmd:'view:quotes'},
   {group:'Navigazione',icon:'📈',label:'Vai a Forecast & KPI',meta:'Target, pesi e storico fatturati',cmd:'view:analytics'},
-  {group:'Navigazione',icon:'⚙',label:'Apri Impostazioni',meta:'Temi, feedback aptico e archivio',cmd:'open-settings'}
+  {group:'Navigazione',icon:'⚙',label:'Apri Impostazioni',meta:'Strumenti, feedback aptico e archivio',cmd:'open-settings'}
  ].filter(item=>matchText(item.label,item.meta,item.group));
 
- const companyItems=(state.contacts||[]).filter(c=>matchText(c.company,c.person,c.email,c.sector,c.city)).slice(0,6).map(c=>({
+ const companyItems=(state.contacts||[]).filter(c=>matchText(
+  c.company,c.person,c.email,c.phone,c.sector,c.city,c.notes,c.taxId,c.source,
+  ...(c.referents||[]).flatMap(r=>[r.name,r.role,r.email,r.phone]),
+  ...(c.history||[]).map(h=>h.text)
+ )).slice(0,6).map(c=>({
   group:'Aziende',
   icon:'🏢',
   label:c.company,
-  meta:`${contactStage(c.id)}${c.person?' · '+c.person:''}`,
+  meta:`${contactStage(c.id)}${c.person?' · '+c.person:''}${c.phone?' · '+c.phone:''}`,
   cmd:`c360:${c.id}`
  }));
 
- const dealItems=(state.deals||[]).filter(d=>!isArchived(d)&&matchText(d.title,contact(d.contactId)?.company,d.service,getSalesStage(d))).slice(0,6).map(d=>({
+ const dealItems=(state.deals||[]).filter(d=>!isArchived(d)&&matchText(
+  d.title,contact(d.contactId)?.company,d.service,getSalesStage(d),
+  d.problem,d.process,d.solution,d.benefit,d.next,d.notes,
+  ...(d.history||[]).map(h=>h.text)
+ )).slice(0,6).map(d=>({
   group:'Opportunità',
   icon:'💼',
   label:d.title,
@@ -873,7 +1048,9 @@ function buildCommandItems(q=''){
   cmd:`deal:${d.id}`
  }));
 
- const taskItems=(state.activities||[]).filter(a=>isOpenTask(a)&&matchText(a.title,contact(a.contactId)?.company,a.type)).slice(0,5).map(a=>({
+ const taskItems=(state.activities||[]).filter(a=>isOpenTask(a)&&matchText(
+  a.title,contact(a.contactId)?.company,a.type,a.notes,a.reason,a.outcome,a.lastOutcome,a.referentName,a.personName,a.calendar
+ )).slice(0,5).map(a=>({
   group:'Attività aperte',
   icon:'☑',
   label:a.title,
