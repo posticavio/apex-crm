@@ -519,4 +519,29 @@ function validateResources(item){
 }
 function resourceSummary(item){return(item.resources||[]).map(r=>`${r.type}: ${r.name} — ${r.url}${r.notes?' · '+r.notes:''}`).join('\n');}
 
+// Keep the page stationary while any dialog is open, including nested dialogs.
+// overflow:hidden alone does not reliably lock the viewport on mobile browsers.
+if(typeof window!=='undefined'&&typeof MutationObserver!=='undefined'&&document.body){
+ let lockedScroll=null;
+ const syncDialogScrollLock=()=>{
+  const hasDialog=!!document.querySelector('dialog[open]');
+  if(hasDialog&&!lockedScroll){
+   lockedScroll={x:window.scrollX,y:window.scrollY,top:document.body.style.top,left:document.body.style.left};
+   document.body.style.top=`-${lockedScroll.y}px`;
+   document.body.style.left=`-${lockedScroll.x}px`;
+   document.body.classList.add('dialog-scroll-locked');
+  }else if(!hasDialog&&lockedScroll){
+   const saved=lockedScroll;
+   lockedScroll=null;
+   document.body.classList.remove('dialog-scroll-locked');
+   document.body.style.top=saved.top;
+   document.body.style.left=saved.left;
+   window.scrollTo({left:saved.x,top:saved.y,behavior:'instant'});
+  }
+ };
+ new MutationObserver(syncDialogScrollLock).observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:['open']});
+ document.addEventListener('close',syncDialogScrollLock,true);
+ syncDialogScrollLock();
+}
+
 render();

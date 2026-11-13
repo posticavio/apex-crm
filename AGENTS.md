@@ -866,3 +866,22 @@ node crm-rapid-check.cjs
   - Prima di avviare nuovi sviluppi funzionali, eseguire `git fetch origin` e verificare l'allineamento di `main`.
 - **Modifiche non pubblicate**:
   - È stata preservata senza toccarla una modifica work-in-progress locale su `index.html` (`#cmd-trigger-btn` e `#command-dialog`) rilevata nel working tree e appartenente all'altro agente (Codex), in conformità alla Regola 6.
+
+### Sessione 2026-11-13 (Blocco scroll sfondo delle finestre sovrapposte) — Agente: OpenAI Codex
+- Richiesta: lo scroll delle finestre sovrapposte deve restare nella finestra, senza muovere la pagina principale; segnalazione su PC.
+- Stato iniziale: working tree pulito, branch `work`, HEAD `5e236a4`, autore Git posticavio (merge senza etichetta agente); letto il passaggio di consegne Antigravity relativo a `718cfc2`.
+- Modifiche: `app.js` osserva apertura/chiusura/rimozione dei dialog, conserva la posizione della pagina e la ripristina solo alla chiusura dell'ultimo dialog; `layout.css` mantiene fisso il body durante il blocco. Il solo overflow hidden esistente non viene considerato sufficiente per tutti i browser.
+- Verifiche: controllo sintassi di app.js; 11 suite locali PASS (crm, import, relationship, sales, resource, unscheduled, quotes, activities, enterprise, cloud-sync, crm-pro). Le suite mcp-server e crm-rapid non eseguite perché richiedono dati Supabase reali e possono modificarli.
+- Browser Chromium isolato: smoke desktop 1440x900 e mobile 390x844 PASS; prove su azienda e attività con rotella interna, fine contenuto, sfondo, dialog annidato rimosso e ripristino scroll PASS. Helper di regressione esterno al checkout: /workspace/apex-dev-tools/dialog-scroll-check.cjs.
+- Limiti: il comportamento originale non era riproducibile nel Chromium locale; aggiunta protezione comune e verificata la sua efficacia nelle condizioni provate. Import privato parisi-cattini.js assente, come già rilevato nell'onboarding; richieste esterne bloccate nei test.
+- Nessun accesso ai dati Supabase, push, deploy o pubblicazione dell'ambiente eseguito. Modifiche locali non pubblicate: app.js, layout.css, AGENTS.md.
+
+### Sessione 2026-11-13 (Pubblicazione correzione scroll) — Agente: OpenAI Codex
+- Richiesta esplicita utente: pubblicare su GitHub e Vercel.
+- Verifiche prima del push: origin/main e HEAD allineati a 5e236a4; 10 controlli sintattici e 11 suite offline PASS; git diff --check PASS. Le due suite con accesso ai dati Supabase reali restano escluse.
+- Commit previsto: correzione comune del blocco scroll dialog, con app.js, layout.css e questo registro.
+- Vercel: API non raggiungibile dalla policy corrente (CONNECT 403); nessun binding Vercel o login CLI locale disponibile. Verificare il deploy automatico GitHub, se configurato; il push da solo non prova il deploy.
+
+
+## Specifiche UX APEX CRM (13 novembre 2026)
+Per ogni intervento sull'interfaccia, leggere e applicare [docs/APEX-UX-SPEC.md](docs/APEX-UX-SPEC.md). Ottimizzare l'app esistente, senza riscriverla o perdere funzionalità.

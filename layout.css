@@ -99,6 +99,12 @@ body:has(dialog[open]) {
   overscroll-behavior: none;
 }
 
+body.dialog-scroll-locked {
+  position: fixed;
+  width: 100%;
+  overflow: hidden !important;
+}
+
 button, input, select, textarea {
   font-family: inherit;
   transition: background-color 0.14s ease, border-color 0.14s ease, color 0.14s ease, box-shadow 0.14s ease, transform 0.12s ease;
