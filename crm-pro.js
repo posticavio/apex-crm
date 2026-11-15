@@ -1180,41 +1180,51 @@ function renderExecutiveHomeView() {
 
   return `
     <div class="executive-home">
-      <!-- 1. Header Status Bar Apple/Notion Metriche a 1 Clic -->
+      <!-- 1. Header Status Bar Pipedrive / Action-First -->
       <div class="exec-action-ribbon exec-status-bar" role="region" aria-label="Riepilogo operativo immediato">
         <button type="button" class="exec-ribbon-card ${overdueTasks.length ? 'urgent' : ''}" data-jump-section="sec-tasks" title="Visualizza le attività da fare e urgenti">
-          <span class="ribbon-icon">🚨</span>
-          <span class="ribbon-label">Da fare subito</span>
+          <span class="ribbon-icon tone-danger">${apexIcon('alert', 15)}</span>
+          <span class="ribbon-body">
+            <span class="ribbon-label">Da fare subito</span>
+            <small class="ribbon-meta">${overdueTasks.length ? `${overdueTasks.length} scadute` : `${todayTasks.length} oggi`}</small>
+          </span>
           <span class="ribbon-count">${(overdueTasks.length + todayTasks.length).toString().padStart(2, '0')}</span>
-          <small class="ribbon-meta">${overdueTasks.length ? `${overdueTasks.length} scadute` : `${todayTasks.length} oggi`}</small>
         </button>
 
         <button type="button" class="exec-ribbon-card" data-jump-section="sec-projects" title="Visualizza i progetti e commesse in corso">
-          <span class="ribbon-icon">🚀</span>
-          <span class="ribbon-label">Progetti attivi</span>
+          <span class="ribbon-icon tone-accent">${apexIcon('rocket', 15)}</span>
+          <span class="ribbon-body">
+            <span class="ribbon-label">Progetti attivi</span>
+            <small class="ribbon-meta">Commesse</small>
+          </span>
           <span class="ribbon-count">${activeProjects.length.toString().padStart(2, '0')}</span>
-          <small class="ribbon-meta">Commesse</small>
         </button>
 
         <button type="button" class="exec-ribbon-card ${suggestedCalls.length ? 'highlight' : ''}" data-jump-section="sec-campaigns" title="Visualizza i ricontatti commerciali suggeriti">
-          <span class="ribbon-icon">✉️</span>
-          <span class="ribbon-label">Ricontatti</span>
+          <span class="ribbon-icon tone-info">${apexIcon('mail', 15)}</span>
+          <span class="ribbon-body">
+            <span class="ribbon-label">Ricontatti</span>
+            <small class="ribbon-meta">Campagna email</small>
+          </span>
           <span class="ribbon-count">${suggestedCalls.length.toString().padStart(2, '0')}</span>
-          <small class="ribbon-meta">Campagna email</small>
         </button>
 
         <button type="button" class="exec-ribbon-card" data-open-consultable="waiting" title="Visualizza le posizioni in attesa di risposta">
-          <span class="ribbon-icon">⏳</span>
-          <span class="ribbon-label">In attesa risposta</span>
+          <span class="ribbon-icon tone-warn">${apexIcon('clock', 15)}</span>
+          <span class="ribbon-body">
+            <span class="ribbon-label">In attesa</span>
+            <small class="ribbon-meta">Dal cliente</small>
+          </span>
           <span class="ribbon-count">${(waitingProjects.length + waitingDeals.length).toString().padStart(2, '0')}</span>
-          <small class="ribbon-meta">Dal cliente</small>
         </button>
 
         <button type="button" class="exec-ribbon-card" data-open-consultable="pending" title="Visualizza le posizioni da definire">
-          <span class="ribbon-icon">⚠️</span>
-          <span class="ribbon-label">Da definire</span>
+          <span class="ribbon-icon tone-muted">${apexIcon('bolt', 15)}</span>
+          <span class="ribbon-body">
+            <span class="ribbon-label">Da definire</span>
+            <small class="ribbon-meta">Senza data</small>
+          </span>
           <span class="ribbon-count">${(unscheduledTasks.length + pendingDeals.length + pendingProjects.length).toString().padStart(2, '0')}</span>
-          <small class="ribbon-meta">Senza data</small>
         </button>
       </div>
 

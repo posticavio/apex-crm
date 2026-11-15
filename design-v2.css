@@ -950,3 +950,224 @@ button.primary:hover {
     flex: 0 0 240px;
   }
 }
+
+/* ==========================================================================
+   PIPEDRIVE #5 FRONT-END OVERHAUL (High-Contrast SaaS Shell, Ribbon & Bento)
+   ========================================================================== */
+:root {
+  --bg: #F6F7F9;
+  --bg-sunken: #EEF0F4;
+  --surface: #FFFFFF;
+  --surface-hover: #F9FAFB;
+  --sidebar: #FFFFFF;
+  --line: #E5E7EB;
+  --line-strong: #D1D5DB;
+  --border: #E5E7EB;
+  --text: #111827;
+  --text-2: #4B5563;
+  --text-3: #6B7280;
+  --accent: #2563EB;
+  --accent-soft: #EFF6FF;
+  --accent-hover: #1D4ED8;
+}
+
+/* Sidebar: clean white rail with soft blue active pill */
+#app-sidebar {
+  background: var(--sidebar) !important;
+  border-right: 1px solid var(--line) !important;
+}
+
+#app-sidebar .workspace-profile {
+  background: var(--bg) !important;
+  border-color: var(--line) !important;
+}
+
+#app-sidebar nav button {
+  height: 34px !important;
+  min-height: 34px !important;
+  border-radius: 8px !important;
+  color: var(--text-2) !important;
+}
+
+#app-sidebar nav button.active {
+  background: var(--accent-soft) !important;
+  color: var(--accent) !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+}
+
+#app-sidebar nav button.active .nav-badge {
+  color: var(--accent) !important;
+}
+
+/* Topbar: crisp white header */
+.topbar {
+  background: rgba(255, 255, 255, 0.94) !important;
+  border-bottom: 1px solid var(--line) !important;
+}
+
+.crumb-badge,
+.topbar #crumb .crumb-root {
+  background: transparent !important;
+  border: 0 !important;
+  padding: 0 !important;
+  color: var(--text-3) !important;
+  font-weight: 500 !important;
+}
+
+/* Compact 1-line page heading (remove bulky date/subtitle/duplicate CTA) */
+.page-heading {
+  padding: 6px 0 8px !important;
+  margin: 0 0 10px !important;
+  border-bottom: 1px solid var(--line) !important;
+}
+
+.page-heading #date-label,
+.page-heading #subtitle,
+.page-heading #new {
+  display: none !important;
+}
+
+.page-heading h1 {
+  font-size: 18px !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.02em !important;
+}
+
+/* Home: 5-column Pipedrive KPI ribbon */
+.exec-action-ribbon.exec-status-bar {
+  display: grid !important;
+  grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+  gap: 10px !important;
+  margin: 0 0 14px !important;
+}
+
+.exec-ribbon-card {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  padding: 10px 12px !important;
+  background: var(--surface) !important;
+  border: 1px solid var(--line) !important;
+  border-radius: 10px !important;
+  box-shadow: none !important;
+  text-align: left !important;
+  min-width: 0 !important;
+  height: auto !important;
+  transition: border-color 0.12s, background 0.12s !important;
+}
+
+.exec-ribbon-card:hover {
+  border-color: var(--line-strong) !important;
+  background: var(--surface-hover) !important;
+}
+
+.exec-ribbon-card.urgent {
+  border-color: rgba(214, 69, 61, 0.35) !important;
+}
+
+.exec-ribbon-card .ribbon-icon {
+  width: 32px !important;
+  height: 32px !important;
+  border-radius: 8px !important;
+  display: inline-grid !important;
+  place-items: center !important;
+  flex-shrink: 0 !important;
+}
+
+.ribbon-icon.tone-danger { background: #FEE2E2 !important; color: #DC2626 !important; }
+.ribbon-icon.tone-accent { background: #EFF6FF !important; color: #2563EB !important; }
+.ribbon-icon.tone-info { background: #E0F2FE !important; color: #0284C7 !important; }
+.ribbon-icon.tone-warn { background: #FEF3C7 !important; color: #D97706 !important; }
+.ribbon-icon.tone-muted { background: #F3F4F6 !important; color: #4B5563 !important; }
+
+.exec-ribbon-card .ribbon-body {
+  min-width: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.exec-ribbon-card .ribbon-label {
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  color: var(--text) !important;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.exec-ribbon-card .ribbon-meta {
+  font-size: 11px !important;
+  color: var(--text-3) !important;
+  white-space: nowrap;
+}
+
+.exec-ribbon-card .ribbon-count {
+  font-size: 18px !important;
+  font-weight: 700 !important;
+  color: var(--text) !important;
+  font-variant-numeric: tabular-nums !important;
+  background: transparent !important;
+  padding: 0 !important;
+  border: 0 !important;
+}
+
+/* Home Bento Grid (clean white cards, 1px hairline) */
+.exec-desktop-bento {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1.55fr) minmax(300px, 1fr) !important;
+  gap: 16px !important;
+  align-items: start !important;
+}
+
+.home-operative-section,
+.exec-bento-card,
+.bento-side-col > section {
+  background: var(--surface) !important;
+  border: 1px solid var(--line) !important;
+  border-radius: 10px !important;
+  padding: 14px 16px !important;
+  box-shadow: none !important;
+}
+
+.bento-side-col {
+  display: grid;
+  gap: 14px;
+}
+
+.home-operative-section .section-title,
+.bento-side-col .section-title {
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  color: var(--text) !important;
+}
+
+/* Kanban column top color bars (Pipedrive #5) */
+.board .column {
+  background: var(--bg-sunken) !important;
+  border-top: 3px solid var(--line-strong) !important;
+}
+.board .column.stage-0 { border-top-color: #F59E0B !important; }
+.board .column.stage-1 { border-top-color: #2563EB !important; }
+.board .column.stage-2 { border-top-color: #7C3AED !important; }
+.board .column.stage-3 { border-top-color: #10B981 !important; }
+.board .column.stage-4 { border-top-color: #EF4444 !important; }
+
+@media (max-width: 767px) {
+  .exec-action-ribbon.exec-status-bar {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    scrollbar-width: none;
+    gap: 8px !important;
+  }
+  .exec-ribbon-card {
+    flex: 0 0 185px !important;
+    width: auto !important;
+    padding: 8px 10px !important;
+  }
+  .exec-desktop-bento {
+    grid-template-columns: 1fr !important;
+  }
+}
