@@ -213,6 +213,7 @@ function render(){
  }
  if(typeof syncMobileShell==='function')syncMobileShell();
  if(typeof applyUiSettings==='function')applyUiSettings();
+ if(typeof initTableSort==='function')initTableSort();
 }
 function dashboard(){const active=openDeals(),won=state.deals.filter(d=>d.stage==='Cliente'&&!isArchived(d)),tasks=state.deals.filter(d=>!isArchived(d)&&getSalesStage(d)!=='Persa'&&(getSalesStage(d)!=='Vinta'||d.next)).sort((a,b)=>(a.due||'9999').localeCompare(b.due||'9999')),due=tasks.filter(d=>d.due&&d.due<=today());
  return `<div class="stats"><div class="stat"><span class="stat-label">Pipeline aperta</span><strong>${money(active.reduce((n,d)=>n+d.setup,0))}</strong><small>${active.length} trattative · costi iniziali</small></div><div class="stat"><span class="stat-label">Follow-up da gestire</span><strong>${due.length.toString().padStart(2,'0')}</strong><small>In scadenza oggi o arretrati</small></div><div class="stat"><span class="stat-label">Clienti acquisiti</span><strong>${new Set(won.map(d=>d.contactId)).size.toString().padStart(2,'0')}</strong><small>Aziende nella fase Cliente</small></div><div class="stat accent"><span class="stat-label">Canoni acquisiti / mese</span><strong>${money(won.reduce((n,d)=>n+d.monthly,0))}</strong><small>Somma dei canoni dei clienti</small></div></div><div class="dashboard"><div class="dashboard-col"><div class="panel"><div class="panel-title"><h2>Le tue prossime azioni <span class="pill">${tasks.length}</span></h2><small>In ordine di scadenza</small></div>${activityList(tasks)}</div>${typeof dashboardLifecyclePanel==='function'?dashboardLifecyclePanel():''}</div><div class="dashboard-col"><div class="panel"><div class="panel-title"><h2>La tua pipeline</h2><button class="text-button" data-view="trattative">Apri bacheca ↗</button></div>${salesStages.map(s=>`<div class="mini-row"><span>${s}</span><strong>${state.deals.filter(d=>getSalesStage(d)===s&&!isArchived(d)).length}</strong></div>`).join('')}</div><div class="guide"><span class="guide-icon">✧</span><div><h3>Parti dal problema, poi dalla tecnologia.</h3><p>Annota il processo da migliorare e il beneficio atteso. La proposta AI viene dopo.</p></div></div></div></div>${typeof renderExecutiveMetrics==='function'?renderExecutiveMetrics():''}`;
@@ -542,6 +543,84 @@ if(typeof window!=='undefined'&&typeof MutationObserver!=='undefined'&&document.
  new MutationObserver(syncDialogScrollLock).observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:['open']});
  document.addEventListener('close',syncDialogScrollLock,true);
  syncDialogScrollLock();
+}
+
+let tableSortState={view:'',tableIdx:0,col:-1,dir:'asc'};
+const IT_MONTHS={gen:0,feb:1,mar:2,apr:3,mag:4,giu:5,lug:6,ago:7,set:8,ott:9,nov:10,dic:11};
+function parseSortCell(td){
+ if(!td)return {type:'empty',val:''};
+ const primary=td.querySelector('strong, a, button')||td;
+ const raw=(primary.textContent||td.textContent||'').replace(/\s+/g,' ').trim();
+ if(!raw||raw==='—'||raw==='-'||/^nessun[ao]?\b/i.test(raw)||/^da (definire|pianificare)$/i.test(raw))return {type:'empty',val:''};
+ const low=raw.toLowerCase();
+ if(low==='oggi'){const d=new Date();d.setHours(0,0,0,0);return {type:'num',val:d.getTime()};}
+ if(low==='domani'){const d=new Date();d.setHours(0,0,0,0);return {type:'num',val:d.getTime()+86400000};}
+ if(/^\d{4}-\d{2}-\d{2}$/.test(raw))return {type:'num',val:Date.parse(raw+'T12:00:00Z')};
+ const dmy=raw.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+ if(dmy)return {type:'num',val:Date.UTC(+dmy[3],+dmy[2]-1,+dmy[1])};
+ const itD=low.match(/^(\d{1,2})\s+(gen|feb|mar|apr|mag|giu|lug|ago|set|ott|nov|dic)(?:\s+(\d{4}))?$/);
+ if(itD){const yr=itD[3]?+itD[3]:new Date().getFullYear();return {type:'num',val:Date.UTC(yr,IT_MONTHS[itD[2]],+itD[1])};}
+ const numMatch=raw.match(/^[-+]?\d[\d.]*(?:,\d+)?(?:\s*(?:€|%|h|ore|gg|\/mese))?$/i);
+ if(numMatch){
+  const n=parseFloat(raw.replace(/[^\d,-]/g,'').replace(/\./g,'').replace(',','.'));
+  if(Number.isFinite(n))return {type:'num',val:n};
+ }
+ return {type:'text',val:raw};
+}
+function sortTableDom(table,colIdx,dir){
+ const tbody=table?.querySelector('tbody');
+ if(!tbody)return;
+ const rows=Array.from(tbody.querySelectorAll('tr'));
+ if(rows.length<2)return;
+ rows.sort((a,b)=>{
+  const pa=parseSortCell(a.children[colIdx]);
+  const pb=parseSortCell(b.children[colIdx]);
+  if(pa.type==='empty'&&pb.type==='empty')return 0;
+  if(pa.type==='empty')return 1;
+  if(pb.type==='empty')return -1;
+  let cmp=0;
+  if(pa.type==='num'&&pb.type==='num')cmp=pa.val-pb.val;
+  else cmp=String(pa.val).localeCompare(String(pb.val),'it',{sensitivity:'base',numeric:true});
+  return dir==='asc'?cmp:-cmp;
+ });
+ rows.forEach(r=>tbody.appendChild(r));
+ table.querySelectorAll('thead th').forEach((th,i)=>{
+  if(i===colIdx)th.setAttribute('aria-sort',dir==='asc'?'ascending':'descending');
+  else th.removeAttribute('aria-sort');
+ });
+}
+function initTableSort(){
+ if(typeof document==='undefined'||typeof document.querySelectorAll!=='function')return;
+ const tables=Array.from(document.querySelectorAll('#content table'));
+ tables.forEach((table,tIdx)=>{
+  const ths=Array.from(table.querySelectorAll('thead th'));
+  ths.forEach((th,cIdx)=>{
+   const label=(th.textContent||'').trim();
+   if(!label||/^azioni$/i.test(label)||th.classList.contains('cell-actions'))return;
+   th.dataset.sortableCol='true';
+   th.title=`Ordina per ${label}`;
+   if(tableSortState.view===view&&tableSortState.tableIdx===tIdx&&tableSortState.col===cIdx){
+    sortTableDom(table,cIdx,tableSortState.dir);
+   }
+  });
+ });
+}
+if(typeof document!=='undefined'&&typeof document.addEventListener==='function'){
+ document.addEventListener('click',e=>{
+  const th=e.target?.closest?.('thead th[data-sortable-col="true"]');
+  if(!th)return;
+  const table=th.closest('table');
+  const content=document.querySelector('#content');
+  if(!table||!content||!content.contains(table))return;
+  const ths=Array.from(table.querySelectorAll('thead th'));
+  const colIdx=ths.indexOf(th);
+  if(colIdx<0)return;
+  const tIdx=Array.from(content.querySelectorAll('table')).indexOf(table);
+  const sameCol=tableSortState.view===view&&tableSortState.tableIdx===tIdx&&tableSortState.col===colIdx;
+  const dir=sameCol&&tableSortState.dir==='asc'?'desc':'asc';
+  tableSortState={view,tableIdx:tIdx,col:colIdx,dir};
+  sortTableDom(table,colIdx,dir);
+ });
 }
 
 render();
