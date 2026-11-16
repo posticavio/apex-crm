@@ -84,11 +84,11 @@ function dealRottingBadge(deal) {
 function leadTempBadge(contact) {
   const temp = contact?.leadTemp || 'warm';
   if (temp === 'hot') {
-    return `<span class="temp-badge temp-hot" title="Lead Caldo: decisione a breve o alto interesse">🔥 Caldo</span>`;
+    return `<span class="temp-badge temp-hot" title="Lead Caldo: decisione a breve o alto interesse"><span class="pipe-act-dot overdue" aria-hidden="true"></span>Caldo</span>`;
   } else if (temp === 'cold') {
-    return `<span class="temp-badge temp-cold" title="Lead Freddo: lungo termine o bassa priorità">❄️ Freddo</span>`;
+    return `<span class="temp-badge temp-cold" title="Lead Freddo: lungo termine o bassa priorità"><span class="pipe-act-dot" aria-hidden="true"></span>Freddo</span>`;
   }
-  return `<span class="temp-badge temp-warm" title="Lead Tiepido: interesse medio o valutazione">☀️ Tiepido</span>`;
+  return `<span class="temp-badge temp-warm" title="Lead Tiepido: interesse medio o valutazione"><span class="pipe-act-dot due" aria-hidden="true"></span>Tiepido</span>`;
 }
 
 // --- 4. INTEGRAZIONE WHATSAPP E EMAIL 1-CLICK ---
@@ -1263,7 +1263,7 @@ function renderExecutiveHomeView() {
           <section class="home-side-widget" id="sec-projects">
             <div class="section-head">
               <div>
-                <h2 class="section-title">🚀 Progetti e Commesse</h2>
+                <h2 class="section-title">${apexIcon('briefcase', 15)} Progetti e Commesse</h2>
                 <p class="section-sub">Stato sintetico, prossimo passo e scadenze concordate.</p>
               </div>
               <div class="section-actions">
@@ -1283,11 +1283,11 @@ function renderExecutiveHomeView() {
           <section class="home-side-widget" id="sec-campaigns">
             <div class="section-head">
               <div>
-                <h2 class="section-title">✉️ Ricontatti Suggeriti</h2>
+                <h2 class="section-title">${apexIcon('mail', 15)} Ricontatti Suggeriti</h2>
                 <p class="section-sub">Email inviata senza risposta oltre 4gg lavorativi.</p>
               </div>
               <div class="section-actions">
-                <button type="button" class="secondary" id="btn-open-campaign-settings">⚙ Intervallo</button>
+                <button type="button" class="secondary" id="btn-open-campaign-settings">${apexIcon('sliders', 13)} Intervallo</button>
                 <button type="button" class="text-button" data-view="campaigns">Tutte ↗</button>
               </div>
             </div>
@@ -1299,7 +1299,7 @@ function renderExecutiveHomeView() {
                   <small>${camp.sends.length} invii · ${(camp.sends || []).filter(s => s.status === 'replied').length} risposte · ${(camp.sends || []).filter(s => s.status === 'called').length} chiamate</small>
                 </div>
                 <div class="csb-right">
-                  <span class="csb-check-tag">📡 Ultimo controllo: <strong>${esc(camp.lastEmailCheck || 'Oggi ore 08:30')}</strong></span>
+                  <span class="csb-check-tag">${apexIcon('clock', 12)} Ultimo controllo: <strong>${esc(camp.lastEmailCheck || 'Oggi ore 08:30')}</strong></span>
                 </div>
               </div>
             ` : ''}
@@ -1309,19 +1309,19 @@ function renderExecutiveHomeView() {
                 <div class="suggested-call-row compact" data-send-id="${esc(s.sendId)}">
                   <div class="scr-info">
                     <div class="scr-title-line">
-                      <strong>🏢 ${esc(s.companyName)}</strong>
-                      <span class="scr-person">👤 ${esc(s.recipientName)} (${esc(s.recipientRole)})</span>
+                      <strong>${apexIcon('building', 13)} ${esc(s.companyName)}</strong>
+                      <span class="scr-person">${apexIcon('user', 12)} ${esc(s.recipientName)} (${esc(s.recipientRole)})</span>
                     </div>
                     <p class="scr-status">${esc(s.statusText)}</p>
                     <small class="scr-notes">${esc(s.notes)}</small>
                   </div>
-                  <div class="scr-actions">
+                  <div class="scr-actions uac-actions-tiered">
                     ${s.recipientPhone
-                      ? `<a href="tel:${esc(s.recipientPhone.replace(/[^+\d]/g, ''))}" class="uac-op-btn op-call">📞 Chiama</a>`
-                      : `<span class="uac-op-btn op-call disabled">📞 No num</span>`}
-                    <button type="button" class="uac-op-btn op-followup" data-prepare-campaign-followup="${esc(s.sendId)}" data-campaign-id="${esc(s.campaignId)}">✉️ Sollecito</button>
-                    <button type="button" class="uac-op-btn op-touchpoint" data-log-campaign-call="${esc(s.sendId)}" data-campaign-id="${esc(s.campaignId)}">⚡ Esito</button>
-                    <button type="button" class="text-button text-muted" data-campaign-optout="${esc(s.sendId)}" data-campaign-id="${esc(s.campaignId)}" title="Interrompe tutti i ricontatti verso questa azienda">Opt-out</button>
+                      ? `<a href="tel:${esc(s.recipientPhone.replace(/[^+\d]/g, ''))}" class="uac-op-btn op-call" data-log-campaign-call="${esc(s.sendId)}" data-campaign-id="${esc(s.campaignId)}" title="Chiama ${esc(s.recipientPhone)} e registra esito">${apexIcon('phone', 13)} Chiama</a>`
+                      : `<span class="uac-op-btn op-call disabled" title="Nessun telefono">${apexIcon('phone', 13)} No num</span>`}
+                    <button type="button" class="uac-op-btn op-followup" data-prepare-campaign-followup="${esc(s.sendId)}" data-campaign-id="${esc(s.campaignId)}" title="Prepara email di sollecito">${apexIcon('mail', 13)} Sollecito</button>
+                    <button type="button" class="uac-op-btn op-touchpoint" data-log-campaign-call="${esc(s.sendId)}" data-campaign-id="${esc(s.campaignId)}" title="Registra esito">${apexIcon('zap', 13)} Esito</button>
+                    <button type="button" class="uac-op-btn op-secondary text-muted" data-campaign-optout="${esc(s.sendId)}" data-campaign-id="${esc(s.campaignId)}" title="Interrompe tutti i ricontatti verso questa azienda">${apexIcon('x', 12)} Opt-out</button>
                   </div>
                 </div>
               `).join('') : '<div class="empty-state-card"><p>Nessuna chiamata da svolgere: tutte le aziende hanno risposto o sono state contattate.</p></div>'}
@@ -1332,7 +1332,7 @@ function renderExecutiveHomeView() {
           <section class="home-side-widget home-consultable-tabs" aria-label="Sezioni consultabili rapide">
             <details class="consultable-section" open>
               <summary class="consultable-summary">
-                <span>🕒 <strong>Cosa è cambiato</strong> (${recentFeed.length} novità)</span>
+                <span>${apexIcon('clock', 14)} <strong>Cosa è cambiato</strong> (${recentFeed.length} novità)</span>
                 <small>Novità acquisite da ChatGPT, note vocali e sincronizzazione</small>
               </summary>
               <div class="consultable-content">

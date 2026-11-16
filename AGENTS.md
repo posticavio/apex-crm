@@ -62,6 +62,35 @@ node crm-rapid-check.cjs
 ---
 
 ## Registro di Passaggio tra Agenti (Handoff Log)
+### Sessione 2026-11-16 (Uniformazione Funzionale Multi-Vista: Switcher Vista Condiviso, Click-to-Open su Riga Universale, Tabelle Dense .v2-table in Tutte le Viste, Badge Temperatura Puliti e Icone SVG Ricontatti) — Agente: Google Antigravity
+- **Ultimo commit precedente rilevato**: `f9ba5ce` (`[Antigravity] feat(tables): universal click-to-sort on all table headers (asc on 1st click, desc on 2nd click)`) su `main`.
+- **Attività completate**:
+  - **Switcher Vista Inline Condiviso (`viewSwitcherHtml`)**:
+    - Estratto selettore di layout `.v2-layout-switch` e reso disponibile in linea sopra la tabella/bacheca in `Opportunità` (`Bacheca | Elenco`), `Progetti` (`Bacheca | Elenco & Costi`) e `Attività`, rimuovendo il selettore nascosto dentro il popover toolbar.
+  - **Click-to-Open Universale su Riga Tabella (`app.js`, `design-v2.css`)**:
+    - Abilitato il click diretto su riga per aprire la scheda di modifica/dettaglio su:
+      - `Aziende` (`.company-row-clickable` -> Cockpit 360°)
+      - `Opportunità` Elenco (`tr[data-row-edit-deal]` -> Scheda trattativa)
+      - `Attività` Elenco (`tr[data-row-edit-task]` -> Task editor)
+      - `Progetti` Elenco (`tr[data-row-edit-project]` -> Project editor)
+      - `Preventivi` (`tr[data-row-edit-quote]` -> Quote editor)
+      - `Categorie` (`tr[data-row-edit-category]` -> Category editor)
+    - Esclusi click accidentali su bottoni interni, link, selettori o icone `360°`.
+  - **Estensione Tabelle Dense `.v2-table` a Tutte le Schermate**:
+    - Applicata classe `.v2-table` a `pipelineTable()`, `categoriesView()`, `quotesView()` e tabelle `analyticsView()` (forecast ponderato e fatturati storici), con righe a 40px, scroll orizzontale nativo racchiuso in `.table-wrap` e ordinamento automatico cliccabile su tutte le intestazioni (`initTableSort`).
+  - **Compattazione Azioni & Icone SVG Ricontatti (`crm-pro.js`, `quotes.js`)**:
+    - `leadTempBadge`: sostituiti emoji con dot semantico (`.pipe-act-dot`) e testo pulito `Caldo / Tiepido / Freddo`.
+    - `crm-pro.js`: sezioni Progetti, Ricontatti Suggeriti e Cosa è cambiato migrati a icone SVG `apexIcon(...)` e bottoni compatti `.uac-op-btn`.
+    - `quotes.js`: etichette bottoni riga sintetizzate in `Modifica`, `PDF`, `Duplica`.
+- **File modificati**:
+  - `app.js`, `crm-pro.js`, `crm-pro-check.cjs`, `projects.js`, `activities.js`, `quotes.js`, `analytics.js`, `design-v2.css`, `AGENTS.md`.
+- **Test eseguiti**:
+  - 10 controlli sintattici (`node --check`) su tutti i file JS: **100% PASS**.
+  - Tutte le 13 suite di test (`*-check.cjs`): **100% PASS**.
+  - Verifica automatizzata Chrome headless CDP (Desktop `1440×900`): switch layout trattative e progetti, rendering `.v2-table`, click-to-open su riga verificato con apertura modale.
+- **Problemi aperti**:
+  - Nessuno.
+
 ### Sessione 2026-11-13c (Design System Unificato `design-v2.css` + `design-v2-views.css`, Icone SVG Nitide, Pipeline Pipedrive #5 con Striscia Follow-up Urgent & Card 3 Righe, Tabelle Dense 40px e Fix Mobile) — Agente: Google Antigravity
 - **Ultimo commit precedente rilevato**: `5e236a4` (`Merge remote-tracking branch 'origin/main'`) su `main`.
 - **Attività completate**:

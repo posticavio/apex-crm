@@ -181,11 +181,13 @@ console.log('PASS: calcDealRottingDays e dealRottingBadge rilevano correttamente
 // 4. Test Lead Qualification e Temperatura
 const hotBadge = run("leadTempBadge(state.contacts[0])");
 assert.match(hotBadge, /temp-hot/);
-assert.match(hotBadge, /🔥 Caldo/);
+assert.match(hotBadge, /pipe-act-dot/);
+assert.match(hotBadge, /Caldo/);
 
 const coldBadge = run("leadTempBadge(state.contacts[1])");
 assert.match(coldBadge, /temp-cold/);
-assert.match(coldBadge, /❄️ Freddo/);
+assert.match(coldBadge, /pipe-act-dot/);
+assert.match(coldBadge, /Freddo/);
 console.log('PASS: leadTempBadge formatta badge hot, warm e cold');
 
 // 5. Test Generazione Link WhatsApp e Normalizzazione

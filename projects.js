@@ -320,10 +320,7 @@ function projectsView(){
      <option value="name" ${projectSort==='name'?'selected':''}>Nome A–Z</option>
     </select>
    </label>`;
- const viewHtml=`<div class="view-toggle" role="group" aria-label="Vista progetti">
-    <button type="button" data-project-layout="board" aria-pressed="${projectLayout==='board'}" class="${projectLayout==='board'?'selected':''}">▥ Bacheca</button>
-    <button type="button" data-project-layout="gantt" aria-pressed="${projectLayout==='gantt'}" class="${projectLayout==='gantt'?'selected':''}">▤ Cronoprogramma &amp; Costi</button>
-   </div>`;
+ const viewBar=typeof viewSwitcherHtml==='function'?`<div class="v2-view-bar">${viewSwitcherHtml([['board','Bacheca'],['gantt','Elenco & Costi']],projectLayout,'data-project-layout','Vista progetti')}</div>`:'';
  const parts=[];
  if(search)parts.push(`"${search}"`);
  if(projectStatusFilter)parts.push(projectStatusFilter);
@@ -334,12 +331,11 @@ function projectsView(){
   searchValue:search,
   filtersHtml,
   hasActiveFilters:Boolean(projectStatusFilter),
-  viewHtml,
   sortHtml,
   hasActiveSort:projectSort!=='due',
   exportDisabled:!rows.length
- }):`<div class="toolbar"><input id="search" aria-label="Cerca progetto" value="${esc(search)}">${filtersHtml}${sortHtml}${viewHtml}<button type="button" id="export-csv" ${!rows.length?'disabled':''}>↓ Esporta CSV</button></div>`;
- return `${statsHtml}${bar}${projectLayout==='board'?projectsBoard(rows):projectsGanttTable(rows)}`;
+ }):`<div class="toolbar"><input id="search" aria-label="Cerca progetto" value="${esc(search)}">${filtersHtml}${sortHtml}<button type="button" id="export-csv" ${!rows.length?'disabled':''}>↓ Esporta CSV</button></div>`;
+ return `${statsHtml}${viewBar}${bar}${projectLayout==='board'?projectsBoard(rows):projectsGanttTable(rows)}`;
 }
 
 function projectsBoard(rows){
@@ -387,7 +383,7 @@ function projectsGanttTable(rows){
   <thead><tr><th>Progetto / Cliente</th><th>Stato &amp; Avanzamento</th><th>Cronoprogramma &amp; Milestone</th><th>Budget / Costi / Margine</th><th>Ore</th><th></th></tr></thead>
   <tbody>${rows.map(p=>{
    const c=contact(p.contactId),prog=projectProgress(p),margin=projectMarginCents(p);
-   return `<tr>
+   return `<tr data-row-edit-project="${esc(p.id)}">
     <td><strong>${esc(p.name)}</strong><small>${esc(c?.company||'—')}</small></td>
     <td data-label="Stato & Avanzamento"><span class="pill ${projectStatusPill(p.status)}">${esc(p.status)}</span><div class="progress-bar-wrap" style="margin-top:8px"><div class="progress-bar-fill" style="width:${prog}%"></div></div><small>${prog}% completato</small></td>
     <td data-label="Cronoprogramma & Milestone"><small>${p.startDate?date(p.startDate):'—'} → ${p.endDate?date(p.endDate):'—'}</small>

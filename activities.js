@@ -683,7 +683,7 @@ function activitiesTable(rows){
    const c=contact(a.contactId),stage=taskLifecycleStage(a),person=taskPersonLabel(a);
    const deal=a.dealId?state.deals.find(d=>d.id===a.dealId):null;
    const quote=a.quoteId?(state.quotes||[]).find(q=>q.id===a.quoteId):null;
-   return `<tr>
+   return `<tr data-row-edit-task="${esc(a.id)}">
     <td><strong>${esc(a.title)}</strong><small>${esc(a.type)}${a.notes?' · '+esc(a.notes):''}</small>${a.outcome?`<small class="task-outcome-preview">Esito: ${esc(a.outcome)}</small>`:''}</td>
     <td data-label="Azienda & Fase"><div><button type="button" class="text-button" data-edit-contact="${esc(a.contactId)}"><strong>${esc(c?.company||'—')}</strong></button><small><span class="pill ${stage==='Cliente'?'green':stage==='Prospect'?'amber':''}">${esc(stage)}</span></small></div></td>
     <td data-label="Referente & Collegamenti"><div>${esc(person||'Azienda')}${deal?`<small>Opp.: ${esc(deal.title)}</small>`:''}${quote?`<small>Prev.: ${esc(latestQuote(quote).number)}</small>`:''}</div></td>

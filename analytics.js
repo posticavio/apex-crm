@@ -123,7 +123,7 @@ function analyticsView(){
   </div>
   <div class="dashboard">
    <div class="dashboard-col">
-    <div class="panel">
+    <div class="panel v2-table">
      <div class="panel-title">
       <h2>Funnel &amp; Forecast Ponderato per Fase</h2>
       <small>Valore lordo × Probabilità di chiusura (%)</small>
@@ -144,7 +144,7 @@ function analyticsView(){
       </table>
      </div>
     </div>
-    <div class="panel">
+    <div class="panel v2-table">
      <div class="panel-title">
       <h2>Storico Fatturati &amp; Incassi Registrati <span class="pill">${f.fin.revenues.length}</span></h2>
       <button type="button" class="text-button" id="toggle-revenue-form">+ Registra fatturato storico</button>
