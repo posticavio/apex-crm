@@ -63,7 +63,7 @@ node crm-rapid-check.cjs
 
 ## Registro di Passaggio tra Agenti (Handoff Log)
 ### Sessione 2026-11-16 (Architettura Desktop "Schermata Unica": Rimozione Scroll Verticale di Pagina, Workstation 3 Colonne Orizzontali Home, Board e Tabelle Viewport-Locked) — Agente: Google Antigravity
-- **Ultimo commit precedente rilevato**: `f9ba5ce` (`[Antigravity] feat(tables): universal click-to-sort on all table headers`) su `main`.
+- **Ultimo commit precedente rilevato**: `1e90ebc` (`[Antigravity] fix(activities): eliminate duplicate Parisi events and harmonize design system across modals, tables and forms into a unified suite`) su `main`.
 - **Richiesta utente**: *"in desktop mode non voglio schermate grandi con scroll verticaole. hai tutto lo spazio per organizzare in schermata unica"*.
 - **Diagnosi del Problema**:
   - In modalità desktop (`>= 1024px`), la pagina subiva uno scroll verticale massivo (fino a **7.965px** in Attività, **3.246px** in Opportunità, **2.543px** in Home, **1.137px** in Aziende), costringendo l'utente a scorrere in basso perdendo l'intestazione, la barra comandi e il contesto visivo.
@@ -91,6 +91,73 @@ node crm-rapid-check.cjs
   - Suite completa standard (10 controlli sintattici `node --check` + 13 suite funzionali `*-check.cjs`): **100% PASS**.
   - Audit CDP headless Chrome su Desktop (`1440×900`): confermato `canScrollVertically: false` su tutte le 7 viste principali (`oggi`, `contatti`, `trattative`, `activities`, `projects`, `quotes`, `analytics`), `bodyScrollHeight: 900px` (da 7.965px).
   - Audit CDP headless Chrome su Mobile (`390×844`): confermato `bodyScrollW: 390` (0 overflow orizzontale) e scrolling naturale verticale su smartphone.
+- **Problemi aperti**:
+  - Nessuno.
+
+### Sessione 2026-11-16 (Fix Duplicati Eventi Parisi, Deduplicazione Automatica Attività e Design System "Vestito Unico" per Modali, Form e Tabelle) — Agente: Google Antigravity
+- **Ultimo commit precedente rilevato**: `f9ba5ce` (`[Antigravity] feat(tables): universal click-to-sort on all table headers (asc on 1st click, desc on 2nd click)`) su `main`.
+- **Diagnosi dei Problemi segnalati dall'utente**:
+  1. *"perche in parisi vengono fuori cosi tanti eventi uguali ✓ Inviare preventivo dettagliato e proposta (Analisi / Offerta) 20 nov ..."*:
+     - In `state.activities` e nel database remoto Supabase erano accumulate 8 attività duplicate per Martino Parisi S.r.l. con titolo identico `"Inviare preventivo dettagliato e proposta"`.
+     - Mancava la deduplicazione in `mergeCrmStates` (`supabase-sync.js`), in `companyTasks` / `dealTasks` / `visibleActivities` (`activities.js`), nel parser audio/vocale (`crm-pro.js`) e nel server MCP (`crm-mcp-server.js`). Ad ogni registrazione touchpoint o test, veniva fatto un `push` ceco con un nuovo `crypto.randomUUID()`.
+     - Inoltre la prima call conoscitiva di Parisi (20/10/2026) conteneva residui raw `<!--__crm_meta:...-->` ed era rimasta in stato non riconciliato.
+  2. *"tutta lapplicazione sembra fatta da pezza di stofa cuciti uno con altro. deve sembrare pero un vestito unico"*:
+     - Forte disomogeneità visiva tra viste: le tabelle secondarie (Opportunità in elenco, Categorie, Campagne) usavano vecchi stili non-`.v2-table`.
+     - I 15 dialoghi modali dell'app (`#editor`, `#task-editor`, `#project-editor`, `#finance-editor`, `#playbook-editor`, `#csv-dialog`, `#quote-editor`, `#settings-dialog`, `#command-dialog`, `#interaction-dialog`, `#deal-stage-dialog`, `#followup-draft-dialog`, `#voice-input-dialog`, `#campaign-settings-dialog`) non erano coperti da `design-v2.css`, ereditando stili disomogenei e contrastanti da vecchie regole in `layout.css`.
+- **Attività completate**:
+  - **Eradicazione Duplicati Parisi & Deduplicazione Universale (`supabase-sync.js`, `activities.js`, `crm-pro.js`, `crm-mcp-server.js`)**:
+    - Implementata deduplicazione intelligente in `mergeCrmStates`: le attività con stessa azienda, titolo normalizzato e stato operativo aperto vengono unificate preservando la scadenza valorizzata e note più ricche.
+    - Eliminati commenti tecnici e residui `<!--__crm_meta:...-->` in note, esiti e descrizioni.
+    - Aggiunta funzione `deduplicateActivitiesList` in `activities.js` usata in `companyTasks`, `dealTasks` e `visibleActivities`.
+    - Reso idempotente `record_interaction` (`crm-mcp-server.js`) e `voice-input-form` (`crm-pro.js`): aggiornano l'attività aperta esistente invece di generare copie duplicate.
+    - Riconciliato lo snapshot cloud su Supabase: rimossi gli 8 duplicati remoti di Parisi; `Prima call conoscitiva` segnata `Completata` (20/10/2026); una sola attività aperta `Inviare preventivo dettagliato e proposta` (`Da fare`, scadenza 06/11/2026).
+  - **Design System "Vestito Unico" Unificato (`design-v2.css`, `app.js`, `crm-pro.js`)**:
+    - Estesa la classe `.v2-table` a tutte le tabelle del CRM (`v2-deals-table`, `v2-categories-table`, `v2-campaigns-table`) per uniformare header (34px, font 12px, tabular-nums), righe (40px) e hover state.
+    - Creato il sistema unificato per tutti i 15 dialoghi modali in `design-v2.css`:
+      - Shell universale (bordo 1px hairline `var(--line)`, raggio 12px, backdrop blur 4px con oscuramento elegante).
+      - Header coerente (`.modal-heading` con eyebrow 11px uppercase, titolo 16.5px bold, pulsante chiusura `×` 28×28px quadrato-morbido).
+      - Form field coerenti (`input`, `select`, `textarea` altezza 34px, bordo `var(--line-strong)`, raggio 6px, focus ring blu cobalt `var(--focus)`).
+      - Footer coerente (`.form-actions` con sfondo sunken, separatore 1px, `Annulla` a destra in stile surface, `Salva` in blu primario `var(--accent)`, tasto `Elimina` in rosso a sinistra).
+      - Scheda 360° slide-over harmonizzata con lo stesso linguaggio visivo.
+- **File modificati**:
+  - `activities.js`, `app.js`, `crm-mcp-server.js`, `crm-pro.js`, `design-v2.css`, `supabase-sync.js`, `AGENTS.md`.
+- **Test eseguiti**:
+  - 10 verifiche sintattiche (`node --check`) superate con 0 errori.
+  - 13 suite di test funzionali (`crm-check.cjs`, `import-check.cjs`, `relationship-check.cjs`, `sales-check.cjs`, `resource-check.cjs`, `unscheduled-check.cjs`, `quotes-check.cjs`, `activities-check.cjs`, `enterprise-check.cjs`, `cloud-sync-check.cjs`, `mcp-server-check.cjs`, `crm-pro-check.cjs`, `crm-rapid-check.cjs`): **100% PASS**.
+  - Verifica diretta browser headless CDP su Parisi: conteggio attività ridotto da 8 duplicati a 3 attività pulite (2 completate, 1 da fare).
+- **Problemi aperti**:
+  - Nessuno.
+- **Attività successive consigliate**:
+  - Pubblicare le modifiche su GitHub (`git push origin main`).
+
+
+### Sessione 2026-11-16 (Uniformazione Funzionale Multi-Vista: Switcher Vista Condiviso, Click-to-Open su Riga Universale, Tabelle Dense .v2-table in Tutte le Viste, Badge Temperatura Puliti e Icone SVG Ricontatti) — Agente: Google Antigravity
+- **Ultimo commit precedente rilevato**: `f9ba5ce` (`[Antigravity] feat(tables): universal click-to-sort on all table headers (asc on 1st click, desc on 2nd click)`) su `main`.
+- **Attività completate**:
+  - **Switcher Vista Inline Condiviso (`viewSwitcherHtml`)**:
+    - Estratto selettore di layout `.v2-layout-switch` e reso disponibile in linea sopra la tabella/bacheca in `Opportunità` (`Bacheca | Elenco`), `Progetti` (`Bacheca | Elenco & Costi`) e `Attività`, rimuovendo il selettore nascosto dentro il popover toolbar.
+  - **Click-to-Open Universale su Riga Tabella (`app.js`, `design-v2.css`)**:
+    - Abilitato il click diretto su riga per aprire la scheda di modifica/dettaglio su:
+      - `Aziende` (`.company-row-clickable` -> Cockpit 360°)
+      - `Opportunità` Elenco (`tr[data-row-edit-deal]` -> Scheda trattativa)
+      - `Attività` Elenco (`tr[data-row-edit-task]` -> Task editor)
+      - `Progetti` Elenco (`tr[data-row-edit-project]` -> Project editor)
+      - `Preventivi` (`tr[data-row-edit-quote]` -> Quote editor)
+      - `Categorie` (`tr[data-row-edit-category]` -> Category editor)
+    - Esclusi click accidentali su bottoni interni, link, selettori o icone `360°`.
+  - **Estensione Tabelle Dense `.v2-table` a Tutte le Schermate**:
+    - Applicata classe `.v2-table` a `pipelineTable()`, `categoriesView()`, `quotesView()` e tabelle `analyticsView()` (forecast ponderato e fatturati storici), con righe a 40px, scroll orizzontale nativo racchiuso in `.table-wrap` e ordinamento automatico cliccabile su tutte le intestazioni (`initTableSort`).
+  - **Compattazione Azioni & Icone SVG Ricontatti (`crm-pro.js`, `quotes.js`)**:
+    - `leadTempBadge`: sostituiti emoji con dot semantico (`.pipe-act-dot`) e testo pulito `Caldo / Tiepido / Freddo`.
+    - `crm-pro.js`: sezioni Progetti, Ricontatti Suggeriti e Cosa è cambiato migrati a icone SVG `apexIcon(...)` e bottoni compatti `.uac-op-btn`.
+    - `quotes.js`: etichette bottoni riga sintetizzate in `Modifica`, `PDF`, `Duplica`.
+- **File modificati**:
+  - `app.js`, `crm-pro.js`, `crm-pro-check.cjs`, `projects.js`, `activities.js`, `quotes.js`, `analytics.js`, `design-v2.css`, `AGENTS.md`.
+- **Test eseguiti**:
+  - 10 controlli sintattici (`node --check`) su tutti i file JS: **100% PASS**.
+  - Tutte le 13 suite di test (`*-check.cjs`): **100% PASS**.
+  - Verifica automatizzata Chrome headless CDP (Desktop `1440×900`): switch layout trattative e progetti, rendering `.v2-table`, click-to-open su riga verificato con apertura modale.
+>>>>>>> origin/main
 - **Problemi aperti**:
   - Nessuno.
 
