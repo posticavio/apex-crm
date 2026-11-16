@@ -50,14 +50,31 @@ function priorityRank(p){return p==='Alta'?0:p==='Media'?1:2;}
 function priorityPillClass(p){return p==='Alta'?'red':p==='Media'?'amber':'';}
 function statusPillClass(s){return s==='Completata'?'green':s==='Annullata'?'red':s==='In corso'?'amber':'';}
 
+function deduplicateActivitiesList(list){
+ if(!Array.isArray(list))return [];
+ const seen=new Set(),res=[];
+ for(const a of list){
+  if(!a||typeof a!=='object')continue;
+  const norm=(a.title||'').trim().toLowerCase().replace(/\s+/g,' ');
+  const isOpen=isOpenTask(a);
+  const key=`${a.contactId||a.companyId}::${norm}::${isOpen?'open':a.status}::${a.dueDate||''}`;
+  if(!seen.has(key)){
+   seen.add(key);
+   res.push(a);
+  }
+ }
+ return res;
+}
+
 function companyTasks(contactId){
- return (state.activities||[]).filter(a=>a.contactId===contactId).sort((a,b)=>{
+ const raw=(state.activities||[]).filter(a=>a.contactId===contactId||a.companyId===contactId).sort((a,b)=>{
   if(isOpenTask(a)!==isOpenTask(b))return isOpenTask(a)?-1:1;
   return (a.dueDate||'9999').localeCompare(b.dueDate||'9999')||priorityRank(a.priority)-priorityRank(b.priority)||a.title.localeCompare(b.title,'it',{sensitivity:'base'});
  });
+ return deduplicateActivitiesList(raw);
 }
 function openCompanyTasks(contactId){return companyTasks(contactId).filter(isOpenTask);}
-function dealTasks(dealId){return (state.activities||[]).filter(a=>a.dealId===dealId);}
+function dealTasks(dealId){return deduplicateActivitiesList((state.activities||[]).filter(a=>a.dealId===dealId));}
 
 function validateActivities(data){
  if(data.activities==null)return;
@@ -385,7 +402,7 @@ function visibleActivities(){
   all:()=>true
  }[activityStatusFilter]||(()=>true);
 
- return (state.activities||[]).filter(a=>{
+ const matched=(state.activities||[]).filter(a=>{
   const c=contact(a.contactId);
   const stage=taskLifecycleStage(a);
   if(activityStageFilter&&stage!==activityStageFilter)return false;
@@ -395,7 +412,8 @@ function visibleActivities(){
   const dealTitle=a.dealId?state.deals.find(d=>d.id===a.dealId)?.title:'';
   const quoteNum=a.quoteId?latestQuote((state.quotes||[]).find(q=>q.id===a.quoteId)||{versions:[{}]})?.number:'';
   return matches(a.title,a.type,a.priority,a.status,a.notes,a.outcome,c?.company,taskPersonLabel(a),dealTitle,quoteNum,stage);
- }).sort((a,b)=>{
+ });
+ return deduplicateActivitiesList(matched).sort((a,b)=>{
   if(activitySort==='priority')return priorityRank(a.priority)-priorityRank(b.priority)||(a.dueDate||'9999').localeCompare(b.dueDate||'9999');
   if(activitySort==='company')return (contact(a.contactId)?.company||'').localeCompare(contact(b.contactId)?.company||'','it',{sensitivity:'base'});
   if(activitySort==='title')return a.title.localeCompare(b.title,'it',{sensitivity:'base'});

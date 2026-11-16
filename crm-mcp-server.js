@@ -1202,24 +1202,41 @@ async function executeTool(name, args) {
         openProject.nextDue = resolvedDue;
       }
 
-      // 8. Create or update activity
+      // 8. Create or update activity (idempotent / duplicate prevention)
       state.activities = state.activities || [];
-      const newActId = crypto.randomUUID();
-      state.activities.push({
-        id: newActId,
-        contactId: matchedComp.id,
-        dealId: openDeal?.id || '',
-        title: nextActionTitle,
-        type: lower.includes('preventivo') ? 'Analisi / Offerta' : 'Chiamata',
-        status: 'Da fare',
-        dueDate: resolvedDue,
-        priority: 'Alta',
-        reason: 'Aggiornamento da colloquio vocale',
-        lastOutcome: transcript,
-        source: 'ChatGPT Voice / Audio',
-        sourceId: sourceId || null,
-        notes: transcript
-      });
+      const normAction = (nextActionTitle || '').toLowerCase().trim();
+      let existingAct = state.activities.find(a =>
+        a.contactId === matchedComp.id &&
+        ['Da fare', 'In corso'].includes(a.status) &&
+        (a.title || '').toLowerCase().trim().includes(normAction.slice(0, 15))
+      );
+      let newActId;
+      if (existingAct) {
+        newActId = existingAct.id;
+        existingAct.title = nextActionTitle;
+        if (resolvedDue) existingAct.dueDate = resolvedDue;
+        existingAct.lastOutcome = transcript;
+        existingAct.notes = transcript;
+        existingAct.source = 'ChatGPT Voice / Audio';
+        if (sourceId) existingAct.sourceId = sourceId;
+      } else {
+        newActId = crypto.randomUUID();
+        state.activities.push({
+          id: newActId,
+          contactId: matchedComp.id,
+          dealId: openDeal?.id || '',
+          title: nextActionTitle,
+          type: lower.includes('preventivo') ? 'Analisi / Offerta' : 'Chiamata',
+          status: 'Da fare',
+          dueDate: resolvedDue,
+          priority: 'Alta',
+          reason: 'Aggiornamento da colloquio vocale',
+          lastOutcome: transcript,
+          source: 'ChatGPT Voice / Audio',
+          sourceId: sourceId || null,
+          notes: transcript
+        });
+      }
 
       // 9. Mark campaign call completed if matching company
       if (state.campaigns) {

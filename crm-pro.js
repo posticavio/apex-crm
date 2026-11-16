@@ -902,41 +902,51 @@ function ensureDemoProjectData(crmState) {
 
   // 1. Martino Parisi S.r.l.
   const parisi = crmState.contacts.find(c => (c.company || '').toLowerCase().includes('parisi'));
-  if (parisi && !crmState.projects.some(p => p.contactId === parisi.id)) {
-    crmState.projects.push({
-      id: 'project-parisi-automazione',
-      contactId: parisi.id,
-      dealId: (crmState.deals || []).find(d => d.contactId === parisi.id)?.id || '',
-      quoteId: '',
-      name: 'Automazione flussi e preventivazione rapida — Parisi',
-      status: 'In corso',
-      startDate: '2026-10-03',
-      endDate: '',
-      budgetCents: 0,
-      costCents: 0,
-      estimatedHours: 40,
-      loggedHours: 6,
-      milestones: [
-        { id: 'ms-p1', title: 'Prima call conoscitiva e analisi flussi doganali', dueDate: '2026-10-20', done: true, dependsOn: '' },
-        { id: 'ms-p2', title: 'Invio proposta economica formale e preventivo', dueDate: '2026-11-06', done: false, dependsOn: 'ms-p1' },
-        { id: 'ms-p3', title: 'Definizione requisiti e prototipo preventivatore rapido', dueDate: '2026-11-20', done: false, dependsOn: 'ms-p2' },
-        { id: 'ms-p4', title: 'Collaudo operativo e formazione referenti', dueDate: '2026-11-30', done: false, dependsOn: 'ms-p3' }
-      ],
-      clientGoal: 'Automatizzare la ricezione richieste doganali e la preventivazione rapida riducendo i tempi manuali di gestione file e archiviazione.',
-      origin: 'Contatto avviato via Gmail a inizio ottobre 2026 a seguito di presentazione delle soluzioni AI e automazione documentale.',
-      currentStatusSummary: 'Prima call conoscitiva svolta con successo con Andrea Zanatta; allineamento positivo sui flussi doganali e richiesta preventivo.',
-      lastOutcome: 'Andrea Zanatta richiede preventivo dettagliato e proposta economica formale entro venerdì.',
-      nextStep: 'Inviare preventivo dettagliato e proposta economica formale',
-      nextDue: '',
-      waitingFor: 'In attesa di invio preventivo (entro venerdì 06/11) e successiva approvazione di Andrea Zanatta.',
-      driveUrl: 'https://drive.google.com/drive/folders/apex-parisi-automazioni',
-      emailThreadUrl: 'https://mail.google.com/mail/u/0/#all/1a101fb411e24e3e',
-      calendarUrl: '',
-      notes: 'Richiesta integrazione con sistemi documentali doganali.'
-    });
+  if (parisi) {
+    if (!crmState.projects.some(p => p.contactId === parisi.id)) {
+      crmState.projects.push({
+        id: 'project-parisi-automazione',
+        contactId: parisi.id,
+        dealId: (crmState.deals || []).find(d => d.contactId === parisi.id)?.id || '',
+        quoteId: '',
+        name: 'Automazione flussi e preventivazione rapida — Parisi',
+        status: 'In corso',
+        startDate: '2026-10-03',
+        endDate: '',
+        budgetCents: 0,
+        costCents: 0,
+        estimatedHours: 40,
+        loggedHours: 6,
+        milestones: [
+          { id: 'ms-p1', title: 'Prima call conoscitiva e analisi flussi doganali', dueDate: '2026-10-20', done: true, dependsOn: '' },
+          { id: 'ms-p2', title: 'Invio proposta economica formale e preventivo', dueDate: '2026-11-06', done: false, dependsOn: 'ms-p1' },
+          { id: 'ms-p3', title: 'Definizione requisiti e prototipo preventivatore rapido', dueDate: '2026-11-20', done: false, dependsOn: 'ms-p2' },
+          { id: 'ms-p4', title: 'Collaudo operativo e formazione referenti', dueDate: '2026-11-30', done: false, dependsOn: 'ms-p3' }
+        ],
+        clientGoal: 'Automatizzare la ricezione richieste doganali e la preventivazione rapida riducendo i tempi manuali di gestione file e archiviazione.',
+        origin: 'Contatto avviato via Gmail a inizio ottobre 2026 a seguito di presentazione delle soluzioni AI e automazione documentale.',
+        currentStatusSummary: 'Prima call conoscitiva svolta con successo con Andrea Zanatta; allineamento positivo sui flussi doganali e richiesta preventivo.',
+        lastOutcome: 'Andrea Zanatta richiede preventivo dettagliato e proposta economica formale entro venerdì.',
+        nextStep: 'Inviare preventivo dettagliato e proposta economica formale',
+        nextDue: '',
+        waitingFor: 'In attesa di invio preventivo (entro venerdì 06/11) e successiva approvazione di Andrea Zanatta.',
+        driveUrl: 'https://drive.google.com/drive/folders/apex-parisi-automazioni',
+        emailThreadUrl: 'https://mail.google.com/mail/u/0/#all/1a101fb411e24e3e',
+        calendarUrl: '',
+        notes: 'Richiesta integrazione con sistemi documentali doganali.'
+      });
+    }
 
-    // Registra la prima call conoscitiva come Completata
-    if (!crmState.activities.some(a => a.contactId === parisi.id && a.title.toLowerCase().includes('conoscitiva'))) {
+    // Registra o riconcilia la prima call conoscitiva come Completata (senza residui di metadati)
+    const callAct = crmState.activities.find(a => (a.contactId === parisi.id || a.companyId === parisi.id) && (a.title || '').toLowerCase().includes('conoscitiva'));
+    if (callAct) {
+      callAct.status = 'Completata';
+      callAct.completedAt = '2026-10-20';
+      callAct.dueDate = '2026-10-20';
+      callAct.notes = 'Incontro conoscitivo svolto il 20/10/2026 ore 17:00 via Teams. Andrea Zanatta ha confermato interesse ad approfondire la soluzione.';
+      callAct.lastOutcome = 'Call svolta con successo con Andrea Zanatta: allineamento positivo sui flussi doganali e interesse a preventivatore rapido';
+      callAct.outcome = callAct.lastOutcome;
+    } else {
       crmState.activities.push({
         id: 'act-parisi-call-completed',
         contactId: parisi.id,
@@ -959,20 +969,35 @@ function ensureDemoProjectData(crmState) {
       });
     }
 
-    // Attività operativa aperta "Da fare": Inviare preventivo entro venerdì
-    if (!crmState.activities.some(a => a.contactId === parisi.id && ['Da fare', 'In corso'].includes(a.status))) {
+    // Riconcilia e deduplica le attività aperte "Inviare preventivo..." di Parisi: esattamente UNA sola aperta
+    const openQuoteActs = crmState.activities.filter(a =>
+      (a.contactId === parisi.id || a.companyId === parisi.id) &&
+      ['Da fare', 'In corso'].includes(a.status) &&
+      (a.title || '').toLowerCase().includes('preventivo')
+    );
+    if (openQuoteActs.length > 1) {
+      // Conserva solo la prima valorizzata e rimuovi tutti i duplicati
+      const keep = openQuoteActs[0];
+      keep.title = 'Inviare preventivo dettagliato e proposta';
+      if (!keep.dueDate) keep.dueDate = '2026-11-06';
+      keep.priority = 'Alta';
+      keep.type = 'Analisi / Offerta';
+      keep.notes = (keep.notes || '').replace(/<!--__crm_meta:.*?-->/gs, '').trim() || 'Preparare proposta commerciale per automazione flussi e preventivatore rapido.';
+      const removeIds = new Set(openQuoteActs.slice(1).map(a => a.id));
+      crmState.activities = crmState.activities.filter(a => !removeIds.has(a.id));
+    } else if (openQuoteActs.length === 0) {
       crmState.activities.push({
         id: 'act-parisi-quote-due',
         contactId: parisi.id,
         companyId: parisi.id,
         dealId: (crmState.deals || []).find(d => d.contactId === parisi.id)?.id || '',
-        title: 'Inviare preventivo dettagliato e proposta economica formale',
+        title: 'Inviare preventivo dettagliato e proposta',
         type: 'Analisi / Offerta',
         priority: 'Alta',
         status: 'Da fare',
         dueDate: '2026-11-06',
         reason: 'Richiesta esplicita di Andrea Zanatta',
-        lastOutcome: 'Andrea Zanatta attende preventivo entro venerdì',
+        lastOutcome: 'Andrea Zanatta attende preventivo dettagliato',
         referentId: parisi.referents?.[0]?.id || '',
         referentName: parisi.person || 'Andrea Zanatta',
         notes: 'Preparare proposta commerciale per automazione ricezione richieste doganali e preventivatore rapido.',
@@ -1619,7 +1644,7 @@ function campaignsView() {
       </div>
     </div>
 
-    <div class="panel">
+    <div class="panel v2-table v2-campaigns-table">
       <div class="panel-title">
         <h2>${esc(camp.name)}</h2>
         <small>📡 Ultimo controllo posta: <strong>${esc(camp.lastEmailCheck || 'Oggi ore 08:30')}</strong></small>
@@ -2127,21 +2152,36 @@ document.addEventListener('submit', e => {
         text: `Colloquio vocale: ${text}`
       });
 
-      // Aggiorna attività o creane una nuova
+      // Aggiorna attività esistente o creane una nuova (senza duplicare attività identiche)
       nextState.activities = nextState.activities || [];
-      nextState.activities.push({
-        id: crypto.randomUUID(),
-        contactId: comp.id,
-        title: parsed.nextStep,
-        type: 'Chiamata',
-        priority: 'Alta',
-        status: 'Da fare',
-        dueDate: parsed.resolvedDue || '',
-        reason: 'Aggiornamento da colloquio vocale',
-        lastOutcome: text,
-        notes: text,
-        source: 'Voice Audio Touchpoint'
-      });
+      const normNext = (parsed.nextStep || '').toLowerCase().trim();
+      const existingOpen = nextState.activities.find(a =>
+        (a.contactId === comp.id || a.companyId === comp.id) &&
+        ['Da fare', 'In corso'].includes(a.status) &&
+        (a.title || '').toLowerCase().trim().includes(normNext.slice(0, 15))
+      );
+      if (existingOpen) {
+        existingOpen.title = parsed.nextStep;
+        if (parsed.resolvedDue) existingOpen.dueDate = parsed.resolvedDue;
+        existingOpen.lastOutcome = text;
+        existingOpen.notes = text;
+        existingOpen.source = 'Voice Audio Touchpoint';
+      } else {
+        nextState.activities.push({
+          id: crypto.randomUUID(),
+          contactId: comp.id,
+          companyId: comp.id,
+          title: parsed.nextStep,
+          type: normNext.includes('preventivo') ? 'Analisi / Offerta' : 'Chiamata',
+          priority: 'Alta',
+          status: 'Da fare',
+          dueDate: parsed.resolvedDue || '',
+          reason: 'Aggiornamento da colloquio vocale',
+          lastOutcome: text,
+          notes: text,
+          source: 'Voice Audio Touchpoint'
+        });
+      }
 
       // Aggiorna deal o project se presente
       const openDeal = (nextState.deals || []).find(d => d.contactId === comp.id && !['Vinta', 'Persa'].includes(d.salesStage) && !d.archived);

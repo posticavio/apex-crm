@@ -1290,3 +1290,378 @@ th[data-sortable-col="true"][aria-sort="descending"]::after {
   margin: 0;
 }
 
+
+/* ==========================================================================
+   UNIFIED SUITE DESIGN SYSTEM (Il "Vestito Unico" — Single Cohesive Wardrobe)
+   ========================================================================== */
+
+/* Universal Dialog Shell */
+dialog:not(#company-360-dialog):not(.mobile-action-sheet) {
+  border: 1px solid var(--line) !important;
+  border-radius: var(--r-lg, 12px) !important;
+  background: var(--surface) !important;
+  color: var(--text) !important;
+  box-shadow: 0 20px 48px -12px rgba(31, 29, 26, 0.18), 0 0 0 1px rgba(31, 29, 26, 0.05) !important;
+  padding: 0 !important;
+  max-width: min(640px, 94vw) !important;
+  width: 100% !important;
+  overflow: hidden !important;
+}
+
+dialog::backdrop {
+  background: rgba(25, 23, 20, 0.40) !important;
+  backdrop-filter: blur(4px) !important;
+  -webkit-backdrop-filter: blur(4px) !important;
+}
+
+/* Cohesive Modal Heading */
+.modal-heading {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  padding: 14px 20px 12px !important;
+  border-bottom: 1px solid var(--line) !important;
+  background: var(--surface) !important;
+  margin: 0 !important;
+}
+
+.modal-heading .eyebrow {
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.05em !important;
+  color: var(--text-3) !important;
+  text-transform: uppercase !important;
+  margin: 0 0 2px !important;
+}
+
+.modal-heading h2,
+.modal-heading h3 {
+  font-size: 16.5px !important;
+  font-weight: 600 !important;
+  letter-spacing: -0.015em !important;
+  color: var(--text) !important;
+  margin: 0 !important;
+  line-height: 1.3 !important;
+}
+
+.modal-heading .icon-btn {
+  width: 28px !important;
+  height: 28px !important;
+  min-height: 28px !important;
+  padding: 0 !important;
+  display: grid !important;
+  place-items: center !important;
+  border-radius: var(--r-sm, 6px) !important;
+  border: 1px solid var(--line) !important;
+  background: var(--surface) !important;
+  color: var(--text-2) !important;
+  font-size: 16px !important;
+  cursor: pointer !important;
+  transition: all 0.12s ease !important;
+}
+
+.modal-heading .icon-btn:hover {
+  background: var(--bg-sunken) !important;
+  color: var(--text) !important;
+  border-color: var(--line-strong) !important;
+}
+
+/* Modal Content & Body Containers */
+#fields,
+#task-fields,
+#project-fields,
+#finance-fields,
+#playbook-fields,
+#quote-fields,
+#interaction-fields,
+#deal-stage-fields,
+#followup-draft-fields,
+.voice-input-body,
+.csv-body,
+.settings-body,
+.command-body {
+  padding: 18px 20px !important;
+  max-height: 72dvh !important;
+  overflow-y: auto !important;
+  overscroll-behavior: contain !important;
+}
+
+/* Modal Footer / Form Actions */
+.form-actions {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 8px !important;
+  padding: 12px 20px !important;
+  border-top: 1px solid var(--line) !important;
+  background: var(--bg-sunken) !important;
+  margin: 0 !important;
+}
+
+.form-actions button,
+button.primary,
+button.secondary {
+  font-family: var(--font) !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  border-radius: var(--r-sm, 6px) !important;
+  transition: background 0.12s, border-color 0.12s, color 0.12s !important;
+}
+
+.form-actions button.primary,
+button.primary {
+  height: 32px !important;
+  padding: 0 16px !important;
+  background: var(--accent) !important;
+  color: #FFFFFF !important;
+  border: 1px solid transparent !important;
+  box-shadow: none !important;
+}
+
+.form-actions button.primary:hover,
+button.primary:hover {
+  background: var(--accent-hover) !important;
+}
+
+.form-actions button:not(.primary):not(.danger),
+button.secondary {
+  height: 32px !important;
+  padding: 0 14px !important;
+  background: var(--surface) !important;
+  color: var(--text) !important;
+  border: 1px solid var(--line-strong) !important;
+  box-shadow: none !important;
+}
+
+.form-actions button:not(.primary):not(.danger):hover,
+button.secondary:hover {
+  background: var(--surface-hover) !important;
+  border-color: var(--text-2) !important;
+}
+
+.form-actions button.danger {
+  height: 32px !important;
+  padding: 0 12px !important;
+  margin-right: auto !important;
+  background: transparent !important;
+  color: var(--danger) !important;
+  border: 1px solid transparent !important;
+}
+
+.form-actions button.danger:hover {
+  background: var(--danger-soft) !important;
+  border-color: var(--danger-soft) !important;
+}
+
+/* Cohesive Form Inputs */
+.field-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 12px 14px !important;
+}
+
+.field-grid .field.full,
+.field.full {
+  grid-column: 1 / -1 !important;
+}
+
+.field {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 5px !important;
+  font-size: 12px !important;
+  font-weight: 500 !important;
+  color: var(--text-2) !important;
+}
+
+.field input,
+.field select,
+.field textarea,
+input[type="text"],
+input[type="number"],
+input[type="date"],
+input[type="email"],
+input[type="tel"],
+input[type="search"],
+select,
+textarea {
+  font-family: var(--font) !important;
+  font-size: 13.5px !important;
+  color: var(--text) !important;
+  background: var(--surface) !important;
+  border: 1px solid var(--line-strong) !important;
+  border-radius: var(--r-sm, 6px) !important;
+  padding: 0 10px !important;
+  box-sizing: border-box !important;
+  transition: border-color 0.12s, box-shadow 0.12s !important;
+}
+
+.field input,
+.field select,
+input[type="text"],
+input[type="number"],
+input[type="date"],
+input[type="email"],
+input[type="tel"],
+input[type="search"],
+select {
+  height: 34px !important;
+}
+
+.field textarea,
+textarea {
+  height: auto !important;
+  padding: 8px 10px !important;
+  min-height: 64px !important;
+  line-height: 1.4 !important;
+}
+
+.field input:focus,
+.field select:focus,
+.field textarea:focus,
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none !important;
+  border-color: var(--accent) !important;
+  box-shadow: var(--focus) !important;
+}
+
+/* Slide-Over Drawer Unified Styling */
+#company-360-dialog {
+  width: min(860px, 94vw) !important;
+  max-width: 94vw !important;
+  height: 100dvh !important;
+  max-height: 100dvh !important;
+  margin: 0 0 0 auto !important;
+  border: 0 !important;
+  border-left: 1px solid var(--line) !important;
+  border-radius: 0 !important;
+  background: var(--bg) !important;
+  box-shadow: var(--sh-drawer) !important;
+}
+
+#company-360-content {
+  display: flex !important;
+  flex-direction: column !important;
+  height: 100% !important;
+  background: var(--bg) !important;
+}
+
+.c360-header {
+  padding: 16px 20px 14px !important;
+  background: var(--surface) !important;
+  border-bottom: 1px solid var(--line) !important;
+}
+
+.c360-actions-bar {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  align-items: center !important;
+  gap: 6px !important;
+  padding: 10px 20px !important;
+  background: var(--surface) !important;
+  border-bottom: 1px solid var(--line) !important;
+}
+
+.c360-action-btn {
+  height: 30px !important;
+  padding: 0 10px !important;
+  font-size: 12.5px !important;
+  font-weight: 500 !important;
+  border-radius: var(--r-sm, 6px) !important;
+  border: 1px solid var(--line-strong) !important;
+  background: var(--surface) !important;
+  color: var(--text) !important;
+  text-decoration: none !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 5px !important;
+}
+
+.c360-action-btn:hover {
+  background: var(--surface-hover) !important;
+  border-color: var(--text-2) !important;
+}
+
+.c360-action-btn.primary-action {
+  background: var(--accent) !important;
+  color: #fff !important;
+  border-color: transparent !important;
+}
+
+.c360-action-btn.primary-action:hover {
+  background: var(--accent-hover) !important;
+}
+
+.c360-stats-ribbon {
+  display: grid !important;
+  grid-template-columns: repeat(4, 1fr) !important;
+  gap: 8px !important;
+  padding: 12px 20px !important;
+  background: var(--bg-sunken) !important;
+  border-bottom: 1px solid var(--line) !important;
+}
+
+.c360-stat-card {
+  background: var(--surface) !important;
+  border: 1px solid var(--line) !important;
+  border-radius: var(--r-sm, 6px) !important;
+  padding: 8px 10px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 2px !important;
+}
+
+.c360-stat-label {
+  font-size: 11px !important;
+  font-weight: 500 !important;
+  color: var(--text-3) !important;
+}
+
+.c360-stat-card strong {
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  color: var(--text) !important;
+}
+
+.c360-stat-card small {
+  font-size: 11px !important;
+  color: var(--text-3) !important;
+}
+
+.c360-tabs {
+  display: flex !important;
+  gap: 4px !important;
+  padding: 0 16px !important;
+  background: var(--surface) !important;
+  border-bottom: 1px solid var(--line) !important;
+}
+
+.c360-tab {
+  height: 36px !important;
+  padding: 0 12px !important;
+  border: 0 !important;
+  border-bottom: 2px solid transparent !important;
+  background: transparent !important;
+  color: var(--text-2) !important;
+  font-size: 12.5px !important;
+  font-weight: 500 !important;
+  cursor: pointer !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+}
+
+.c360-tab.active {
+  color: var(--accent) !important;
+  font-weight: 600 !important;
+  border-bottom-color: var(--accent) !important;
+}
+
+.c360-tab-body {
+  flex: 1 1 auto !important;
+  padding: 16px 20px !important;
+  overflow-y: auto !important;
+  overscroll-behavior: contain !important;
+}

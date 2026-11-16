@@ -62,6 +62,43 @@ node crm-rapid-check.cjs
 ---
 
 ## Registro di Passaggio tra Agenti (Handoff Log)
+### Sessione 2026-11-16 (Fix Duplicati Eventi Parisi, Deduplicazione Automatica Attività e Design System "Vestito Unico" per Modali, Form e Tabelle) — Agente: Google Antigravity
+- **Ultimo commit precedente rilevato**: `f9ba5ce` (`[Antigravity] feat(tables): universal click-to-sort on all table headers (asc on 1st click, desc on 2nd click)`) su `main`.
+- **Diagnosi dei Problemi segnalati dall'utente**:
+  1. *"perche in parisi vengono fuori cosi tanti eventi uguali ✓ Inviare preventivo dettagliato e proposta (Analisi / Offerta) 20 nov ..."*:
+     - In `state.activities` e nel database remoto Supabase erano accumulate 8 attività duplicate per Martino Parisi S.r.l. con titolo identico `"Inviare preventivo dettagliato e proposta"`.
+     - Mancava la deduplicazione in `mergeCrmStates` (`supabase-sync.js`), in `companyTasks` / `dealTasks` / `visibleActivities` (`activities.js`), nel parser audio/vocale (`crm-pro.js`) e nel server MCP (`crm-mcp-server.js`). Ad ogni registrazione touchpoint o test, veniva fatto un `push` ceco con un nuovo `crypto.randomUUID()`.
+     - Inoltre la prima call conoscitiva di Parisi (20/10/2026) conteneva residui raw `<!--__crm_meta:...-->` ed era rimasta in stato non riconciliato.
+  2. *"tutta lapplicazione sembra fatta da pezza di stofa cuciti uno con altro. deve sembrare pero un vestito unico"*:
+     - Forte disomogeneità visiva tra viste: le tabelle secondarie (Opportunità in elenco, Categorie, Campagne) usavano vecchi stili non-`.v2-table`.
+     - I 15 dialoghi modali dell'app (`#editor`, `#task-editor`, `#project-editor`, `#finance-editor`, `#playbook-editor`, `#csv-dialog`, `#quote-editor`, `#settings-dialog`, `#command-dialog`, `#interaction-dialog`, `#deal-stage-dialog`, `#followup-draft-dialog`, `#voice-input-dialog`, `#campaign-settings-dialog`) non erano coperti da `design-v2.css`, ereditando stili disomogenei e contrastanti da vecchie regole in `layout.css`.
+- **Attività completate**:
+  - **Eradicazione Duplicati Parisi & Deduplicazione Universale (`supabase-sync.js`, `activities.js`, `crm-pro.js`, `crm-mcp-server.js`)**:
+    - Implementata deduplicazione intelligente in `mergeCrmStates`: le attività con stessa azienda, titolo normalizzato e stato operativo aperto vengono unificate preservando la scadenza valorizzata e note più ricche.
+    - Eliminati commenti tecnici e residui `<!--__crm_meta:...-->` in note, esiti e descrizioni.
+    - Aggiunta funzione `deduplicateActivitiesList` in `activities.js` usata in `companyTasks`, `dealTasks` e `visibleActivities`.
+    - Reso idempotente `record_interaction` (`crm-mcp-server.js`) e `voice-input-form` (`crm-pro.js`): aggiornano l'attività aperta esistente invece di generare copie duplicate.
+    - Riconciliato lo snapshot cloud su Supabase: rimossi gli 8 duplicati remoti di Parisi; `Prima call conoscitiva` segnata `Completata` (20/10/2026); una sola attività aperta `Inviare preventivo dettagliato e proposta` (`Da fare`, scadenza 06/11/2026).
+  - **Design System "Vestito Unico" Unificato (`design-v2.css`, `app.js`, `crm-pro.js`)**:
+    - Estesa la classe `.v2-table` a tutte le tabelle del CRM (`v2-deals-table`, `v2-categories-table`, `v2-campaigns-table`) per uniformare header (34px, font 12px, tabular-nums), righe (40px) e hover state.
+    - Creato il sistema unificato per tutti i 15 dialoghi modali in `design-v2.css`:
+      - Shell universale (bordo 1px hairline `var(--line)`, raggio 12px, backdrop blur 4px con oscuramento elegante).
+      - Header coerente (`.modal-heading` con eyebrow 11px uppercase, titolo 16.5px bold, pulsante chiusura `×` 28×28px quadrato-morbido).
+      - Form field coerenti (`input`, `select`, `textarea` altezza 34px, bordo `var(--line-strong)`, raggio 6px, focus ring blu cobalt `var(--focus)`).
+      - Footer coerente (`.form-actions` con sfondo sunken, separatore 1px, `Annulla` a destra in stile surface, `Salva` in blu primario `var(--accent)`, tasto `Elimina` in rosso a sinistra).
+      - Scheda 360° slide-over harmonizzata con lo stesso linguaggio visivo.
+- **File modificati**:
+  - `activities.js`, `app.js`, `crm-mcp-server.js`, `crm-pro.js`, `design-v2.css`, `supabase-sync.js`, `AGENTS.md`.
+- **Test eseguiti**:
+  - 10 verifiche sintattiche (`node --check`) superate con 0 errori.
+  - 13 suite di test funzionali (`crm-check.cjs`, `import-check.cjs`, `relationship-check.cjs`, `sales-check.cjs`, `resource-check.cjs`, `unscheduled-check.cjs`, `quotes-check.cjs`, `activities-check.cjs`, `enterprise-check.cjs`, `cloud-sync-check.cjs`, `mcp-server-check.cjs`, `crm-pro-check.cjs`, `crm-rapid-check.cjs`): **100% PASS**.
+  - Verifica diretta browser headless CDP su Parisi: conteggio attività ridotto da 8 duplicati a 3 attività pulite (2 completate, 1 da fare).
+- **Problemi aperti**:
+  - Nessuno.
+- **Attività successive consigliate**:
+  - Pubblicare le modifiche su GitHub (`git push origin main`).
+
+
 ### Sessione 2026-11-16 (Uniformazione Funzionale Multi-Vista: Switcher Vista Condiviso, Click-to-Open su Riga Universale, Tabelle Dense .v2-table in Tutte le Viste, Badge Temperatura Puliti e Icone SVG Ricontatti) — Agente: Google Antigravity
 - **Ultimo commit precedente rilevato**: `f9ba5ce` (`[Antigravity] feat(tables): universal click-to-sort on all table headers (asc on 1st click, desc on 2nd click)`) su `main`.
 - **Attività completate**:

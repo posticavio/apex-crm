@@ -441,9 +441,44 @@
         const lowPri = (a.priority || '').toLowerCase();
         if (actPriorityMap[lowPri]) a.priority = actPriorityMap[lowPri];
         if (!['Alta','Media','Bassa'].includes(a.priority)) a.priority = 'Media';
+        // Pulisci note ed esiti da commenti tecnici o residui di metadati
+        if (a.notes && typeof a.notes === 'string') {
+          a.notes = a.notes.replace(/<!--__crm_meta:.*?-->/gs, '').trim();
+        }
+        if (a.lastOutcome && typeof a.lastOutcome === 'string') {
+          a.lastOutcome = a.lastOutcome.replace(/<!--__crm_meta:.*?-->/gs, '').trim();
+        }
+        if (a.outcome && typeof a.outcome === 'string') {
+          a.outcome = a.outcome.replace(/<!--__crm_meta:.*?-->/gs, '').trim();
+        }
         return a;
       })
       .filter(a => typeof a.contactId === 'string' && validContactIds.has(a.contactId));
+
+    // Deduplicazione attività identiche (stessa azienda, stesso titolo normalizzato e stesso stato operativo)
+    const dedupedActivities = [];
+    const seenActKeys = new Map();
+    for (const a of merged.activities) {
+      const normTitle = (a.title || '').trim().toLowerCase().replace(/\s+/g, ' ');
+      const isOpen = ['Da fare', 'In corso'].includes(a.status);
+      const key = `${a.contactId}::${normTitle}::${isOpen ? 'open' : a.status}`;
+
+      if (!seenActKeys.has(key)) {
+        seenActKeys.set(key, a);
+        dedupedActivities.push(a);
+      } else {
+        const existing = seenActKeys.get(key);
+        // Preserva data più precisa o scadenza valorizzata
+        if (!existing.dueDate && a.dueDate) existing.dueDate = a.dueDate;
+        if (!existing.dueTime && a.dueTime) existing.dueTime = a.dueTime;
+        if ((!existing.notes || existing.notes.length < (a.notes || '').length) && a.notes) {
+          existing.notes = a.notes;
+        }
+        if (!existing.lastOutcome && a.lastOutcome) existing.lastOutcome = a.lastOutcome;
+        if (!existing.source && a.source) existing.source = a.source;
+      }
+    }
+    merged.activities = dedupedActivities;
 
     const salesStageMap = {
       'primo contatto': 'Trattativa',
