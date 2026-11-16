@@ -1228,10 +1228,10 @@ function renderExecutiveHomeView() {
         </button>
       </div>
 
-      <!-- 2. Widescreen Desktop Bento Grid (2 Colonne bilanciate su Desktop) -->
+      <!-- 2. Widescreen Desktop Bento Grid (3 Colonne bilanciate su Desktop in Schermata Unica) -->
       <div class="exec-desktop-bento">
-        <!-- COLONNA SINISTRA: Priorità Operative & Attività da Svolgere -->
-        <div class="bento-main-col">
+        <!-- COLONNA 1: Priorità Operative & Attività Immediate -->
+        <div class="bento-col bento-col-tasks">
           <section class="home-operative-section" id="sec-tasks">
             <div class="section-head">
               <div>
@@ -1257,29 +1257,8 @@ function renderExecutiveHomeView() {
           </section>
         </div>
 
-        <!-- COLONNA DESTRA: Executive Radar & Cockpit -->
-        <div class="bento-side-col">
-          <!-- Widget 1: Progetti & Commesse in Corso -->
-          <section class="home-side-widget" id="sec-projects">
-            <div class="section-head">
-              <div>
-                <h2 class="section-title">🚀 Progetti e Commesse</h2>
-                <p class="section-sub">Stato sintetico, prossimo passo e scadenze concordate.</p>
-              </div>
-              <div class="section-actions">
-                <button type="button" class="text-button" data-view="projects">Tutti i progetti ↗</button>
-                <button type="button" class="text-button" data-new="project">+ Progetto</button>
-              </div>
-            </div>
-
-            <div class="projects-cockpit-stack">
-              ${activeProjects.length
-                ? activeProjects.map(p => typeof renderProjectExecutiveCockpit === 'function' ? renderProjectExecutiveCockpit(p) : `<div class="card"><strong>${esc(p.name)}</strong></div>`).join('')
-                : '<div class="empty-state-card"><p>Nessun progetto in corso. Avvia una nuova commessa da un’opportunità vinta!</p></div>'}
-            </div>
-          </section>
-
-          <!-- Widget 2: Ricontatti Commerciali Suggeriti da Campagne -->
+        <!-- COLONNA 2: Ricontatti Commerciali Suggeriti da Campagne -->
+        <div class="bento-col bento-col-campaigns">
           <section class="home-side-widget" id="sec-campaigns">
             <div class="section-head">
               <div>
@@ -1327,8 +1306,31 @@ function renderExecutiveHomeView() {
               `).join('') : '<div class="empty-state-card"><p>Nessuna chiamata da svolgere: tutte le aziende hanno risposto o sono state contattate.</p></div>'}
             </div>
           </section>
+        </div>
 
-          <!-- Widget 3: Viste Consultabili Rapide (Accordion / Tab Compatti) -->
+        <!-- COLONNA 3: Executive Radar & Cockpit Progetti -->
+        <div class="bento-col bento-col-radar">
+          <!-- Widget 1: Progetti & Commesse in Corso -->
+          <section class="home-side-widget" id="sec-projects">
+            <div class="section-head">
+              <div>
+                <h2 class="section-title">🚀 Progetti e Commesse</h2>
+                <p class="section-sub">Stato sintetico, prossimo passo e scadenze concordate.</p>
+              </div>
+              <div class="section-actions">
+                <button type="button" class="text-button" data-view="projects">Tutti i progetti ↗</button>
+                <button type="button" class="text-button" data-new="project">+ Progetto</button>
+              </div>
+            </div>
+
+            <div class="projects-cockpit-stack">
+              ${activeProjects.length
+                ? activeProjects.map(p => typeof renderProjectExecutiveCockpit === 'function' ? renderProjectExecutiveCockpit(p) : `<div class="card"><strong>${esc(p.name)}</strong></div>`).join('')
+                : '<div class="empty-state-card"><p>Nessun progetto in corso. Avvia una nuova commessa da un’opportunità vinta!</p></div>'}
+            </div>
+          </section>
+
+          <!-- Widget 2: Viste Consultabili Rapide (Accordion / Tab Compatti) -->
           <section class="home-side-widget home-consultable-tabs" aria-label="Sezioni consultabili rapide">
             <details class="consultable-section" open>
               <summary class="consultable-summary">

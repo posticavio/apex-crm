@@ -62,6 +62,38 @@ node crm-rapid-check.cjs
 ---
 
 ## Registro di Passaggio tra Agenti (Handoff Log)
+### Sessione 2026-11-16 (Architettura Desktop "Schermata Unica": Rimozione Scroll Verticale di Pagina, Workstation 3 Colonne Orizzontali Home, Board e Tabelle Viewport-Locked) — Agente: Google Antigravity
+- **Ultimo commit precedente rilevato**: `f9ba5ce` (`[Antigravity] feat(tables): universal click-to-sort on all table headers`) su `main`.
+- **Richiesta utente**: *"in desktop mode non voglio schermate grandi con scroll verticaole. hai tutto lo spazio per organizzare in schermata unica"*.
+- **Diagnosi del Problema**:
+  - In modalità desktop (`>= 1024px`), la pagina subiva uno scroll verticale massivo (fino a **7.965px** in Attività, **3.246px** in Opportunità, **2.543px** in Home, **1.137px** in Aziende), costringendo l'utente a scorrere in basso perdendo l'intestazione, la barra comandi e il contesto visivo.
+  - Nella Home, la colonna destra impilava in cascata verticale Progetti, Ricontatti (16 righe), Cosa è cambiato, In attesa e Da definire invece di sfruttare la larghezza degli schermi widescreen desktop.
+- **Attività completate**:
+  - **Architettura Viewport-Locked Desktop a Schermata Unica (`design-v2.css`)**:
+    - `html, body`: bloccati a `height: 100vh !important; max-height: 100vh !important; overflow: hidden !important;`.
+    - `aside#app-sidebar`: ancorato a tutta altezza (`100vh`) con scroll interno indipendente.
+    - `main` e `.page`: dimensionati a `calc(100vh - 48px)` con header fisso e zero overflow di pagina.
+    - Scomparsa del footer ridondante su desktop per massimizzare lo spazio verticale utile per i dati.
+  - **Home Workstation a 3 Colonne Bilanciate (`crm-pro.js`, `design-v2.css`)**:
+    - Riorganizzato `.exec-desktop-bento` in 3 colonne parallele affiancate che occupano il 100% dell'altezza disponibile:
+      1. **Colonna 1 (Azioni Immediate)**: stack attività con filtri rapidi e scroll interno slim.
+      2. **Colonna 2 (Ricontatti Commerciali Suggeriti)**: banner campagna e lista ricontatti scrollabile internamente.
+      3. **Colonna 3 (Executive Radar & Progetti)**: cockpit commesse attive + novità recenti "Cosa è cambiato" / consultabili.
+  - **Bacheche Kanban & Tabelle a tutta altezza con Header Fisso (`design-v2.css`)**:
+    - Opportunità (`#trattative`): striscia urgente Pipedrive fissa, colonne bacheca estese al fondo del viewport con scorrimento verticale interno a ciascuna colonna e `flex-shrink: 0` sulle card per preservare la leggibilità a 3 righe.
+    - Attività (`#activities`): vista elenco, calendario mensile/settimanale e bacheca contenuti nella schermata unica (`scrollHeight` = 900px, 0 vertical scroll).
+    - Tabelle Aziende, Preventivi, Progetti, Campagne: `thead th` sticky al top, tabella che riempie l'altezza fino al bordo inferiore con scroll interno.
+- **File modificati**:
+  - `design-v2.css`
+  - `crm-pro.js`
+  - `AGENTS.md`
+- **Test eseguiti**:
+  - Suite completa standard (10 controlli sintattici `node --check` + 13 suite funzionali `*-check.cjs`): **100% PASS**.
+  - Audit CDP headless Chrome su Desktop (`1440×900`): confermato `canScrollVertically: false` su tutte le 7 viste principali (`oggi`, `contatti`, `trattative`, `activities`, `projects`, `quotes`, `analytics`), `bodyScrollHeight: 900px` (da 7.965px).
+  - Audit CDP headless Chrome su Mobile (`390×844`): confermato `bodyScrollW: 390` (0 overflow orizzontale) e scrolling naturale verticale su smartphone.
+- **Problemi aperti**:
+  - Nessuno.
+
 ### Sessione 2026-11-13c (Design System Unificato `design-v2.css` + `design-v2-views.css`, Icone SVG Nitide, Pipeline Pipedrive #5 con Striscia Follow-up Urgent & Card 3 Righe, Tabelle Dense 40px e Fix Mobile) — Agente: Google Antigravity
 - **Ultimo commit precedente rilevato**: `5e236a4` (`Merge remote-tracking branch 'origin/main'`) su `main`.
 - **Attività completate**:

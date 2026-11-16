@@ -597,6 +597,8 @@ button.primary:hover {
   margin-bottom: 8px;
   box-shadow: none;
   transition: border-color 0.12s;
+  flex-shrink: 0 !important;
+  height: auto !important;
 }
 
 .deal-container:hover {
@@ -604,33 +606,122 @@ button.primary:hover {
 }
 
 .deal-container .deal {
-  background: transparent;
-  border: 0;
-  padding: 0;
-  text-align: left;
-  width: 100%;
-  box-shadow: none;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  background: transparent !important;
+  border: 0 !important;
+  padding: 0 !important;
+  text-align: left !important;
+  width: 100% !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
 }
 
-.deal-container .deal strong {
-  display: block;
-  font-size: 13.5px;
-  font-weight: 600;
-  color: var(--text);
-  margin: 6px 0 2px;
+.deal-row-top {
+  display: flex !important;
+  align-items: flex-start !important;
+  justify-content: space-between !important;
+  gap: 8px !important;
+  width: 100% !important;
 }
 
-.deal-container .deal p {
-  font-size: 12.5px;
-  color: var(--text-2);
-  margin: 0 0 4px;
+.deal-row-top strong {
+  display: block !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  color: var(--text) !important;
+  margin: 0 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
 }
 
-.deal-container .deal .amount {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text);
-  margin: 4px 0 2px;
+.deal-row-company {
+  display: block !important;
+  font-size: 12px !important;
+  color: var(--text-2) !important;
+  margin: 2px 0 6px !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+.deal-row-meta {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  font-size: 12px !important;
+  width: 100% !important;
+  color: var(--text-3) !important;
+}
+
+.deal-row-meta .amount {
+  font-weight: 600 !important;
+  color: var(--text) !important;
+  font-variant-numeric: tabular-nums !important;
+}
+
+.deal-row-meta .deal-due.is-overdue {
+  color: var(--danger) !important;
+  font-weight: 600 !important;
+}
+
+.deal-hover-actions {
+  display: flex !important;
+  gap: 6px !important;
+  margin-top: 8px !important;
+  padding-top: 6px !important;
+  border-top: 1px solid var(--line) !important;
+}
+
+.deal-hover-actions button {
+  height: 24px !important;
+  padding: 0 8px !important;
+  font-size: 11.5px !important;
+}
+
+/* Task card in activities board */
+.task-card .task-card-body {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  gap: 4px !important;
+  padding: 0 !important;
+}
+
+.task-card-badges {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 4px !important;
+  margin-bottom: 4px !important;
+}
+
+.task-card strong {
+  display: block !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  color: var(--text) !important;
+}
+
+.task-company-line {
+  font-size: 12px !important;
+  color: var(--text-2) !important;
+  margin: 2px 0 !important;
+}
+
+.task-card-actions {
+  display: flex !important;
+  gap: 6px !important;
+  margin-top: 8px !important;
+  padding-top: 6px !important;
+  border-top: 1px solid var(--line) !important;
+}
+
+.task-card-actions button {
+  height: 24px !important;
+  padding: 0 8px !important;
+  font-size: 11.5px !important;
 }
 
 /* ---------- Company 360° Slide-Over Drawer (HubSpot/Attio) ---------- */
@@ -1114,31 +1205,19 @@ button.primary:hover {
 }
 
 /* Home Bento Grid (clean white cards, 1px hairline) */
-.exec-desktop-bento {
-  display: grid !important;
-  grid-template-columns: minmax(0, 1.55fr) minmax(300px, 1fr) !important;
-  gap: 16px !important;
-  align-items: start !important;
-}
-
 .home-operative-section,
 .exec-bento-card,
-.bento-side-col > section {
+.home-side-widget {
   background: var(--surface) !important;
   border: 1px solid var(--line) !important;
-  border-radius: 10px !important;
-  padding: 14px 16px !important;
+  border-radius: var(--r-md) !important;
+  padding: 12px 14px !important;
   box-shadow: none !important;
 }
 
-.bento-side-col {
-  display: grid;
-  gap: 14px;
-}
-
 .home-operative-section .section-title,
-.bento-side-col .section-title {
-  font-size: 14px !important;
+.home-side-widget .section-title {
+  font-size: 13.5px !important;
   font-weight: 600 !important;
   color: var(--text) !important;
 }
@@ -1154,6 +1233,461 @@ button.primary:hover {
 .board .column.stage-3 { border-top-color: #10B981 !important; }
 .board .column.stage-4 { border-top-color: #EF4444 !important; }
 
+/* Thin scrollbars across entire app */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--line-strong) transparent;
+}
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--line-strong);
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--muted);
+}
+
+/* ==========================================================================
+   DESKTOP SINGLE-SCREEN ARCHITECTURE (NO VERTICAL PAGE SCROLL)
+   Desktop viewport (>= 1024px) fits entire UI without window scroll.
+   Horizontal space is leveraged for side-by-side workstation columns.
+   ========================================================================== */
+@media (min-width: 1024px) {
+  html, body {
+    height: 100vh !important;
+    max-height: 100vh !important;
+    overflow: hidden !important;
+  }
+
+  body {
+    display: flex;
+    overflow: hidden !important;
+  }
+
+  aside#app-sidebar {
+    height: 100vh !important;
+    max-height: 100vh !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    flex-shrink: 0;
+  }
+
+  main {
+    height: 100vh !important;
+    max-height: 100vh !important;
+    min-height: 0 !important;
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden !important;
+  }
+
+  main > header {
+    flex-shrink: 0;
+    height: var(--topbar-h, 48px);
+    z-index: 20;
+  }
+
+  .page {
+    flex: 1;
+    min-height: 0;
+    height: calc(100vh - var(--topbar-h, 48px)) !important;
+    max-height: calc(100vh - var(--topbar-h, 48px)) !important;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden !important;
+    padding: 8px 18px 8px !important;
+    margin: 0 !important;
+    max-width: 100% !important;
+  }
+
+  .page-heading {
+    flex-shrink: 0;
+    padding: 2px 0 4px !important;
+    margin: 0 0 6px !important;
+    border-bottom: 1px solid var(--line) !important;
+  }
+
+  .page > footer {
+    display: none !important;
+  }
+
+  #content {
+    flex: 1;
+    min-height: 0;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* 1. Home View: 3 Balanced Workstation Columns (Immediate, Campaigns, Projects/Radar) */
+  .executive-home {
+    flex: 1;
+    min-height: 0;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .exec-action-ribbon.exec-status-bar {
+    flex-shrink: 0;
+    margin-bottom: 8px !important;
+    display: grid !important;
+    grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+    gap: 8px !important;
+  }
+
+  .exec-ribbon-card {
+    height: 38px !important;
+    padding: 4px 10px !important;
+  }
+
+  .exec-desktop-bento {
+    flex: 1;
+    min-height: 0;
+    height: calc(100% - 46px) !important;
+    display: grid !important;
+    grid-template-columns: minmax(360px, 1.35fr) minmax(320px, 1.1fr) minmax(280px, 0.95fr) !important;
+    gap: 12px !important;
+    overflow: hidden !important;
+    align-items: stretch !important;
+  }
+
+  .bento-col {
+    height: 100%;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .bento-col-tasks .home-operative-section {
+    height: 100%;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    margin-bottom: 0 !important;
+  }
+
+  .bento-col-tasks .section-head {
+    flex-shrink: 0;
+    padding-bottom: 4px;
+  }
+
+  .bento-col-tasks .home-task-filter-pills {
+    flex-shrink: 0;
+    margin-bottom: 6px;
+  }
+
+  .bento-col-tasks .unified-tasks-stack {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-width: thin;
+    padding-right: 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .bento-col-campaigns .home-side-widget {
+    height: 100%;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    margin-bottom: 0 !important;
+  }
+
+  .bento-col-campaigns .section-head {
+    flex-shrink: 0;
+    padding-bottom: 4px;
+  }
+
+  .bento-col-campaigns .campaign-summary-banner {
+    flex-shrink: 0;
+    margin-bottom: 6px;
+    padding: 6px 10px;
+  }
+
+  .bento-col-campaigns .suggested-calls-list {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-width: thin;
+    padding-right: 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .bento-col-radar {
+    height: 100%;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    overflow: hidden;
+  }
+
+  .bento-col-radar #sec-projects {
+    flex: 1.1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    margin-bottom: 0 !important;
+  }
+
+  .bento-col-radar #sec-projects .section-head {
+    flex-shrink: 0;
+    padding-bottom: 4px;
+  }
+
+  .bento-col-radar #sec-projects .projects-cockpit-stack {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    padding-right: 2px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .bento-col-radar .home-consultable-tabs {
+    flex: 0.9;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    margin-bottom: 0 !important;
+  }
+
+  .bento-col-radar .home-consultable-tabs details {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .bento-col-radar .home-consultable-tabs summary {
+    flex-shrink: 0;
+  }
+
+  .bento-col-radar .home-consultable-tabs .consultable-content {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    padding-right: 2px;
+  }
+
+  /* 2. Opportunities Pipeline (Kanban & Table) */
+  .pipe-urgent-strip {
+    flex-shrink: 0;
+    margin-bottom: 6px !important;
+  }
+
+  .pipeline-mobile-tabs {
+    display: none !important;
+  }
+
+  .board {
+    flex: 1;
+    min-height: 0;
+    height: 100% !important;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: stretch !important;
+    gap: 10px !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    padding-bottom: 4px !important;
+    margin-bottom: 0 !important;
+  }
+
+  .board .column {
+    height: 100% !important;
+    min-height: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    width: 280px !important;
+    min-width: 250px !important;
+    max-width: 320px !important;
+    flex-shrink: 0 !important;
+    overflow: hidden !important;
+    padding: 8px !important;
+    border-radius: var(--r-md) !important;
+  }
+
+  .board .column-heading,
+  .board .column-value {
+    flex-shrink: 0;
+  }
+
+  .board .column-body {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    scrollbar-width: thin;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding-right: 2px;
+  }
+
+  /* 3. Tables (Aziende, Preventivi, Progetti, Campagne) */
+  .company-phase-chips-bar {
+    flex-shrink: 0;
+    margin-bottom: 6px !important;
+  }
+
+  .toolbar-compact,
+  .toolbar {
+    flex-shrink: 0;
+    margin-bottom: 6px !important;
+  }
+
+  .panel.v2-table,
+  .panel {
+    flex: 1;
+    min-height: 0;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
+    margin-bottom: 0 !important;
+  }
+
+  .panel.v2-table .table-wrap,
+  .panel .table-wrap {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto !important;
+    overflow-x: auto !important;
+    scrollbar-width: thin;
+  }
+
+  .panel.v2-table thead th,
+  .panel thead th {
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 2 !important;
+    background: var(--bg) !important;
+  }
+
+  /* 4. Attività (List, Week, Month, Board) */
+  .v2-stats-strip {
+    flex-shrink: 0;
+    margin-bottom: 6px !important;
+  }
+
+  .v2-activities-head {
+    flex-shrink: 0;
+    margin-bottom: 6px !important;
+  }
+
+  .temporal-groups.v2-groups {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto !important;
+    scrollbar-width: thin;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 10px !important;
+    padding-right: 4px;
+  }
+
+  .temporal-groups .temporal-group {
+    flex-shrink: 0;
+  }
+
+  .cal-month-wrap {
+    flex: 1;
+    min-height: 0;
+    height: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
+  }
+
+  .cal-header,
+  .cal-weekdays {
+    flex-shrink: 0;
+  }
+
+  .cal-month-grid {
+    flex: 1;
+    min-height: 0;
+    grid-template-rows: repeat(auto-fit, minmax(0, 1fr)) !important;
+    overflow-y: auto;
+  }
+
+  .cal-week-grid {
+    flex: 1;
+    min-height: 0;
+    height: 100% !important;
+    overflow-y: hidden !important;
+  }
+
+  .cal-week-col {
+    height: 100% !important;
+    min-height: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  .cal-week-col-head {
+    flex-shrink: 0;
+  }
+
+  .cal-week-col-body {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto !important;
+    scrollbar-width: thin;
+  }
+
+  /* 5. Forecast & KPI (Analytics) */
+  .stats {
+    flex-shrink: 0;
+    margin-bottom: 6px !important;
+  }
+
+  .dashboard {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto !important;
+    scrollbar-width: thin;
+    padding-right: 4px;
+  }
+}
+
+/* Mobile & Tablet Fallbacks (< 1024px) */
+@media (max-width: 1023px) {
+  .exec-desktop-bento {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 14px !important;
+  }
+
+  .bento-col {
+    height: auto !important;
+    min-height: auto !important;
+    overflow: visible !important;
+  }
+}
+
 @media (max-width: 767px) {
   .exec-action-ribbon.exec-status-bar {
     display: flex !important;
@@ -1166,9 +1700,6 @@ button.primary:hover {
     flex: 0 0 185px !important;
     width: auto !important;
     padding: 8px 10px !important;
-  }
-  .exec-desktop-bento {
-    grid-template-columns: 1fr !important;
   }
 }
 
